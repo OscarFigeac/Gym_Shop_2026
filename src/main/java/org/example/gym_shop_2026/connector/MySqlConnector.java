@@ -36,7 +36,8 @@ public class MySqlConnector implements Connector {
         String password = env.getProperty("database.password");
 
         try {
-            this.connection = DriverManager.getConnection("jdbc:mysql://" + url + "/" + database, user, password);
+            Connection conn = DriverManager.getConnection("jdbc:mysql://" + url + "/" + database, user, password);
+            this.connection = conn;
         }
         catch (SQLException e) {
             log.error("Could not connect to database: {}", e.toString());
