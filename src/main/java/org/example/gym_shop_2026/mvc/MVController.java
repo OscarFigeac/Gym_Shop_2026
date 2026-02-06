@@ -2,9 +2,6 @@ package org.example.gym_shop_2026.mvc;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
 /**
  * An MVC controller for handling redirects to named views.
  *
@@ -30,5 +27,15 @@ public class MVController {
     @GetMapping(path = "/login")
     public String login() {
         return "login";
+    }
+
+    /**
+     * Loads register.html page when get requesting /register.
+     *
+     * @return A {@link String} representing a view register.html web page
+     */
+    @GetMapping(path = "/register")
+    public String register() {
+        return "register";
     }
 }
