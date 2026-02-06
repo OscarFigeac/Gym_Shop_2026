@@ -30,9 +30,9 @@ public class MySqlConnector implements Connector {
         }
 
         //Store environment properties
-        String url = env.getProperty("database.url");
-        String database = env.getProperty("database.dbName");
-        String user = env.getProperty("database.user");
+        String url = env.getProperty("database.server");
+        String database = env.getProperty("database.db");
+        String user = env.getProperty("database.username");
         String password = env.getProperty("database.password");
 
         try {
