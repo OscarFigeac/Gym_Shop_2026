@@ -2,6 +2,7 @@ package org.example.gym_shop_2026.services;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
+import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +26,18 @@ public class TwoFactorAuthenticationService {
 
         this.googleAuthenticator = new GoogleAuthenticator(config);
         log.info("2FA service initialised with a 60-second timer.");
+    }
+
+    /**
+     * Takes in a username and generates a unique token for them using
+     * the Google Authentication Library.
+     * @param username The user the key is being generated for.
+     * @return The key String generated for the user.
+     * @author Oscar
+     */
+    public String generateToken(String username){
+        log.info("Generating new 2FA token for user {} ", username );
+        final GoogleAuthenticatorKey key = googleAuthenticator.createCredentials();
+        return key.getKey();
     }
 }
