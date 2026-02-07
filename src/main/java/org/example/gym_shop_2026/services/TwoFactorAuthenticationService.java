@@ -15,7 +15,7 @@ public class TwoFactorAuthenticationService {
 
     private final GoogleAuthenticator googleAuthenticator;
 
-    public TwoFactorAuthenticationService(){
+    public TwoFactorAuthenticationService() {
         // here we add a one-minute timer, as it's set to 30 seconds by default, which
         // could result in the user having trouble to log in.
         // the risk of breaches using past keys does increase. to be discussed.
@@ -34,7 +34,7 @@ public class TwoFactorAuthenticationService {
      * Creates login credentials for the user.
      * @return A unique login credential for each user.
      */
-    public GoogleAuthenticatorKey createCredentials(){
+    public GoogleAuthenticatorKey createCredentials() {
         return googleAuthenticator.createCredentials();
     }
 
@@ -45,7 +45,7 @@ public class TwoFactorAuthenticationService {
      * @param key The object that contains the secret key.
      * @return A URL String object starting with 'otpauth://'
      */
-    public String generateQrCodeUrl(String username, GoogleAuthenticatorKey key){
+    public String generateQrCodeUrl(String username, GoogleAuthenticatorKey key) {
         log.info("Generating QR code for User: {}", username);
         String baseUrl = GoogleAuthenticatorQRGenerator.getOtpAuthURL("GymShop", username, key);
 
@@ -62,9 +62,10 @@ public class TwoFactorAuthenticationService {
      *         between the user's end and the server to agree on what the code should
      *         be.
      */
-    public String generateToken(String username){
-        log.info("Generating new 2FA token for user {} ", username );
+    public String generateToken(String username) {
+        log.info("Generating new 2FA token for user {} ", username);
         final GoogleAuthenticatorKey key = googleAuthenticator.createCredentials();
+
         return key.getKey();
     }
 
@@ -79,12 +80,12 @@ public class TwoFactorAuthenticationService {
      * @param code The number the user will see and enter to verify its identity.
      * @return True if success, false otherwise.
      */
-    public boolean verifyToken(String username, String token, int code){
-        log.debug("Verification attempt for user: {} code: {}" , username, code);
+    public boolean verifyToken(String username, String token, int code) {
+        log.debug("Verification attempt for user: {} code: {}", username, code);
 
         boolean isValid = googleAuthenticator.authorize(token, code);
 
-        if (isValid){
+        if (isValid) {
             log.info("2FA SUCCESS: User: {} has successfully logged in. ", username);
         } else {
             log.warn("2FA ALERT: User: {} failed to provide code. ", username);
