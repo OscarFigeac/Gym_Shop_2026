@@ -20,12 +20,21 @@ public class TwoFactorAuthenticationService {
         // the risk of breaches using past keys does increase. to be discussed.
 
         GoogleAuthenticatorConfig config = new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder()
-                .setTimeStepSizeInMillis(TimeUnit.MILLISECONDS.toMillis(1))
+                .setTimeStepSizeInMillis(TimeUnit.MINUTES.toMillis(1))
                 .setWindowSize(3) // allows a one-minute search through new and old tokens. Three stands for 1 in the past, 1 in the present and 1 in the future
                 .build();
 
         this.googleAuthenticator = new GoogleAuthenticator(config);
         log.info("2FA service initialised with a 60-second timer.");
+    }
+
+    /**
+     * @author Oscar
+     * Creates login credentials for the user.
+     * @return A unique login credential for each user.
+     */
+    public GoogleAuthenticatorKey createCredentials(){
+        return googleAuthenticator.createCredentials();
     }
 
     /**
