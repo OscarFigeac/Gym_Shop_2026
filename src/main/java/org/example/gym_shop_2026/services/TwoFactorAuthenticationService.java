@@ -3,6 +3,7 @@ package org.example.gym_shop_2026.services;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,21 @@ public class TwoFactorAuthenticationService {
      */
     public GoogleAuthenticatorKey createCredentials(){
         return googleAuthenticator.createCredentials();
+    }
+
+    /**
+     * @author Oscar
+     * Generates a URL that'll be turned into a QR on our frontend.
+     * @param username The user's username.
+     * @param key The object that contains the secret key.
+     * @return A URL String object starting with 'otpauth://'
+     */
+    public String generateQrCodeUrl(String username, GoogleAuthenticatorKey key){
+        log.info("Generating QR code for User: {}", username);
+        String baseUrl = GoogleAuthenticatorQRGenerator.getOtpAuthURL("GymShop", username, key);
+
+        // This is basically telling the user end to only refresh every 60 seconds
+        return baseUrl + "&period=60";
     }
 
     /**
