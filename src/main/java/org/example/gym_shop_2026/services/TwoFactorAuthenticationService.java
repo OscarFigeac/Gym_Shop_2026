@@ -29,15 +29,42 @@ public class TwoFactorAuthenticationService {
     }
 
     /**
-     * Takes in a username and generates a unique token for them using
+     * @author Oscar
+     * Takes in a username and generates a unique login token for them using
      * the Google Authentication Library.
      * @param username The user the key is being generated for.
-     * @return The key String generated for the user.
-     * @author Oscar
+     * @return The token to keep track in the database.It also serves as an anchor
+     *         between the user's end and the server to agree on what the code should
+     *         be.
      */
     public String generateToken(String username){
         log.info("Generating new 2FA token for user {} ", username );
         final GoogleAuthenticatorKey key = googleAuthenticator.createCredentials();
         return key.getKey();
+    }
+
+    /**
+     * @author Oscar
+     * Takes in a username, token and code, and using the Google Authentication Library
+     * it authorises the username to log in if they pass the authentication process.
+     * @param username The user attempting to log in.
+     * @param token The token to keep track in the database.It also serves as an anchor
+     *              between the user's end and the server to agree on what the code should
+     *              be.
+     * @param code The number the user will see and enter to verify its identity.
+     * @return True if success, false otherwise.
+     */
+    public boolean verifyToken(String username, String token, int code){
+        log.debug("Verification attempt for user: {} code: {}" , username, code);
+
+        boolean isValid = googleAuthenticator.authorize(token, code);
+
+        if (isValid){
+            log.info("2FA SUCCESS: User: {} has successfully logged in. ", username);
+        } else {
+            log.warn("2FA ALERT: User: {} failed to provide code. ", username);
+        }
+
+        return isValid;
     }
 }
