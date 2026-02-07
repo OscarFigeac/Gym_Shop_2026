@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>header</title>
+</head>
+<body>
+    <header class="nav-content" style="background-color: lawngreen; width: 100%; height: 40px;" th:fragment="header">
+        <div class="" style="float: right">
+            <a th:href="@{/}" class="btn btn-transparent text-light">Home</a>
+            <a th:href="@{/login}" class="btn btn-transparent text-light">Login</a>
+            <a th:href="@{/register}" class="btn btn-transparent text-light">Register</a>
+        </div>
+    </header>
+</body>
+</html>
