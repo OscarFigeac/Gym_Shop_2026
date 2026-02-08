@@ -37,6 +37,8 @@ public class UserDAOImpl implements UserDAO{
                 throw e;
             }
         }
+
+        return false;
     }
 
     @Override
@@ -58,17 +60,15 @@ public class UserDAOImpl implements UserDAO{
         }
         if(dob == null){
             throw new IllegalArgumentException("Date of Birth - Field cannot be null or empty for registration process !");
-        }
-
-        Connection conn = connector.getConnection();
-        if(conn == null){
+        };
+        if(connector.getConnection() == null){
             throw new SQLException("register() - Unable to establish connection to the database !");
         }
 
         String hashPassword = PasswordHasher.hashPassword(pWord);
         int addedRows = 0;
 
-        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO users (username, fullName, userType, email, password, dob) VALUES (?,?,?,?,?,?)")){
+        try(PreparedStatement ps = connector.getConnection().prepareStatement("INSERT INTO users (username, full_name, user_type, email, password, dob) VALUES (?,?,?,?,?,?)")){
             ps.setString(1, uName);
             ps.setString(2, fName);
             ps.setString(3, type);

@@ -3,16 +3,14 @@ package org.example.gym_shop_2026.entities;
 import lombok.*;
 
 
-import java.sql.Time;
 import java.util.Date;
-import java.util.Objects;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 @Getter
 @Builder
 @AllArgsConstructor
-public class Users {
+public class User {
     @EqualsAndHashCode.Include
     @NonNull
     private int user_id;
@@ -28,4 +26,9 @@ public class Users {
     private String password;
     @NonNull
     private Date dob;
+    //2FA
+    @NonNull
+    private String secretKey;
+    @NonNull
+    private boolean is2faEnabled;
 }
