@@ -1,6 +1,7 @@
 package org.example.gym_shop_2026.utils;
 
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 public class PasswordHasher {
     private static final int WORKLOAD = 12;

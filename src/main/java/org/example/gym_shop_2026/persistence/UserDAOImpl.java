@@ -3,9 +3,12 @@ package org.example.gym_shop_2026.persistence;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.utils.PasswordHasher;
+import org.springframework.stereotype.Repository;
+import org.example.gym_shop_2026.utils.PasswordHasher;
 
 import java.sql.*;
 
+@Repository
 @Slf4j
 public class UserDAOImpl implements UserDAO{
     private final Connector connector;
@@ -16,19 +19,16 @@ public class UserDAOImpl implements UserDAO{
 
     @Override
     public boolean login(String uName, String pWord) throws SQLException {
-        Connection conn = connector.getConnection();
-        if(conn == null){
+        if(connector == null){
             throw new SQLException("login() - Unable to establish a connection to the database !");
         }
-
-        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE username = ?")){
+        try(PreparedStatement ps = connector.getConnection().prepareStatement("SELECT * FROM users WHERE username = ?")){
             ps.setString(1, uName);
             try(ResultSet rs = ps.executeQuery()){
                 if(rs.next()){
                     String hashPassword = rs.getString("password");
                     return PasswordHasher.verifyPassword(pWord, hashPassword);
                 }
-                return false;
             }catch (SQLException e){
                 log.error("login() - An issue has arisen when the query was executed or processing the result set. Exception - {}", e.getMessage());
                 throw e;

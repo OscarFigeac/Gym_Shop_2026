@@ -1,5 +1,6 @@
 package org.example.gym_shop_2026.connector;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 
@@ -15,7 +16,7 @@ import java.sql.SQLException;
  */
 @Slf4j
 public class MySqlConnector implements Connector {
-    private Connection connection;
+    @Getter private Connection connection;
 
     /**
      * Instantiates a MySqlConnector object that stores a connection to an SQL database with {@link Environment}

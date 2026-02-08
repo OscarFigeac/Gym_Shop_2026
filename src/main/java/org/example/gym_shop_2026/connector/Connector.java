@@ -4,5 +4,6 @@ import java.sql.Connection;
 
 public interface Connector {
     boolean freeConnection();
+    Connection getConnection();
 
 }
