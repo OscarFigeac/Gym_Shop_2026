@@ -13,5 +13,19 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 public class Users {
-
+    @EqualsAndHashCode.Include
+    @NonNull
+    private int user_id;
+    @NonNull
+    private String username;
+    @NonNull
+    private String fullName;
+    @NonNull
+    private String userType;
+    @NonNull
+    private String email;
+    @NonNull
+    private String password;
+    @NonNull
+    private Date dob;
 }
