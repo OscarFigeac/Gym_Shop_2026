@@ -1,7 +1,12 @@
 package org.example.gym_shop_2026.mvc;
 
+import org.example.gym_shop_2026.services.TwoFactorAuthenticationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 /**
  * An MVC controller for handling redirects to named views.
  *
@@ -9,6 +14,14 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller
 public class MVController {
+
+    private final TwoFactorAuthenticationService tfaService;
+
+    @Autowired
+    public MVController(TwoFactorAuthenticationService tfaService) {
+        this.tfaService = tfaService;
+    }
+
     /**
      * Loads index.html page when get requesting url /.
      *
@@ -37,5 +50,20 @@ public class MVController {
     @GetMapping(path = "/register")
     public String register() {
         return "register";
+    }
+
+    @PostMapping("/confirm-2fa")
+    public String confirm2fa(@RequestParam("code") int code,
+                             @RequestParam("secret") String secret,
+                             java.security.Principal principal){
+
+        String username = principal.getName();
+
+        if (tfaService.verifyToken(username, secret, code)){
+            tfaService.finalize2faSetup(username, secret);
+            return "redirect:/?mfa_success=true";
+        }
+
+        return "redirect:/register?error=invalid_2fa";
     }
 }
