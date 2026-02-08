@@ -28,4 +28,9 @@ public class Users {
     private String password;
     @NonNull
     private Date dob;
+    //2FA
+    @NonNull
+    private String secretKey;
+    @NonNull
+    private boolean is2faEnabled;
 }
