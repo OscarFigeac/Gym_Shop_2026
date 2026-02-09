@@ -107,6 +107,37 @@ public class UserDAOImpl implements UserDAO{
         return user;
     }
 
+    @Override
+    public boolean updateUser (User toBeUpdated) throws SQLException{
+        if(toBeUpdated ==  null){
+            throw new IllegalArgumentException("toBeUpdated - User cannot be null to go through update process !");
+        }
+
+        Connection conn = connector.getConnection();
+        if(conn ==  null){
+            throw new SQLException("updateUser() - Unable to establish a connection to the database !");
+        }
+
+        try(PreparedStatement ps = conn.prepareStatement("UPDATE users SET username = ?, fullName = ?, userType = ?, email = ?, password = ?, dob = ? WHERE user_id = ?")){
+            ps.setString(1, toBeUpdated.getUsername());
+            ps.setString(2, toBeUpdated.getFullName());
+            ps.setString(3, toBeUpdated.getUserType());
+            ps.setString(4, toBeUpdated.getEmail());
+            ps.setString(5, toBeUpdated.getPassword());
+            ps.setDate(6, (Date) toBeUpdated.getDob());
+            ps.setInt(7, toBeUpdated.getUser_id());
+
+            int rowsAffected = ps.executeUpdate();
+
+            if(rowsAffected == 0){
+                log.warn("updateUser() - No User Found With User_ID: {}", toBeUpdated.getUser_id());
+            }
+            return rowsAffected == 1;
+        }catch(SQLException e){
+            log.error("updateUser() - Database Error: {}", e.getMessage());
+            throw e;
+        }
+    }
 
     private static boolean stringValidation(String x){
         return x==null||x.isEmpty();
