@@ -2,9 +2,8 @@ package org.example.gym_shop_2026.persistence;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.connector.Connector;
-import org.example.gym_shop_2026.entities.Users;
+import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.utils.PasswordHasher;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Repository;
 import org.example.gym_shop_2026.utils.PasswordHasher;
 
@@ -37,8 +36,6 @@ public class UserDAOImpl implements UserDAO{
                 throw e;
             }
         }
-
-        return false;
     }
 
     @Override
@@ -87,7 +84,7 @@ public class UserDAOImpl implements UserDAO{
     }
 
     @Override
-    public Users findByUsername(String Username) throws SQLException{
+    public User findByUsername(String Username) throws SQLException{
         if(stringValidation(Username)){
             throw new IllegalArgumentException("Username - Field cannot be null or empty for search function.");
         }
@@ -97,7 +94,7 @@ public class UserDAOImpl implements UserDAO{
             throw new SQLException("findByUsername() - Unable to establish connection to the database !");
         }
 
-        Users user = null;
+        User user = null;
         try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE username = ?")){
             ps.setString(1, Username);
             try(ResultSet rs = ps.executeQuery()){
@@ -115,8 +112,8 @@ public class UserDAOImpl implements UserDAO{
         return x==null||x.isEmpty();
     }
 
-    private static Users mapUserRow(ResultSet rs) throws SQLException {
-        return Users.builder()
+    private static User mapUserRow(ResultSet rs) throws SQLException {
+        return User.builder()
                 .user_id(rs.getInt("user_id"))
                 .username(rs.getString("username"))
                 .fullName(rs.getString("fullName"))
