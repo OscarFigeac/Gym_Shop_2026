@@ -2,6 +2,7 @@ package org.example.gym_shop_2026.persistence;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.connector.Connector;
+import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.utils.PasswordHasher;
 import org.springframework.stereotype.Repository;
 import org.example.gym_shop_2026.utils.PasswordHasher;
@@ -29,13 +30,12 @@ public class UserDAOImpl implements UserDAO{
                     String hashPassword = rs.getString("password");
                     return PasswordHasher.verifyPassword(pWord, hashPassword);
                 }
+                return false;
             }catch (SQLException e){
                 log.error("login() - An issue has arisen when the query was executed or processing the result set. Exception - {}", e.getMessage());
                 throw e;
             }
         }
-
-        return false;
     }
 
     @Override
@@ -83,7 +83,75 @@ public class UserDAOImpl implements UserDAO{
         return addedRows == 1;
     }
 
+    @Override
+    public User findByUsername(String Username) throws SQLException{
+        if(stringValidation(Username)){
+            throw new IllegalArgumentException("Username - Field cannot be null or empty for search function.");
+        }
+
+        Connection conn = connector.getConnection();
+        if(conn == null){
+            throw new SQLException("findByUsername() - Unable to establish connection to the database !");
+        }
+
+        User user = null;
+        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE username = ?")){
+            ps.setString(1, Username);
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()) user = mapUserRow(rs);
+            }
+        } catch (SQLException e) {
+            log.error("findByUsername(): SQL error. \nException: {}", e.getMessage());
+            throw e;
+        }
+        return user;
+    }
+
+    @Override
+    public boolean updateUser (User toBeUpdated) throws SQLException{
+        if(toBeUpdated ==  null){
+            throw new IllegalArgumentException("toBeUpdated - User cannot be null to go through update process !");
+        }
+
+        Connection conn = connector.getConnection();
+        if(conn ==  null){
+            throw new SQLException("updateUser() - Unable to establish a connection to the database !");
+        }
+
+        try(PreparedStatement ps = conn.prepareStatement("UPDATE users SET username = ?, fullName = ?, userType = ?, email = ?, password = ?, dob = ? WHERE user_id = ?")){
+            ps.setString(1, toBeUpdated.getUsername());
+            ps.setString(2, toBeUpdated.getFullName());
+            ps.setString(3, toBeUpdated.getUserType());
+            ps.setString(4, toBeUpdated.getEmail());
+            ps.setString(5, toBeUpdated.getPassword());
+            ps.setDate(6, (Date) toBeUpdated.getDob());
+            ps.setInt(7, toBeUpdated.getUser_id());
+
+            int rowsAffected = ps.executeUpdate();
+
+            if(rowsAffected == 0){
+                log.warn("updateUser() - No User Found With User_ID: {}", toBeUpdated.getUser_id());
+            }
+            return rowsAffected == 1;
+        }catch(SQLException e){
+            log.error("updateUser() - Database Error: {}", e.getMessage());
+            throw e;
+        }
+    }
+
     private static boolean stringValidation(String x){
         return x==null||x.isEmpty();
+    }
+
+    private static User mapUserRow(ResultSet rs) throws SQLException {
+        return User.builder()
+                .user_id(rs.getInt("user_id"))
+                .username(rs.getString("username"))
+                .fullName(rs.getString("fullName"))
+                .userType(rs.getString("userType"))
+                .email(rs.getString("email"))
+                .password(rs.getString("password"))
+                .dob(rs.getDate("dob"))
+                .build();
     }
 }

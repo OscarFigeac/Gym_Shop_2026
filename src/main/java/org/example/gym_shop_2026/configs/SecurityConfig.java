@@ -1,11 +1,15 @@
 package org.example.gym_shop_2026.configs;
 
+import org.example.gym_shop_2026.security.CustomAuthenticationDetailsSource;
+import org.example.gym_shop_2026.security.CustomAuthenticationProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
@@ -34,6 +38,16 @@ public class SecurityConfig {
     @Value("${spring.security.user.password}")
     private String password;
 
+    private final CustomAuthenticationProvider authProvider;
+    private final CustomAuthenticationDetailsSource detailsSource;
+
+    @Autowired
+    public SecurityConfig(CustomAuthenticationProvider authProvider,
+                          CustomAuthenticationDetailsSource detailsSource){
+        this.authProvider = authProvider;
+        this.detailsSource = detailsSource;
+
+    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
@@ -41,12 +55,31 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorizeRequests -> {
-           authorizeRequests.anyRequest().permitAll();
-        })
-        .httpBasic(HttpBasicConfigurer::disable)
-        .formLogin(FormLoginConfigurer::disable)
-        .csrf(CsrfConfigurer::disable);
+        http
+                //enable this for production, testing purposes only for disabling it
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("login-username")
+                        .passwordParameter("login-password")
+                        .authenticationDetailsSource(detailsSource)
+                        .defaultSuccessUrl("/", true)
+                        .permitAll()
+                )
+
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                );
+
+        http.authenticationProvider(authProvider);
 
         return http.build();
     }

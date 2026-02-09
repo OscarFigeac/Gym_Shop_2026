@@ -5,8 +5,12 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gym_shop_2026.entities.User;
+import org.example.gym_shop_2026.persistence.UserDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -14,8 +18,11 @@ import java.util.concurrent.TimeUnit;
 public class TwoFactorAuthenticationService {
 
     private final GoogleAuthenticator googleAuthenticator;
+    private final UserDAO userDAO;
 
-    public TwoFactorAuthenticationService() {
+    @Autowired
+    public TwoFactorAuthenticationService(UserDAO userDAO) {
+        this.userDAO = userDAO;
         // here we add a one-minute timer, as it's set to 30 seconds by default, which
         // could result in the user having trouble to log in.
         // the risk of breaches using past keys does increase. to be discussed.
@@ -92,5 +99,43 @@ public class TwoFactorAuthenticationService {
         }
 
         return isValid;
+    }
+
+    /**
+     * @author Oscar
+     * Sets up the 2FA flag to true after completing setup.
+     * @param username The user completing the setup.
+     * @param generatedSecret The new unique token generated for the user.
+     * @throws SQLException If anything goes wrong with the database at any point.
+     */
+    public void finalize2faSetup(String username, String generatedSecret) throws SQLException {
+        log.info("Finalising setup for User: {}", username);
+        User existingUser = (User) userDAO; //casting it? will it work???
+        if (existingUser != null) {
+            User updatedUser = User.builder()
+                    .user_id(existingUser.getUser_id())
+                    .username(existingUser.getUsername())
+                    .fullName(existingUser.getFullName())
+                    .userType(existingUser.getUserType())
+                    .email(existingUser.getEmail())
+                    .password(existingUser.getPassword())
+                    .dob(existingUser.getDob())
+                    .secretKey(generatedSecret)
+                    .is2faEnabled(true)
+                    .build();
+            userDAO.updateUser(updatedUser);
+        }
+    }
+
+    /**
+     * Generates a QR Image Google Authenticator can understand
+     * @param token the unique token stored in the database for each user
+     * @param username the user the image is being generated for
+     * @return
+     */
+    public String generateQrCodeImageUrl(String token, String username) {
+        // creates a URL that Google Authenticator can understand
+        return "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
+                "otpauth://totp/GymShop:" + username + "?secret=" + token + "&issuer=GymShop";
     }
 }
