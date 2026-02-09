@@ -54,7 +54,7 @@ public class MySqlConnector implements Connector {
      */
     public MySqlConnector(String server, String username, String password, String dbName) {
         try {
-            this.connection = DriverManager.getConnection(server+dbName, username, password);
+            this.connection = DriverManager.getConnection("jdbc:mysql://" + server + "/" + dbName, username, password);
         }
         catch(SQLException e) {
             log.error("Could not connect to database: {}", e.toString());
