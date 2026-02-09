@@ -1,11 +1,8 @@
 package org.example.gym_shop_2026.connector;
 
-import org.example.gym_shop_2026.GymShop2026Application;
-import org.example.gym_shop_2026.GymShop2026ApplicationTests;
 import org.example.gym_shop_2026.configs.ConnectorTestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.SQLException;
