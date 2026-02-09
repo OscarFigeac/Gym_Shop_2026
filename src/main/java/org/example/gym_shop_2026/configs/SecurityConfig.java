@@ -84,14 +84,16 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
 
-        UserDetails user = User.withUsername(username).password(password).roles("ADMIN").build();
-
-        manager.createUser(user);
-
-        return manager;
-    }
+    // commented out because CustomAuthenticationProvider uses the UserDAO and database directly
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+//
+//        UserDetails user = User.withUsername(username).password(password).roles("ADMIN").build();
+//
+//        manager.createUser(user);
+//
+//        return manager;
+//    }
 }
