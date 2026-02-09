@@ -18,7 +18,7 @@ public class User {
     private String username;
     @NonNull
     private String fullName;
-    @NonNull
+    @NonNull //change to enum
     private String userType;
     @NonNull
     private String email;
