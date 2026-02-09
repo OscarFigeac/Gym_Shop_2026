@@ -133,7 +133,7 @@ public class TwoFactorAuthenticationService {
      * @param username the user the image is being generated for
      * @return
      */
-    public String generateQrCodeImageUri(String token, String username) {
+    public String generateQrCodeImageUrl(String token, String username) {
         // creates a URL that Google Authenticator can understand
         return "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
                 "otpauth://totp/GymShop:" + username + "?secret=" + token + "&issuer=GymShop";
