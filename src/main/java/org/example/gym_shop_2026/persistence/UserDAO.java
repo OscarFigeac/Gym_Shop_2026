@@ -9,5 +9,8 @@ public interface UserDAO {
     boolean login(String username, String password) throws SQLException;
     boolean register(String username, String fullName, String userType, String eMail, String passWord, Date birthDay) throws SQLException;
     User findByUsername(String Username) throws SQLException;
+    boolean createUser(User toBeCreated) throws SQLException;
+    boolean findUserByID(int userId) throws SQLException;
     boolean updateUser(User toBeUpdated) throws SQLException;
+    boolean deleteUser(User toBeDeleted) throws SQLException;
 }

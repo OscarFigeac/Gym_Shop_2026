@@ -18,6 +18,8 @@ public class UserDAOImpl implements UserDAO{
         this.connector = connector;
     }
 
+    //Functionality:
+
     @Override
     public boolean login(String uName, String pWord) throws SQLException {
         if(connector == null){
@@ -107,6 +109,10 @@ public class UserDAOImpl implements UserDAO{
         return user;
     }
 
+    //CRUD Methods:
+
+
+
     @Override
     public boolean updateUser (User toBeUpdated) throws SQLException{
         if(toBeUpdated ==  null){
@@ -138,6 +144,8 @@ public class UserDAOImpl implements UserDAO{
             throw e;
         }
     }
+
+    //Private Methods:
 
     private static boolean stringValidation(String x){
         return x==null||x.isEmpty();

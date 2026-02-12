@@ -15,6 +15,8 @@ public class UserService {
         this.userDao = userDao;
     }
 
+    //Functionality Methods
+
     public boolean loginUser(String username, String password) throws SQLException {
         return userDao.login(username, password);
     }
@@ -27,5 +29,5 @@ public class UserService {
         return userDao.findByUsername(toBeFound);
     }
 
-
+    //CRUD Methods
 }
