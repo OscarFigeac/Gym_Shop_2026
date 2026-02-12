@@ -30,4 +30,17 @@ public class UserService {
     }
 
     //CRUD Methods
+
+    public boolean createUser (User toBeCreated) throws SQLException{
+        return userDao.createUser(toBeCreated);
+    }
+    public User readUser (int UserID) throws SQLException{
+        return userDao.findUserByID(UserID);
+    }
+    public boolean updateUser (User toBeUpdated) throws SQLException{
+        return userDao.updateUser(toBeUpdated);
+    }
+    public boolean deleteUser (User toBeDeleted) throws SQLException{
+        return userDao.deleteUser(toBeDeleted);
+    }
 }
