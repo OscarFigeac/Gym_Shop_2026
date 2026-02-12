@@ -143,6 +143,30 @@ public class UserDAOImpl implements UserDAO{
     }
 
     @Override
+    public User findUserByID(int ID) throws SQLException{
+        if(ID <= 0){
+            throw new IllegalArgumentException("ID - ID cannot be less than or equal to zero for search process !");
+        }
+
+        Connection conn = connector.getConnection();
+        if(conn == null){
+            throw new SQLException("findUserByID - Unable to establish a connection to the database !");
+        }
+
+        User found = null;
+        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE user_id = ?")){
+            ps.setInt(1, ID);
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()) found = mapUserRow(rs);
+            }
+        } catch (SQLException e) {
+            log.error("findByUsername(): SQL error. \nException: {}", e.getMessage());
+            throw e;
+        }
+        return found;
+    }
+
+    @Override
     public boolean updateUser (User toBeUpdated) throws SQLException{
         if(toBeUpdated ==  null){
             throw new IllegalArgumentException("toBeUpdated - User cannot be null to go through update process !");
