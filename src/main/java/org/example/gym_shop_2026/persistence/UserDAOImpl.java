@@ -193,9 +193,36 @@ public class UserDAOImpl implements UserDAO{
             }
             return rowsAffected == 1;
         }catch(SQLException e){
-            log.error("updateUser() - Database Error: {}", e.getMessage());
+            log.error("updateUser() - The SQL query could not be executed or prepared by the program. Exception: {}", e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public boolean deleteUser (User toBeDeleted) throws SQLException{
+        if(toBeDeleted == null){
+            throw new IllegalArgumentException("toBeDeleted - User cannot be null to go through deletion process !");
+        }
+
+        Connection conn = connector.getConnection();
+        if(conn == null){
+            throw new SQLException("deleteUser() - Unable to establish a connection to the database !");
+        }
+
+        int affectedRows = 0;
+
+        try(PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE user_id = ?")){
+            ps.setInt(1, toBeDeleted.getUser_id());
+
+            affectedRows = ps.executeUpdate();
+            if(affectedRows == 0){
+                log.warn("deleteUser() - No User Found With User_ID: {}", toBeDeleted.getUser_id());
+            }
+        }catch(SQLException e){
+            log.error("deleteUser() - The SQL query could not be executed or prepared by the program. Exception: {}", e.getMessage());
+            throw e;
+        }
+        return affectedRows == 1;
     }
 
     //Private Methods:
