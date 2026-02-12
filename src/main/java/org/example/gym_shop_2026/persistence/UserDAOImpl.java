@@ -111,7 +111,36 @@ public class UserDAOImpl implements UserDAO{
 
     //CRUD Methods:
 
+    @Override
+    public boolean createUser(User toBeCreated) throws SQLException{
+        if(toBeCreated == null){
+            throw new IllegalArgumentException("toBeCreated - User cannot be null to go through creation process !");
+        }
 
+        Connection conn = connector.getConnection();
+        if(conn == null){
+            throw new SQLException("createUser() - Unable to establish a connection to the database !");
+        }
+
+        int addedRows = 0;
+
+        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO users (username, fullname, usertype, email, password, dob) VALUES (?,?,?,?,?,?)")){
+            ps.setString(1, toBeCreated.getUsername());
+            ps.setString(2, toBeCreated.getFullName());
+            ps.setString(3, toBeCreated.getUserType());
+            ps.setString(4, toBeCreated.getEmail());
+            ps.setString(5, toBeCreated.getPassword());
+            ps.setDate(6, (Date) toBeCreated.getDob());
+
+            addedRows = ps.executeUpdate();
+        }catch(SQLIntegrityConstraintViolationException e){
+            log.error("createUser() - Username \"{}\" is not available !", toBeCreated.getUsername());
+        }catch(SQLException e){
+            log.error("createUser() - The SQL query could not be executed or prepared by the program. Exception: {}", e.getMessage());
+            throw e;
+        }
+        return addedRows == 1;
+    }
 
     @Override
     public boolean updateUser (User toBeUpdated) throws SQLException{
