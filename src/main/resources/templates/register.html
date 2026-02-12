@@ -3,32 +3,166 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home : Gym Shop</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Register | Gym Shop 2026</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .gym-container {
+            border: 2px solid #adff2f;
+            background-color: #111;
+            padding: 30px;
+            margin-top: 60px;
+        }
+
+        .gym-title {
+            background-color: #adff2f;
+            color: #000;
+            display: inline-block;
+            padding: 5px 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            color: #adff2f;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .form-control {
+            background-color: #000;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 0;
+            padding: 12px;
+        }
+
+        .form-control:focus {
+            background-color: #000;
+            border-color: #adff2f;
+            color: #fff;
+            box-shadow: 0 0 5px rgba(173, 255, 47, 0.5);
+        }
+
+        .btn-gym {
+            background-color: #adff2f;
+            color: #000;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 0;
+            width: 100%;
+            padding: 15px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-gym:hover {
+            box-shadow: 0 0 15px #adff2f;
+            transform: scale(1.02);
+            background-color: #fff;
+            color: #000;
+        }
+
+        .gym-alert {
+            background-color: #000;
+            border: 2px solid #ff0000;
+            color: #ff0000;
+            padding: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Validation*/
+        .was-validated .form-control:valid {
+            border-color: #adff2f !important;
+            background-image: none;
+        }
+
+        .was-validated .form-control:invalid {
+            border-color: #ff0000 !important;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #adff2f;
+            font-size: 0.9rem;
+            font-weight: bold;
+            user-select: none;
+        }
+    </style>
 </head>
 <body>
-<header th:replace="~{fragments/header}">
 
-</header>
-<main>
-    <form onsubmit="registerValidation()" th:action="@{/}" method="post">
-        <legend>Register</legend>
-        <label for="fName">First name</label> <br> <br>
-        <input type="text" name="fName" id="fName" placeholder="Enter your first name" minlength="3" required>
-        <label for="lName">Last name</label> <br> <br>
-        <input type="text" name="lName" id="lName" placeholder="Enter your last name" minlength="3" required>
-        <label for="eMail">E-mail address</label> <br> <br>
-        <input type="email" name="eMail" id="eMail" placeholder="Enter your email address" required>
-        <label for="username">Username</label> <br> <br>
-        <input type="text" name="username" id="username" placeholder="Enter desired username" required>
-        <label for="password">Password</label> <br> <br>
-        <input type="password" name="password" id="password" placeholder="Enter desired password" minlength="8" required>
-        <label for="pass-repeat"></label> <br> <br>
-        <input type="password" name="passRepeat" id="pass-repeat" minLength="8" required>
-        <button type="submit">Register</button>
-    </form>
+<header th:replace="~{fragments/header :: mainHeader}"></header>
+
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 gym-container">
+            <h2 class="gym-title">Create Account</h2>
+
+            <form th:action="@{/login}" method="post" class="needs-validation" novalidate>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="fName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="fName" name="fName" placeholder="FIRST NAME" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lName" name="lName" placeholder="SECOND NAME" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="eMail" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="eMail" name="eMail" placeholder="NAME@EXAMPLE.COM" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="reg-username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="reg-username" name="username" placeholder="CHOOSE A USERNAME" required>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="reg-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="reg-password" name="password" placeholder="MIN 8 CHARS" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="passRepeat" class="form-label">Repeat Password</label>
+                        <input type="password" class="form-control" id="passRepeat" name="passRepeat" placeholder="CONFIRM PASSWORD" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-gym">Join the Club</button>
+
+                <div class="text-center mt-4">
+                    <a th:href="@{/login}" class="text-muted text-decoration-none small">
+                        ALREADY A MEMBER? <span style="color: #adff2f; font-weight: bold;">LOG IN</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-<script defer src="/js/validation.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
