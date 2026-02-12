@@ -1,17 +1,40 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>header</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <header class="nav-content" style="background-color: lawngreen; width: 100%; height: 40px;" th:fragment="header">
-        <div class="" style="float: right">
-            <a th:href="@{/}" class="btn btn-transparent text-light">Home</a>
-            <a th:href="@{/login}" class="btn btn-transparent text-light">Login</a>
-            <a th:href="@{/register}" class="btn btn-transparent text-light">Register</a>
+<div th:fragment="header">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom" style="border-color: #adff2f !important; border-width: 3px !important;">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/" style="color: #adff2f;">
+                [Logo - In development]
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            Products
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="#">Supplements</a></li>
+                            <li><a class="dropdown-item" href="#">Equipment</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#">Locations</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex">
+                    <a th:href="@{/login}" class="btn btn-outline-light me-2">Login</a>
+                    <a th:href="@{/register}" class="btn text-black fw-bold" style="background-color: #adff2f;">Sign Up</a>
+                </div>
+            </div>
         </div>
-    </header>
+    </nav>
+</div>
 </body>
 </html>
