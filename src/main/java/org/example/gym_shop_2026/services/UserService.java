@@ -1,5 +1,6 @@
 package org.example.gym_shop_2026.services;
 
+import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.persistence.UserDAO;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +19,12 @@ public class UserService {
         return userDao.login(username, password);
     }
 
-    public boolean register(String username, String fullName, String userType, String eMail, String password, Date DoB) throws SQLException{
+    public boolean registerUser (String username, String fullName, String userType, String eMail, String password, Date DoB) throws SQLException{
         return userDao.register(username, fullName, userType, eMail, password, DoB);
+    }
+
+    public User findUser (String toBeFound) throws SQLException{
+        return userDao.findByUsername(toBeFound);
     }
 
 
