@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS transactions(
     amount_paid DECIMAL(8, 2) NOT NULL,
     transaction_date TIMESTAMP NOT NULL,
     status VARCHAR(255),
-    CONSTRAINT fk_users FOREIGN KEY(user_id) REFERENCES users(user_id),
+    CONSTRAINT fk_transactionsusers FOREIGN KEY(user_id) REFERENCES users(user_id),
     CONSTRAINT fk_subscriptions FOREIGN KEY(plan_id) REFERENCES subscriptions(plan_id),
     CONSTRAINT fk_paymentmethods FOREIGN KEY(method_id) REFERENCES payment_methods(method_id)
 );
@@ -64,6 +64,6 @@ CREATE TABLE IF NOT EXISTS products(
 CREATE TABLE IF NOT EXISTS productslocations(
     product_id INT NOT NULL,
     location_id INT NOT NULL,
-    CONSTRAINT fk_products FOREIGN KEY(product_id) REFERENCES products(product_id),
-    CONSTRAINT fk_locations FOREIGN KEY(location_id) REFERENCES locations(location_id)
+    CONSTRAINT fk_productslocationsproducts FOREIGN KEY(product_id) REFERENCES products(product_id),
+    CONSTRAINT fk_productslocationslocations FOREIGN KEY(location_id) REFERENCES locations(location_id)
 );
