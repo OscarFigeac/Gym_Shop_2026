@@ -108,12 +108,27 @@ public class MVController {
         userDAO.updateUser(newUser); //HAVE A LOOK AT THIS. MIGHT NEED A SAVE METHOD INSTEAD OF USING THE UPDATE ONE
 
         String secret = tfaService.generateToken(username);
-        String qrCodeUrl = tfaService.generateQrCodeImageUrl(secret, username);
+        String qrCodeUrl = tfaService.generateQrCodeImageUri(secret, username);
 
+        //passing data into the next form page (setup-2fa.html)
         model.addAttribute("username", username);
         model.addAttribute("secret", secret);
         model.addAttribute("qrCodeUrl", qrCodeUrl);
 
         return "setup-2fa";
     }
+
+    @PostMapping("/confirm-2fa")
+    public String confirm2fa(@RequestParam("code") int code,
+                             @RequestParam("secret")String secret,
+                             @RequestParam("username") String username) throws SQLException {
+        if (tfaService.verifyToken(username, secret, code)){
+            tfaService.finalize2faSetup(username, secret);
+
+            return "redirect:/login?registered=true";
+        }
+
+        return "redirect:/setup-2fa?error=invalid_code";
+    }
+
 }
