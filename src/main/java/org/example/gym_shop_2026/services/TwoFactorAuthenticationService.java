@@ -110,7 +110,8 @@ public class TwoFactorAuthenticationService {
      */
     public void finalize2faSetup(String username, String generatedSecret) throws SQLException {
         log.info("Finalising setup for User: {}", username);
-        User existingUser = (User) userDAO; //casting it? will it work???
+        User existingUser = userDAO.findByUsername(username);
+        
         if (existingUser != null) {
             User updatedUser = User.builder()
                     .user_id(existingUser.getUser_id())
@@ -123,7 +124,11 @@ public class TwoFactorAuthenticationService {
                     .secretKey(generatedSecret)
                     .is2faEnabled(true)
                     .build();
+
             userDAO.updateUser(updatedUser);
+        }else{
+            log.error("2FA: Failed to finalise setup. User: {} could not be found in the database.", username);
+            throw new SQLException("User not found during 2FA finalisation.");
         }
     }
 
@@ -133,7 +138,7 @@ public class TwoFactorAuthenticationService {
      * @param username the user the image is being generated for
      * @return
      */
-    public String generateQrCodeImageUrl(String token, String username) {
+    public String generateQrCodeImageUri(String token, String username) {
         // creates a URL that Google Authenticator can understand
         return "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
                 "otpauth://totp/GymShop:" + username + "?secret=" + token + "&issuer=GymShop";
