@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.sql.Date;
 import java.sql.SQLException;
 
 /**
  * An MVC controller for handling redirects to named views.
  *
- * @author Cal Woods
+ * @author Oscar Figeac & Cal Woods
  */
 @Controller
 public class MVController {
@@ -62,73 +63,60 @@ public class MVController {
         return "register";
     }
 
-    /**
-     * @author Oscar
-     * Looks for a tag named code within the login.html file to trigger the authentication process.
-     *
-     * @param code The 6-digit code to authenticate.
-     * @param secret The unique String token.
-     * @param principal The User object.
-     * @return a String to redirect the user to whether a success page or an invalid one.
-     */
-    @PostMapping("/confirm-2fa")
-    public String confirm2fa(@RequestParam("code") int code,
-                             @RequestParam("secret") String secret,
-                             java.security.Principal principal) throws SQLException {
-
-        String username = principal.getName();
-
-        if (tfaService.verifyToken(username, secret, code)){
-            tfaService.finalize2faSetup(username, secret);
-            return "redirect:/?mfa_success=true";
-        }
-
-        return "redirect:/register?error=invalid_2fa";
-    }
-
     @PostMapping("/register")
     public String registerUser(@RequestParam String fName,
                                @RequestParam String lName,
                                @RequestParam String eMail,
                                @RequestParam String username,
                                @RequestParam String password,
+                               @RequestParam(required = false) String dob,
                                Model model) throws SQLException {
 
-        String encodedPassword = passwordEncoder.encode(password);
+        //converting html date into java.sql.date for dao readability
+        Date sqlDate = (dob != null && !dob.isEmpty())
+                ? Date.valueOf(dob)
+                : new Date(System.currentTimeMillis());
 
-        User newUser = User.builder()
-                .username(username)
-                .fullName(fName + " " + lName)
-                .email(eMail)
-                .password(encodedPassword)
-                .userType("customer")
-                .is2faEnabled(false)
-                .build();
+        boolean isRegistered = userDAO.register(username, fName + " " +
+                lName, "customer", eMail, password, sqlDate);
 
-        userDAO.updateUser(newUser); //HAVE A LOOK AT THIS. MIGHT NEED A SAVE METHOD INSTEAD OF USING THE UPDATE ONE
+        if (isRegistered){
+            String secret = tfaService.generateToken(username);
+            String qrCodeUrl = tfaService.generateQrCodeImageUri(secret, username);
 
-        String secret = tfaService.generateToken(username);
-        String qrCodeUrl = tfaService.generateQrCodeImageUri(secret, username);
+            model.addAttribute("username", username);
+            model.addAttribute("secret", secret);
+            model.addAttribute("qrCodeUrl", qrCodeUrl);
 
-        //passing data into the next form page (setup-2fa.html)
-        model.addAttribute("username", username);
-        model.addAttribute("secret", secret);
-        model.addAttribute("qrCodeUrl", qrCodeUrl);
+            return "setup-2fa";
+        }
 
-        return "setup-2fa";
+        return "redirect:/register?error=registration_failed";
     }
 
+    /**
+     * @author Oscar
+     * Looks for a tag named code within the login.html file to trigger the authentication process.
+     *
+     * @param code The 6-digit code to authenticate.
+     * @param secret The unique String token.
+     * @param username The user being authenticated.
+     * @return a String to redirect the user to whether a success page or an invalid one.
+     */
     @PostMapping("/confirm-2fa")
     public String confirm2fa(@RequestParam("code") int code,
-                             @RequestParam("secret")String secret,
+                             @RequestParam("secret") String secret,
                              @RequestParam("username") String username) throws SQLException {
+
         if (tfaService.verifyToken(username, secret, code)){
             tfaService.finalize2faSetup(username, secret);
 
             return "redirect:/login?registered=true";
         }
 
-        return "redirect:/setup-2fa?error=invalid_code";
+        return "redirect:/setup-2fa?error=invalid_code&username=" + username + "&secret=" + secret;
     }
+
+
 
 }
