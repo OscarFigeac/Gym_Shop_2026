@@ -31,8 +31,7 @@ import static org.springframework.security.config.Elements.CSRF;
 
 /**
  * Configuration class for Spring Security.
- *
- * @author Cal Woods
+ * @author Oscar Figeac & Cal Woods
  */
 @Configuration
 @EnableWebSecurity
