@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Your Gains | Gym Shop 2026</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .gym-container {
+            border: 2px solid #adff2f;
+            background-color: #111;
+            padding: 30px;
+            margin-top: 60px;
+        }
+
+        .gym-title {
+            background-color: #adff2f;
+            color: #000;
+            display: inline-block;
+            padding: 5px 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            color: #adff2f;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .form-control {
+            background-color: #000;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 0;
+            padding: 12px;
+        }
+
+        .form-control:focus {
+            background-color: #000;
+            border-color: #adff2f;
+            color: #fff;
+            box-shadow: 0 0 5px rgba(173, 255, 47, 0.5);
+        }
+
+        .btn-gym {
+            background-color: #adff2f;
+            color: #000;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 0;
+            width: 100%;
+            padding: 15px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-gym:hover {
+            box-shadow: 0 0 15px #adff2f;
+            transform: scale(1.02);
+            background-color: #fff;
+            color: #000;
+        }
+
+        .gym-alert {
+            background-color: #000;
+            border: 2px solid #ff0000;
+            color: #ff0000;
+            padding: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .qr-wrapper {
+            background-color: #fff;
+            padding: 15px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .secret-key {
+            color: #adff2f;
+            font-family: monospace;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            background: #222;
+            padding: 5px 10px;
+        }
+
+        .manual-box {
+            border: 1px dashed #adff2f;
+            background-color: #000;
+            padding: 20px;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: mainHeader}"></header>
+
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 gym-container text-center">
+            <h2 class="gym-title">DON'T LOSE YOUR GAINS!</h2>
+
+            <p class="mb-4 small text-uppercase" style="letter-spacing: 1px;">
+                Scan the code with Google Authenticator to enable security
+            </p>
+
+            <div th:if="${param.error}" class="gym-alert">
+                INVALID CODE - PLEASE TRY AGAIN
+            </div>
+
+            <div class="qr-wrapper">
+                <img th:src="${qrCodeUrl}" alt="2FA QR Code" width="200" height="200">
+            </div>
+
+            <div class="manual-box">
+                <p class="small text-uppercase mb-2" style="color: #adff2f;">Can't scan the code?</p>
+                <p class="small mb-3 text-muted">Tap "+" in the app and select "Enter a setup key"</p>
+
+                <div class="mb-3">
+                    <label class="form-label d-block" style="font-size: 0.7rem;">Account Name</label>
+                    <span class="text-white">GymShop: <span th:text="${username}">Username</span></span>
+                </div>
+
+                <div>
+                    <label class="form-label d-block" style="font-size: 0.7rem;">Your Secret Key</label>
+                    <span class="secret-key" th:text="${secret}">SECRETKEY123</span>
+                </div>
+            </div>
+
+            <hr style="border-color: #444; margin: 30px 0;">
+
+            <form id="setupForm" th:action="@{/confirm-2fa}" method="post">
+                <input type="hidden" name="username" th:value="${username}">
+                <input type="hidden" name="secret" th:value="${secret}">
+
+                <div class="mb-4 text-start">
+                    <label for="code" class="form-label">Enter 6-Digit Authenticator Code</label>
+                    <input type="text" class="form-control text-center fw-bold" id="code" name="code"
+                           placeholder="000 000" maxlength="6" inputmode="numeric" required
+                           style="font-size: 1.5rem; letter-spacing: 5px;">
+                </div>
+
+                <button type="submit" class="btn-gym">Verify & Finish Setup</button>
+            </form>
+
+            <div class="mt-4">
+                <a th:href="@{/login}" class="text-muted text-decoration-none small">
+                    CANCEL AND RETURN TO <span style="color: #adff2f;">LOGIN</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

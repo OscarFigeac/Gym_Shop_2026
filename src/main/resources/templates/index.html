@@ -1,16 +1,115 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org/">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Home : Gym Shop</title>
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-	</head>
-	<body>
-		<header th:replace="~{fragments/header}"></header>
-		<main>
-			<h1 th:text="#{welcome.message}" style="text-align: center"></h1>
-		</main>
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-	</body>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Home : Gym Shop 2026</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		body {
+			background-color: #000;
+			color: #fff;
+			font-family: sans-serif;
+		}
+
+		.placeholder-box {
+			border: 2px solid #adff2f;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			font-weight: bold;
+			color: #adff2f;
+			text-transform: uppercase;
+		}
+
+		.banner-placeholder {
+			height: 400px;
+			width: 100%;
+			margin: 2rem 0;
+		}
+
+		.product-square {
+			height: 250px;
+			width: 100%;
+			background-color: #111;
+		}
+
+		.section-title {
+			background-color: #adff2f;
+			color: #000;
+			display: inline-block;
+			padding: 8px 25px;
+			font-weight: 900;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+		}
+
+		.next-indicator {
+			color: #adff2f;
+			font-size: 4rem;
+			cursor: pointer;
+			transition: transform 0.2s;
+		}
+
+		.next-indicator:hover {
+			transform: translateX(10px);
+		}
+	</style>
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="container py-4">
+
+	<section class="row">
+		<div class="col-12">
+			<div class="placeholder-box banner-placeholder">
+				[Slideshow banner - In development]
+			</div>
+		</div>
+	</section>
+
+	<section class="mt-5">
+		<div class="row mb-4">
+			<div class="col-12">
+				<h2 class="section-title">Best Sellers</h2>
+			</div>
+		</div>
+
+		<div class="row g-4">
+			<div class="col-6 col-lg-3">
+				<div class="placeholder-box product-square">
+					[In development]
+				</div>
+			</div>
+			<div class="col-6 col-lg-3">
+				<div class="placeholder-box product-square">
+					[In development]
+				</div>
+			</div>
+			<div class="col-6 col-lg-3">
+				<div class="placeholder-box product-square">
+					[In development]
+				</div>
+			</div>
+			<div class="col-6 col-lg-3">
+				<div class="placeholder-box product-square">
+					[In development]
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-12 text-end">
+				<span class="next-indicator">&#10141;</span>
+			</div>
+		</div>
+	</section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

@@ -11,27 +11,27 @@ import java.sql.*;
 
 @Repository
 @Slf4j
-public class UserDAOImpl implements UserDAO{
+public class UserDAOImpl implements UserDAO {
     private final Connector connector;
 
-    public UserDAOImpl(Connector connector){
+    public UserDAOImpl(Connector connector) {
         this.connector = connector;
     }
 
     @Override
     public boolean login(String uName, String pWord) throws SQLException {
-        if(connector == null){
+        if (connector == null) {
             throw new SQLException("login() - Unable to establish a connection to the database !");
         }
-        try(PreparedStatement ps = connector.getConnection().prepareStatement("SELECT * FROM users WHERE username = ?")){
+        try (PreparedStatement ps = connector.getConnection().prepareStatement("SELECT * FROM users WHERE username = ?")) {
             ps.setString(1, uName);
-            try(ResultSet rs = ps.executeQuery()){
-                if(rs.next()){
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
                     String hashPassword = rs.getString("password");
                     return PasswordHasher.verifyPassword(pWord, hashPassword);
                 }
                 return false;
-            }catch (SQLException e){
+            } catch (SQLException e) {
                 log.error("login() - An issue has arisen when the query was executed or processing the result set. Exception - {}", e.getMessage());
                 throw e;
             }
@@ -39,33 +39,33 @@ public class UserDAOImpl implements UserDAO{
     }
 
     @Override
-    public boolean register(String uName, String fName, String type, String eMail, String pWord, Date dob) throws SQLException{
-        if(stringValidation(uName)){
+    public boolean register(String uName, String fName, String type, String eMail, String pWord, Date dob) throws SQLException {
+        if (stringValidation(uName)) {
             throw new IllegalArgumentException("Username - Field cannot be null or empty for registration process !");
         }
-        if(stringValidation(fName)){
+        if (stringValidation(fName)) {
             throw new IllegalArgumentException("Full Name - Field cannot be null or empty for registration process !");
         }
-        if(stringValidation(type)){
+        if (stringValidation(type)) {
             throw new IllegalArgumentException("User Type - Field cannot be null or empty for registration process !");
         }
-        if(stringValidation(eMail)){
+        if (stringValidation(eMail)) {
             throw new IllegalArgumentException("E-Mail - Field cannot be null or empty for registration process !");
         }
-        if(stringValidation(pWord)){
+        if (stringValidation(pWord)) {
             throw new IllegalArgumentException("Password - Field cannot be null or empty for registration process !");
         }
-        if(dob == null){
+        if (dob == null) {
             throw new IllegalArgumentException("Date of Birth - Field cannot be null or empty for registration process !");
-        };
-        if(connector.getConnection() == null){
+        }
+        if (connector.getConnection() == null) {
             throw new SQLException("register() - Unable to establish connection to the database !");
         }
 
         String hashPassword = PasswordHasher.hashPassword(pWord);
         int addedRows = 0;
 
-        try(PreparedStatement ps = connector.getConnection().prepareStatement("INSERT INTO users (username, full_name, user_type, email, password, dob) VALUES (?,?,?,?,?,?)")){
+        try (PreparedStatement ps = connector.getConnection().prepareStatement("INSERT INTO users (username, full_name, user_type, email, password, dob) VALUES (?,?,?,?,?,?)")) {
             ps.setString(1, uName);
             ps.setString(2, fName);
             ps.setString(3, type);
@@ -74,9 +74,9 @@ public class UserDAOImpl implements UserDAO{
             ps.setDate(6, dob);
 
             addedRows = ps.executeUpdate();
-        }catch(SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             log.error("register() - Username \"{}\" unavailable !", uName);
-        }catch(SQLException e){
+        } catch (SQLException e) {
             log.error("register() - The SQL query could not be executed or prepared by the program. Exception: {}", e.getMessage());
             throw e;
         }
@@ -84,21 +84,21 @@ public class UserDAOImpl implements UserDAO{
     }
 
     @Override
-    public User findByUsername(String Username) throws SQLException{
-        if(stringValidation(Username)){
+    public User findByUsername(String Username) throws SQLException {
+        if (stringValidation(Username)) {
             throw new IllegalArgumentException("Username - Field cannot be null or empty for search function.");
         }
 
         Connection conn = connector.getConnection();
-        if(conn == null){
+        if (conn == null) {
             throw new SQLException("findByUsername() - Unable to establish connection to the database !");
         }
 
         User user = null;
-        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE username = ?")){
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE username = ?")) {
             ps.setString(1, Username);
-            try(ResultSet rs = ps.executeQuery()){
-                if(rs.next()) user = mapUserRow(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) user = mapUserRow(rs);
             }
         } catch (SQLException e) {
             log.error("findByUsername(): SQL error. \nException: {}", e.getMessage());
@@ -108,39 +108,42 @@ public class UserDAOImpl implements UserDAO{
     }
 
     @Override
-    public boolean updateUser (User toBeUpdated) throws SQLException{
-        if(toBeUpdated ==  null){
+    public boolean updateUser(User toBeUpdated) throws SQLException {
+        if (toBeUpdated == null) {
             throw new IllegalArgumentException("toBeUpdated - User cannot be null to go through update process !");
         }
 
         Connection conn = connector.getConnection();
-        if(conn ==  null){
+        if (conn == null) {
             throw new SQLException("updateUser() - Unable to establish a connection to the database !");
         }
 
-        try(PreparedStatement ps = conn.prepareStatement("UPDATE users SET username = ?, fullName = ?, userType = ?, email = ?, password = ?, dob = ? WHERE user_id = ?")){
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE users SET username = ?, fullName = ?, userType = ?, email = ?, password = ?, dob = ?, secret_key = ?, is_2fa_enabled = ? WHERE user_id = ?")) {
             ps.setString(1, toBeUpdated.getUsername());
             ps.setString(2, toBeUpdated.getFullName());
             ps.setString(3, toBeUpdated.getUserType());
             ps.setString(4, toBeUpdated.getEmail());
             ps.setString(5, toBeUpdated.getPassword());
             ps.setDate(6, (Date) toBeUpdated.getDob());
-            ps.setInt(7, toBeUpdated.getUser_id());
+            // 2FA fields
+            ps.setString(7, toBeUpdated.getSecretKey());
+            ps.setBoolean(8, toBeUpdated.is2faEnabled());
+            ps.setInt(9, toBeUpdated.getUser_id());
 
             int rowsAffected = ps.executeUpdate();
 
-            if(rowsAffected == 0){
+            if (rowsAffected == 0) {
                 log.warn("updateUser() - No User Found With User_ID: {}", toBeUpdated.getUser_id());
             }
             return rowsAffected == 1;
-        }catch(SQLException e){
+        } catch (SQLException e) {
             log.error("updateUser() - Database Error: {}", e.getMessage());
             throw e;
         }
     }
 
-    private static boolean stringValidation(String x){
-        return x==null||x.isEmpty();
+    private static boolean stringValidation(String x) {
+        return x == null || x.isEmpty();
     }
 
     private static User mapUserRow(ResultSet rs) throws SQLException {
@@ -152,6 +155,9 @@ public class UserDAOImpl implements UserDAO{
                 .email(rs.getString("email"))
                 .password(rs.getString("password"))
                 .dob(rs.getDate("dob"))
+                //2FA fields
+                .secretKey(rs.getString("secret_key"))
+                .is2faEnabled(rs.getBoolean("is_2fa_enabled"))
                 .build();
     }
 }
