@@ -40,7 +40,8 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
          User user = (User) result.getPrincipal();
 
          if (!user.is2faEnabled()){
-             log.info("2FA is not enabled for User: {}", user.getUsername());
+             //logger.info("2FA is not enabled for User: {}");
+             log.info("2FA is not enabled for User: {}" , user.getUsername());
              return result;
          }
 
