@@ -2,6 +2,7 @@ package org.example.gym_shop_2026.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.entities.User;
+import org.example.gym_shop_2026.persistence.UserDAO;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.example.gym_shop_2026.services.TwoFactorAuthenticationService;
@@ -10,15 +11,22 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
+
 @Slf4j
 @Component
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
-    @Autowired
     private TwoFactorAuthenticationService tfaService;
+    private UserDAO userDAO;
 
-    public CustomAuthenticationProvider(UserDetailsService userDetailsService) {
+    @Autowired
+    public CustomAuthenticationProvider(UserDetailsServiceImpl userDetailsService,
+                                        TwoFactorAuthenticationService tfaService,
+                                        UserDAO userDAO) {
         super(userDetailsService);
+        this.tfaService = tfaService;
+        this.userDAO = userDAO;
     }
 
     /**
@@ -34,35 +42,34 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     public Authentication authenticate(Authentication auth){
          Authentication result = super.authenticate(auth);
 
-         CustomWebAuthenticationDetails details = (CustomWebAuthenticationDetails) auth.getDetails();
-         String verificationCode = details.getVerificationCode();
+         org.springframework.security.core.userdetails.User springUser =
+                 (org.springframework.security.core.userdetails.User) result.getPrincipal();
 
-         User user = (User) result.getPrincipal();
+         org.example.gym_shop_2026.entities.User dbUser;
 
-         if (!user.is2faEnabled()){
-             //logger.info("2FA is not enabled for User: {}");
-             log.info("2FA is not enabled for User: {}" , user.getUsername());
+         try{
+             dbUser = userDAO.findByUsername(springUser.getUsername());
+         } catch (SQLException e) {
+             throw new BadCredentialsException("Security Database Error");
+         }
+
+         if (!dbUser.is2faEnabled()){
+             log.info("2FA is not enabled for User: {}", dbUser.getUsername());
              return result;
          }
 
-         String userSecret = user.getSecretKey();
+        CustomWebAuthenticationDetails details = (CustomWebAuthenticationDetails) auth.getDetails();
+        String verificationCode = details.getVerificationCode();
 
-         //is it a BadCredentials Exception?
-         if (verificationCode == null || verificationCode.trim().isEmpty()){
-             throw new BadCredentialsException("2FA is enabled for this user. Please use your authenticator to access your account.");
-         }
+        if (verificationCode == null || verificationCode.trim().isEmpty()){
+            throw new BadCredentialsException("2FA Required");
+        }
 
-         try{
-             int code = Integer.parseInt(verificationCode.replaceAll("\\s+", ""));
+        int code = Integer.parseInt(verificationCode.replaceAll("\\s+", ""));
+        if (!tfaService.verifyToken(dbUser.getUsername(), dbUser.getSecretKey(), code)) {
+            throw new BadCredentialsException("Incorrect 2FA Code");
+        }
 
-             if (!tfaService.verifyToken(user.getUsername(), userSecret, code)){
-                 throw new BadCredentialsException("The code is incorrect or has expired.");
-             }
-         } catch (NumberFormatException e){
-             throw new BadCredentialsException("Invalid format. Please enter a 6 digit code.");
-         }
-
-         log.info("User: {} fully authenticated. Starting session." , user.getUsername());
-         return result;
+        return result;
     }
 }
