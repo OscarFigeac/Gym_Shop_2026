@@ -58,30 +58,29 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> {
-            try{
-                org.example.gym_shop_2026.entities.User user = userDAO.findByUsername(username);
-                if (user == null){
-                    throw new UsernameNotFoundException("User not found: " + username);
-                }
-
-                // returns the spring security user object mapped from our database user
-                return org.springframework.security.core.userdetails.User.builder()
-                        .username(user.getUsername())
-                        .password(user.getPassword())
-                        .disabled(false)
-                        .accountExpired(false)
-                        .credentialsExpired(false)
-                        .accountLocked(false)
-                        .authorities("USER")
-                        .build();
-            } catch (SQLException e){
-                throw new UsernameNotFoundException("Database error during authentication", e);
-            }
-        };
-    }
+//    public UserDetailsService userDetailsService() {
+//        return username -> {
+//            try{
+//                org.example.gym_shop_2026.entities.User user = userDAO.findByUsername(username);
+//                if (user == null){
+//                    throw new UsernameNotFoundException("User not found: " + username);
+//                }
+//
+//                // returns the spring security user object mapped from our database user
+//                return org.springframework.security.core.userdetails.User.builder()
+//                        .username(user.getUsername())
+//                        .password(user.getPassword())
+//                        .disabled(false)
+//                        .accountExpired(false)
+//                        .credentialsExpired(false)
+//                        .accountLocked(false)
+//                        .authorities("USER")
+//                        .build();
+//            } catch (SQLException e){
+//                throw new UsernameNotFoundException("Database error during authentication", e);
+//            }
+//        };
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
