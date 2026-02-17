@@ -18,6 +18,8 @@ public class UserDAOImpl implements UserDAO {
         this.connector = connector;
     }
 
+    //Functionality:
+
     @Override
     public boolean login(String uName, String pWord) throws SQLException {
         if (connector == null) {
@@ -107,6 +109,63 @@ public class UserDAOImpl implements UserDAO {
         return user;
     }
 
+    //CRUD Methods:
+
+    @Override
+    public boolean createUser(User toBeCreated) throws SQLException{
+        if(toBeCreated == null){
+            throw new IllegalArgumentException("toBeCreated - User cannot be null to go through creation process !");
+        }
+
+        Connection conn = connector.getConnection();
+        if(conn == null){
+            throw new SQLException("createUser() - Unable to establish a connection to the database !");
+        }
+
+        int addedRows = 0;
+
+        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO users (username, fullname, usertype, email, password, dob) VALUES (?,?,?,?,?,?)")){
+            ps.setString(1, toBeCreated.getUsername());
+            ps.setString(2, toBeCreated.getFullName());
+            ps.setString(3, toBeCreated.getUserType());
+            ps.setString(4, toBeCreated.getEmail());
+            ps.setString(5, toBeCreated.getPassword());
+            ps.setDate(6, (Date) toBeCreated.getDob());
+
+            addedRows = ps.executeUpdate();
+        }catch(SQLIntegrityConstraintViolationException e){
+            log.error("createUser() - Username \"{}\" is not available !", toBeCreated.getUsername());
+        }catch(SQLException e){
+            log.error("createUser() - The SQL query could not be executed or prepared by the program. Exception: {}", e.getMessage());
+            throw e;
+        }
+        return addedRows == 1;
+    }
+
+    @Override
+    public User findUserByID(int ID) throws SQLException{
+        if(ID <= 0){
+            throw new IllegalArgumentException("ID - ID cannot be less than or equal to zero for search process !");
+        }
+
+        Connection conn = connector.getConnection();
+        if(conn == null){
+            throw new SQLException("findUserByID - Unable to establish a connection to the database !");
+        }
+
+        User found = null;
+        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE user_id = ?")){
+            ps.setInt(1, ID);
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()) found = mapUserRow(rs);
+            }
+        } catch (SQLException e) {
+            log.error("findByUsername(): SQL error. \nException: {}", e.getMessage());
+            throw e;
+        }
+        return found;
+    }
+
     @Override
     public boolean updateUser(User toBeUpdated) throws SQLException {
         if (toBeUpdated == null) {
@@ -142,6 +201,35 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
+    @Override
+    public boolean deleteUser (User toBeDeleted) throws SQLException{
+        if(toBeDeleted == null){
+            throw new IllegalArgumentException("toBeDeleted - User cannot be null to go through deletion process !");
+        }
+
+        Connection conn = connector.getConnection();
+        if(conn == null){
+            throw new SQLException("deleteUser() - Unable to establish a connection to the database !");
+        }
+
+        int affectedRows = 0;
+
+        try(PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE user_id = ?")){
+            ps.setInt(1, toBeDeleted.getUser_id());
+
+            affectedRows = ps.executeUpdate();
+            if(affectedRows == 0){
+                log.warn("deleteUser() - No User Found With User_ID: {}", toBeDeleted.getUser_id());
+            }
+        }catch(SQLException e){
+            log.error("deleteUser() - The SQL query could not be executed or prepared by the program. Exception: {}", e.getMessage());
+            throw e;
+        }
+        return affectedRows == 1;
+    }
+
+    //Private Methods:
+
     private static boolean stringValidation(String x) {
         return x == null || x.isEmpty();
     }
@@ -161,3 +249,5 @@ public class UserDAOImpl implements UserDAO {
                 .build();
     }
 }
+
+
