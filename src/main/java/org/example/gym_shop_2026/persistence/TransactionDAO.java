@@ -32,10 +32,10 @@ public interface TransactionDAO {
      * new Transaction object.
      * @param transactionId Given transaction id
      * @param newTransaction Given {@link Transaction} object with changed data.
-     * @return {@link Transaction} object that was inserted
+     * @return Number of rows affected by delete.
      * @throws SQLException If operation fails
      */
-    Transaction UpdateTransactionById(int transactionId, Transaction newTransaction) throws SQLException;
+    int updateTransactionById(int transactionId, Transaction newTransaction) throws SQLException;
 
     /**
      * Deletes a transaction using transaction id.
@@ -45,5 +45,4 @@ public interface TransactionDAO {
      * @throws SQLException If operation fails.
      */
     Transaction deleteTransactionById(int transactionId) throws SQLException;
-
 }
