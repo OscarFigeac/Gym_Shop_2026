@@ -3,7 +3,7 @@ package org.example.gym_shop_2026.entities;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Getter
@@ -18,7 +18,7 @@ public class Transaction {
     private int planId;
     private int methodId;
     private double amountPaid;
-    private LocalTime transactionDate;
+    private LocalDateTime transactionDate;
 
     @Setter
     private String status;
