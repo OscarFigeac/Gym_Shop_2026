@@ -29,6 +29,5 @@ public class Product {
     @NonNull
     private final int inStock;
 
-    @NonNull
     private final int storeId;
 }
