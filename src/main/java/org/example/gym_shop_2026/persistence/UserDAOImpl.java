@@ -5,7 +5,7 @@ import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.utils.PasswordHasher;
 import org.springframework.stereotype.Repository;
-import org.example.gym_shop_2026.utils.PasswordHasher;
+
 
 import java.sql.*;
 
