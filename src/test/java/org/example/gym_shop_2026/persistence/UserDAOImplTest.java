@@ -8,6 +8,9 @@ import org.mockito.Mock;
 import org.mockito.internal.matchers.Null;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.sql.Date;
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserDAOImplTest {
@@ -59,4 +62,5 @@ class UserDAOImplTest {
             this.userDAO.login("testUser123", "test123");
         });
     }
+
 }
