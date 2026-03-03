@@ -2,6 +2,8 @@ package org.example.gym_shop_2026.configs;
 
 import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.connector.MySqlConnector;
+import org.example.gym_shop_2026.persistence.TransactionDAO;
+import org.example.gym_shop_2026.persistence.TransactionDAOImpl;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 
