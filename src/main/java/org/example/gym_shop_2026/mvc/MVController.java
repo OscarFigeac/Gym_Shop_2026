@@ -1,6 +1,5 @@
 package org.example.gym_shop_2026.mvc;
 
-import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.persistence.UserDAO;
 import org.example.gym_shop_2026.services.TwoFactorAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;

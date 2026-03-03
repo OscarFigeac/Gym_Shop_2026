@@ -7,7 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @SpringBootTest(classes = ConnectorTestConfig.class)
