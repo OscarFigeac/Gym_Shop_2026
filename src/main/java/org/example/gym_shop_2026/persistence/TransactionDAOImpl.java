@@ -23,7 +23,7 @@ public class TransactionDAOImpl implements TransactionDAO {
     public boolean createTransaction(Transaction newTransaction) throws SQLException {
         if(newTransaction == null) {
             log.error("Could not perform create transaction operation as given Transaction object was null!");
-            throw new SQLException("Could not perform create transaction operation as given Transaction object was null!");
+            throw new IllegalArgumentException("Could not perform create transaction operation as given Transaction object was null!");
         }
 
 
