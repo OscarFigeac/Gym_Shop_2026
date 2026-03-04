@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS users(
 	password VARCHAR(72) NOT NULL,
 	dob DATE NOT NULL,
     address VARCHAR(255),
-    eircode CHAR(8)
+    eircode CHAR(8),
+    secret_key VARCHAR(255) NOT NULL,
+    is_2fa_enabled BOOLEAN NOT NULL
 );
 
 # CREATE TABLE IF NOT EXISTS locations(
