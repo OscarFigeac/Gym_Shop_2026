@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS users(
     eircode CHAR(8)
 );
 
-CREATE TABLE IF NOT EXISTS locations(
-	location_id INT AUTO_INCREMENT PRIMARY KEY,
-	location_addresscode VARCHAR(255) NOT NULL
-);
+# CREATE TABLE IF NOT EXISTS locations(
+# 	location_id INT AUTO_INCREMENT PRIMARY KEY,
+# 	location_address_code VARCHAR(255) NOT NULL
+# );
 
 CREATE TABLE IF NOT EXISTS subscriptions(
     plan_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -61,9 +61,9 @@ CREATE TABLE IF NOT EXISTS products(
     CONSTRAINT fk_locations FOREIGN KEY(location_id) REFERENCES locations(location_id)
 );
 
-CREATE TABLE IF NOT EXISTS productslocations(
-    product_id INT NOT NULL,
-    location_id INT NOT NULL,
-    CONSTRAINT fk_productslocationsproducts FOREIGN KEY(product_id) REFERENCES products(product_id),
-    CONSTRAINT fk_productslocationslocations FOREIGN KEY(location_id) REFERENCES locations(location_id)
-);
+# CREATE TABLE IF NOT EXISTS productslocations(
+#     product_id INT NOT NULL,
+#     location_id INT NOT NULL,
+#     CONSTRAINT fk_productslocationsproducts FOREIGN KEY(product_id) REFERENCES products(product_id),
+#     CONSTRAINT fk_productslocationslocations FOREIGN KEY(location_id) REFERENCES locations(location_id)
+# );
