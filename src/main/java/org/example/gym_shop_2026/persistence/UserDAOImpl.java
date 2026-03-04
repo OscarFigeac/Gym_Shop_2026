@@ -123,7 +123,7 @@ public class UserDAOImpl implements UserDAO {
 
         int addedRows = 0;
 
-        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO users (username, fullname, usertype, email, password, dob) VALUES (?,?,?,?,?,?)")){
+        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO users (username, full_name, user_type, email, password, dob) VALUES (?,?,?,?,?,?)")){
             ps.setString(1, toBeCreated.getUsername());
             ps.setString(2, toBeCreated.getFullName());
             ps.setString(3, toBeCreated.getUserType());
@@ -176,7 +176,7 @@ public class UserDAOImpl implements UserDAO {
             throw new SQLException("updateUser() - Unable to establish a connection to the database !");
         }
 
-        try (PreparedStatement ps = conn.prepareStatement("UPDATE users SET username = ?, fullName = ?, userType = ?, email = ?, password = ?, dob = ?, secret_key = ?, is_2fa_enabled = ? WHERE user_id = ?")) {
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE users SET username = ?, full_name = ?, user_type = ?, email = ?, password = ?, dob = ?, secret_key = ?, is_2fa_enabled = ? WHERE user_id = ?")) {
             ps.setString(1, toBeUpdated.getUsername());
             ps.setString(2, toBeUpdated.getFullName());
             ps.setString(3, toBeUpdated.getUserType());
