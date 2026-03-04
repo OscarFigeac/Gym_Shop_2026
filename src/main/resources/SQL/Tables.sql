@@ -2,6 +2,14 @@ CREATE DATABASE IF NOT EXISTS `gymshopdb`;
 CREATE DATABASE IF NOT EXISTS gymshopdbtest;
 
 -- Run in each database
+# CREATE TABLE IF NOT EXISTS addresses (
+#     address_id INT AUTO_INCREMENT PRIMARY KEY,
+#     user_id INT NOT NULL,
+#     address VARCHAR(255),
+#     eircode CHAR(8) NOT NULL,
+#     CONSTRAINT fk_addresses_users FOREIGN KEY(user_id) REFERENCES users(user_id)
+# );
+
 CREATE TABLE IF NOT EXISTS users(
 	user_id INT AUTO_INCREMENT PRIMARY KEY,
 	username VARCHAR(255) NOT NULL,
