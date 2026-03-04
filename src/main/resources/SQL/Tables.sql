@@ -66,9 +66,7 @@ CREATE TABLE IF NOT EXISTS products(
     product_category VARCHAR(255),
     name VARCHAR(255) NOT NULL,
     price DECIMAL(8, 2) NOT NULL,
-    in_stock TINYINT NOT NULL,
-    location_id INT,
-    CONSTRAINT fk_locations FOREIGN KEY(location_id) REFERENCES locations(location_id)
+    in_stock TINYINT NOT NULL
 );
 
 # CREATE TABLE IF NOT EXISTS productslocations(
