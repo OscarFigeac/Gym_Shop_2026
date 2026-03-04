@@ -5,6 +5,8 @@ import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.entities.Subscription;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -21,9 +23,40 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
         this.connector = connector;
     }
 
+    /**
+     * Creates new {@link Subscription} record in configured connection storage.
+     * @param subscription Given created {@link Subscription} object
+     * @return True if operation successful
+     */
     @Override
-    public boolean createSubscription(Subscription subscription) {
-        return false;
+    public boolean createSubscription(Subscription subscription) throws SQLException {
+        if(subscription == null) {
+            log.error("Could not perform create subscription operation as given new Subscription object was null!");
+            throw new IllegalArgumentException("Could not perform create subscription operation as given new Subscription object was null!");
+        }
+
+        int rowsAffected = 0;
+
+        try(PreparedStatement ps = connector.getConnection().prepareStatement("INSERT INTO subscriptions(description, plan_name, plan_price, plan_duration)" +
+                "VALUES(?, ?, ?, ?)")) {
+            ps.setString(1, subscription.getDescription());
+            ps.setString(2, subscription.getPlanName());
+            ps.setDouble(3, subscription.getPlanPrice());
+            ps.setInt(4, subscription.getPlanDuration());
+
+            try {
+                rowsAffected = ps.executeUpdate();
+                return rowsAffected == 1;
+            }
+            catch(SQLException e) {
+                log.error("Could not perform create subscription operation as update failed to execute! {}", e);
+                throw new SQLException("Could not perform create subscription operation as update failed to execute!");
+            }
+        }
+        catch(SQLException e) {
+            log.error("Could not perform create subscription operation as there was a problem inserting into configured storage! {}", e);
+            throw new SQLException("Could not perform create subscription operation as there was a problem with inserting into configured storage!");
+        }
     }
 
     @Override
