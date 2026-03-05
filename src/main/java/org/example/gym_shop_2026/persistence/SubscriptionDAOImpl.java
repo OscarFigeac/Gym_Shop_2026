@@ -162,8 +162,36 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
      * @throws SQLException If operation fails
      */
     @Override
-    public Subscription deleteSubscriptionByPlanId(int planId) {
-        return null;
+    public Subscription deleteSubscriptionByPlanId(int planId) throws SQLException {
+        if(validatePlanId(planId) == false) {
+            log.error("Could not perform delete subscription by id operation as given planId < 1!");
+            throw new IllegalArgumentException("Could not perform delete subscription by id operation as given planId < 1!");
+        }
+
+        Subscription deletedSubscription = getSubscriptionById(planId);
+
+        if(deletedSubscription == null) {
+            log.info("Could not perform delete subscription by id operation as stored subscription does not exist!");
+            return deletedSubscription;
+        }
+
+        try(PreparedStatement ps = connector.getConnection().prepareStatement("DELETE FROM subscriptions WHERE plan_id = ?")) {
+            ps.setInt(1, planId);
+
+            try {
+                ps.executeUpdate();
+            }
+            catch(SQLException e) {
+                log.error("Could not perform delete subscription by id! {}", e.toString());
+                throw e;
+            }
+        }
+        catch(SQLException e) {
+            log.error("Could not perform delete subscription by id! {}", e.toString());
+            throw e;
+        }
+
+        return deletedSubscription;
     }
 
     /**
