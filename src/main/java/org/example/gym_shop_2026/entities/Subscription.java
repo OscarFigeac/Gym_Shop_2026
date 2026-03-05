@@ -15,10 +15,10 @@ import lombok.*;
 @AllArgsConstructor
 public class Subscription {
     @Setter(AccessLevel.NONE)
-    @EqualsAndHashCode.Include private int planId;
+    @EqualsAndHashCode.Include private int planId = 1;
 
-    @NonNull private String description;
     @NonNull private String planName;
+    @NonNull private String description;
     @NonNull private double planPrice;
     @NonNull private int planDuration;
 }
