@@ -29,6 +29,8 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
      * Creates new {@link Subscription} record in configured connection storage.
      * @param subscription Given created {@link Subscription} object
      * @return True if operation successful
+     *
+     * @throws SQLException If operation fails
      */
     @Override
     public boolean createSubscription(Subscription subscription) throws SQLException {
@@ -61,6 +63,11 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
         }
     }
 
+    /**
+     * Gets all subscriptions from configured connection.
+     * @return {@link List<Subscription>} of found subscriptions or a blank {@link List<Subscription>}
+     * @throws SQLException If operation fails
+     */
     @Override
     public List<Subscription> getAllSubscriptions() throws SQLException {
         List<Subscription> subscriptions = new ArrayList<>();
