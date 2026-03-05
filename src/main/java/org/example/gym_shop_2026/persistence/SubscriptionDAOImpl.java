@@ -6,7 +6,9 @@ import org.example.gym_shop_2026.entities.Subscription;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -77,5 +79,26 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
     @Override
     public Subscription deleteSubscriptionByPlanId(int planId) {
         return null;
+    }
+
+    private Subscription mapSubscriptionRow(ResultSet rs) throws SQLException {
+        if(rs == null) {
+            log.error("Could not map subscription object row as Subscription object was null!");
+            throw new IllegalArgumentException("Could not map subscription object row as Subscription object was null!");
+        }
+        if(rs.isClosed()) {
+            log.error("Could not map subscription object row as Subscription object was closed!");
+            throw new IllegalArgumentException("Could not map subscription object row as Subscription object was closed!");
+        }
+
+        Subscription subscription = new Subscription(
+                rs.getInt(1),
+                rs.getString(2),
+                rs.getString(3),
+                rs.getDouble(4),
+                rs.getInt(5)
+        );
+
+        return subscription;
     }
 }
