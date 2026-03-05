@@ -36,7 +36,9 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
     public boolean createSubscription(Subscription subscription) throws SQLException {
         if(validateSubscription(subscription) == false) {
             log.error("Could not perform create subscription operation as given subscription contained errors! See logs.");
+            throw new IllegalArgumentException("Could not perform create subscription operation as given subscription contained errors!");
         }
+
         int rowsAffected = 0;
 
         try(PreparedStatement ps = connector.getConnection().prepareStatement("INSERT INTO subscriptions(description, plan_name, plan_price, plan_duration)" +
