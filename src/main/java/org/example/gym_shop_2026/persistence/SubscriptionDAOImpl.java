@@ -37,7 +37,6 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
         if(validateSubscription(subscription) == false) {
             log.error("Could not perform create subscription operation as given subscription contained errors! See logs.");
         }
-
         int rowsAffected = 0;
 
         try(PreparedStatement ps = connector.getConnection().prepareStatement("INSERT INTO subscriptions(description, plan_name, plan_price, plan_duration)" +
@@ -89,6 +88,12 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
         }
     }
 
+    /**
+     * Gets a subscription from configured storage matching given planId value.
+     * @param planId Given {@link Subscription} plan id
+     * @return {@link Subscription} object containing found subscription data or null if not found
+     * @throws SQLException If operation fails
+     */
     @Override
     public Subscription getSubscriptionById(int planId) throws SQLException {
         if (validatePlanId(planId) == false) {
@@ -117,16 +122,38 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
         return null;
     }
 
+    /**
+     * Updates a subscription in configured storage.
+     * @param planId Given stored {@link Subscription} plan id
+     * @param newSubscription Given new {@link Subscription} to replace old stored subscription
+     * @return True if update successful
+     *
+     * @throws SQLException If operation fails
+     *
+     * @implNote Does not update stored plan id, but updates everything else to newSubscription values
+     */
     @Override
     public boolean updateSubscription(int planId, Subscription newSubscription) {
         return false;
     }
 
+    /**
+     * Deletes subscription from configured storage.
+     * @param planId Given plan id
+     * @return Deleted stored subscription if planId matches or null if not found.
+     * @throws SQLException If operation fails
+     */
     @Override
     public Subscription deleteSubscriptionByPlanId(int planId) {
         return null;
     }
 
+    /**
+     * Maps results from given {@link ResultSet} to a {@link Subscription} object.
+     * @param rs Given {@link ResultSet} object
+     * @return {@link Subscription} containing {@link ResultSet} values or null if {@link ResultSet}
+     * @throws SQLException
+     */
     private Subscription mapSubscriptionRow(ResultSet rs) throws SQLException {
         if(rs == null) {
             log.error("Could not map subscription object row as Subscription object was null!");
