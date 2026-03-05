@@ -62,8 +62,25 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
     }
 
     @Override
-    public List<Subscription> getAllSubscriptions() {
-        return List.of();
+    public List<Subscription> getAllSubscriptions() throws SQLException {
+        List<Subscription> subscriptions = new ArrayList<>();
+
+        try(PreparedStatement ps = connector.getConnection().prepareStatement("SELECT * FROM subscriptions")) {
+            try(ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    subscriptions.add(mapSubscriptionRow(rs));
+                }
+                return subscriptions;
+            }
+            catch(SQLException e) {
+                log.error("Could not perform get all subscriptions as there was a problem getting the information from connection! {}", e.toString());
+                throw e;
+            }
+        }
+        catch(SQLException e) {
+            log.error("Could not get all subscriptions from configured storage! {}", e.toString());
+            throw e;
+        }
     }
 
     @Override
