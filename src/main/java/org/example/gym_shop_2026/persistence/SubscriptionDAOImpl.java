@@ -51,12 +51,12 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
                 return rowsAffected == 1;
             }
             catch(SQLException e) {
-                log.error("Could not perform create subscription operation as update failed to execute! {}", e);
+                log.error("Could not perform create subscription operation as update failed to execute! {}", e.toString());
                 throw new SQLException("Could not perform create subscription operation as update failed to execute!");
             }
         }
         catch(SQLException e) {
-            log.error("Could not perform create subscription operation as there was a problem inserting into configured storage! {}", e);
+            log.error("Could not perform create subscription operation as there was a problem inserting into configured storage! {}", e.toString());
             throw new SQLException("Could not perform create subscription operation as there was a problem with inserting into configured storage!");
         }
     }
