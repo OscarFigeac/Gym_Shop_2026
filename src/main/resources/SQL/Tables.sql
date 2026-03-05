@@ -23,12 +23,6 @@ CREATE TABLE IF NOT EXISTS users(
     secret_key VARCHAR(255) NOT NULL,
     is_2fa_enabled BOOLEAN NOT NULL
 );
-
-# CREATE TABLE IF NOT EXISTS locations(
-# 	location_id INT AUTO_INCREMENT PRIMARY KEY,
-# 	location_address_code VARCHAR(255) NOT NULL
-# );
-
 CREATE TABLE IF NOT EXISTS subscriptions(
     plan_id INT AUTO_INCREMENT PRIMARY KEY,
     description VARCHAR(255) NOT NULL,
@@ -36,6 +30,26 @@ CREATE TABLE IF NOT EXISTS subscriptions(
     plan_price DECIMAL(8, 2) NOT NULL,
     plan_duration INT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS products(
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_category VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(8, 2) NOT NULL,
+    in_stock TINYINT NOT NULL
+);
+
+# CREATE TABLE IF NOT EXISTS locations(
+# 	location_id INT AUTO_INCREMENT PRIMARY KEY,
+# 	location_address_code VARCHAR(255) NOT NULL
+# );
+
+
+# CREATE TABLE IF NOT EXISTS subscriptions_users(
+#     plan_id INT NOT NULL,
+#     user_id INT NOT NULL,
+#     CONSTRAINT fk_subscriptionsusers_subscriptions FOREIGN KEY(plan_id) REFERENCES subscriptions(plan_id),
+#     CONSTRAINT fk_subscriptionsusers_users FOREIGN KEY(user_id) REFERENCES users(user_id)
+# );
 
 CREATE TABLE IF NOT EXISTS payment_methods(
     method_id INT AUTO_INCREMENT PRIMARY KEY,
