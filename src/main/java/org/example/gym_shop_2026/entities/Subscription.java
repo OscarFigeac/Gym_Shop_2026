@@ -12,6 +12,7 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class Subscription {
     @Setter(AccessLevel.NONE)
     @EqualsAndHashCode.Include private int planId;
