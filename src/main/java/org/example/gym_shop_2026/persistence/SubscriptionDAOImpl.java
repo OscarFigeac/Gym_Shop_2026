@@ -125,4 +125,35 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
 
         return subscription;
     }
+
+    /**
+     * Validates given plan id.
+     * @param planId Given plan id
+     * @return True if given plan id is > 0, else false
+     */
+    private static boolean validatePlanId(int planId) {
+        if(planId <= 0) {
+            log.error("Could not validate given planId as it was less than zero!");
+        }
+
+        return planId > 0;
+    }
+
+    /**
+     * Validates given {@link Subscription} object.
+     * @param subscription Given {@link Subscription} object
+     * @return True if validation successful, else false
+     */
+    private static boolean validateSubscription(Subscription subscription) {
+        if(subscription == null) {
+            log.error("Could not validate given subscription as it was null!");
+            return false;
+        }
+        if(validatePlanId(subscription.getPlanId())) {
+            log.error("Given subscription contains bad planId value < 1!");
+            return false;
+        }
+
+        return true;
+    }
 }
