@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS payment_methods(
     card_type VARCHAR(12) NOT NULL,
     is_valid TINYINT NOT NULL,
     is_primary TINYINT NOT NULL,
-    CONSTRAINT fk_users FOREIGN KEY(user_id) REFERENCES users(user_id)
+    CONSTRAINT fk_paymentmethods_users FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE IF NOT EXISTS transactions(
@@ -70,17 +70,9 @@ CREATE TABLE IF NOT EXISTS transactions(
     amount_paid DECIMAL(8, 2) NOT NULL,
     transaction_date TIMESTAMP NOT NULL,
     status VARCHAR(255),
-    CONSTRAINT fk_transactionsusers FOREIGN KEY(user_id) REFERENCES users(user_id),
-    CONSTRAINT fk_subscriptions FOREIGN KEY(plan_id) REFERENCES subscriptions(plan_id),
-    CONSTRAINT fk_paymentmethods FOREIGN KEY(method_id) REFERENCES payment_methods(method_id)
-);
-
-CREATE TABLE IF NOT EXISTS products(
-    product_id INT AUTO_INCREMENT PRIMARY KEY,
-    product_category VARCHAR(255),
-    name VARCHAR(255) NOT NULL,
-    price DECIMAL(8, 2) NOT NULL,
-    in_stock TINYINT NOT NULL
+    CONSTRAINT fk_transactions_users FOREIGN KEY(user_id) REFERENCES users(user_id),
+    CONSTRAINT fk_transactions_subscriptions FOREIGN KEY(plan_id) REFERENCES subscriptions(plan_id),
+    CONSTRAINT fk_transactions_paymentmethods FOREIGN KEY(method_id) REFERENCES payment_methods(method_id)
 );
 
 # CREATE TABLE IF NOT EXISTS productslocations(
