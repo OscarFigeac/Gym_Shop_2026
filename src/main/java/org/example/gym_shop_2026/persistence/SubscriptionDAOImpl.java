@@ -133,8 +133,26 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
      * @implNote Does not update stored plan id, but updates everything else to newSubscription values
      */
     @Override
-    public boolean updateSubscription(int planId, Subscription newSubscription) {
-        return false;
+    public boolean updateSubscription(int planId, Subscription newSubscription) throws SQLException {
+        validatePlanId(planId);
+        validateSubscription(newSubscription);
+
+        int rowsAffected = 0;
+
+        try(PreparedStatement ps = connector.getConnection().prepareStatement("UPDATE subscriptions SET plan_name = ?, description = ?, plan_price = ?, plan_duration = ?")) {
+            ps.setString(1, newSubscription.getPlanName());
+            ps.setString(2, newSubscription.getDescription());
+            ps.setDouble(3, newSubscription.getPlanPrice());
+            ps.setInt(4, newSubscription.getPlanDuration());
+
+            rowsAffected = ps.executeUpdate();
+        }
+        catch(SQLException e) {
+            log.error("Could not perform updateSubscription operation as update failed to execute! {}", e.toString());
+            throw e;
+        }
+
+        return rowsAffected == 1;
     }
 
     /**
