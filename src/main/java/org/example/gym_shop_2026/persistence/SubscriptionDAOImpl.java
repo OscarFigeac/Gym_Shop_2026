@@ -34,9 +34,8 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
      */
     @Override
     public boolean createSubscription(Subscription subscription) throws SQLException {
-        if(subscription == null) {
-            log.error("Could not perform create subscription operation as given new Subscription object was null!");
-            throw new IllegalArgumentException("Could not perform create subscription operation as given new Subscription object was null!");
+        if(validateSubscription(subscription) == false) {
+            log.error("Could not perform create subscription operation as given subscription contained errors! See logs.");
         }
 
         int rowsAffected = 0;
@@ -91,7 +90,30 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
     }
 
     @Override
-    public Subscription getSubscriptionById(int planId) {
+    public Subscription getSubscriptionById(int planId) throws SQLException {
+        if (validatePlanId(planId) == false) {
+            log.error("Could not perform get subscription by id operation as given planId < 1!");
+            throw new IllegalArgumentException("Could not perform get subscription by id operation as given planId < 1!");
+        }
+
+        try(PreparedStatement ps = connector.getConnection().prepareStatement("SELECT * FROM subscriptions WHERE plan_id = ?")) {
+            ps.setInt(1, planId);
+
+            try(ResultSet rs = ps.executeQuery()) {
+                if(rs.next()) {
+                    return mapSubscriptionRow(rs);
+                }
+            }
+            catch(SQLException e) {
+                log.error("Could not perform get subscription by id! {}", e.toString());
+                throw e;
+            }
+        }
+        catch(SQLException e) {
+            log.error("Could not perform get subscription by id due to query error! {}", e.toString());
+            throw e;
+        }
+
         return null;
     }
 
