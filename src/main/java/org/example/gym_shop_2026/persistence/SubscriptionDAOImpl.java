@@ -60,11 +60,6 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
     }
 
     @Override
-    public List<Subscription> getSubscriptionsByUserId(int userId) {
-        return List.of();
-    }
-
-    @Override
     public List<Subscription> getAllSubscriptions() {
         return List.of();
     }

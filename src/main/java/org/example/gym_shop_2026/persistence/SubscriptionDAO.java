@@ -21,15 +21,6 @@ public interface SubscriptionDAO {
     boolean createSubscription(Subscription subscription) throws SQLException;
 
     /**
-     * Gets all stored subscription records for a {@link org.example.gym_shop_2026.entities.User} using userId.
-     * @param userId Given id of user
-     * @return Found {@link List<Subscription>} entities or blank list
-     *
-     * @throws SQLException
-     */
-    List<Subscription> getSubscriptionsByUserId(int userId) throws SQLException;
-
-    /**
      * Retrieves a {@link List<Subscription>} with all stored subscription records.
      * @return {@link List<Subscription>} with all records or a blank {@link List<Subscription>}
      *
