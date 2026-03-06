@@ -246,8 +246,8 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
             log.error("Could not validate given subscription as it was null!");
             return false;
         }
-        if(validatePlanId(subscription.getPlanId())) {
-            log.error("Given subscription contains bad planId value < 1!");
+        if(!validatePlanId(subscription.getPlanId())) {
+            log.error("Given subscription contains bad planId value < 1! {}", subscription.getPlanId());
             return false;
         }
 
