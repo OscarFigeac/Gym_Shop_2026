@@ -136,8 +136,14 @@ public class SubscriptionDAOImpl implements SubscriptionDAO {
      */
     @Override
     public boolean updateSubscription(int planId, Subscription newSubscription) throws SQLException {
-        validatePlanId(planId);
-        validateSubscription(newSubscription);
+        if(!validatePlanId(planId)) {
+            log.error("Could not perform update operation as given planId < 1!");
+            throw new IllegalArgumentException("Could not perform update operation as given planId < 1!");
+        }
+        if(!validateSubscription(newSubscription)) {
+            log.error("Could not perform update operation as given subscription contained errors! {}", newSubscription.toString());
+            throw new IllegalArgumentException("Could not perform update operation as given subscription contained errors!");
+        }
 
         int rowsAffected = 0;
 
