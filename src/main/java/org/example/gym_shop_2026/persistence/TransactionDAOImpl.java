@@ -100,6 +100,36 @@ public class TransactionDAOImpl implements TransactionDAO {
     }
 
     @Override
+    public List<Transaction> getTransactionsByUserId(int userId) throws SQLException {
+        if(userId <= 0) {
+            log.error("Could not perform get transactions by user id operation as given User id {} was <= 0!", userId);
+            throw new IllegalArgumentException("Could not perform get transactions by user id operation as given user id " + userId + " was <= 0!");
+        }
+
+        List<Transaction> transactions = new ArrayList<>();
+
+        try(PreparedStatement ps = connector.getConnection().prepareStatement("SELECT * FROM transactions WHERE user_id = ?")) {
+            ps.setInt(1, userId);
+
+            try(ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    transactions.add(mapTransactionRow(rs));
+                }
+            }
+            catch (SQLException e) {
+                log.error("Could not perform get transactions by id operation as there was a problem! {}", e.toString());
+                throw new SQLException("Could not perform get transactions by id operation as there was a problem!");
+            }
+        }
+        catch (SQLException e) {
+            log.error("Could not perform get transactions by id operation as there was a problem! {}", e.toString());
+            throw new SQLException("Could not perform get transactions by id operation as there was a problem!");
+        }
+
+        return transactions;
+    }
+
+    @Override
     public int updateTransactionById(int transactionId, Transaction newTransaction) throws SQLException {
         if(transactionId <= 0) {
             log.error("Could not perform update transaction by id operation as given transaction id {} was invalid!", transactionId);
