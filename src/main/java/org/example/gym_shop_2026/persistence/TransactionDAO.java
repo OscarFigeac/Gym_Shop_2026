@@ -18,6 +18,13 @@ public interface TransactionDAO {
     List<Transaction> getTransactions() throws SQLException;
 
     /**
+     * Gets all transactions with a given user id.
+     * @param userId Given user_id.
+     * @return {@link List<Transaction>} containing all transactions with user id
+     * @throws SQLException If there is a communications link failure with sql
+     */
+    List<Transaction> getTransactionsByUserId(int userId) throws SQLException;
+    /**
      * Retrieves a transaction record using given transaction
      * id.
      * @param transactionId Given transaction id
