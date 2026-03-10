@@ -5,8 +5,10 @@ import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.entities.Transaction;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.time.LocalDateTime;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class TransactionDAOImpl implements TransactionDAO {
     public boolean createTransaction(Transaction newTransaction) throws SQLException {
         if(newTransaction == null) {
             log.error("Could not perform create transaction operation as given Transaction object was null!");
-            throw new SQLException("Could not perform create transaction operation as given Transaction object was null!");
+            throw new IllegalArgumentException("Could not perform create transaction operation as given Transaction object was null!");
         }
 
 
@@ -95,6 +97,36 @@ public class TransactionDAOImpl implements TransactionDAO {
         }
 
         return null;
+    }
+
+    @Override
+    public List<Transaction> getTransactionsByUserId(int userId) throws SQLException {
+        if(userId <= 0) {
+            log.error("Could not perform get transactions by user id operation as given User id {} was <= 0!", userId);
+            throw new IllegalArgumentException("Could not perform get transactions by user id operation as given user id " + userId + " was <= 0!");
+        }
+
+        List<Transaction> transactions = new ArrayList<>();
+
+        try(PreparedStatement ps = connector.getConnection().prepareStatement("SELECT * FROM transactions WHERE user_id = ?")) {
+            ps.setInt(1, userId);
+
+            try(ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    transactions.add(mapTransactionRow(rs));
+                }
+            }
+            catch (SQLException e) {
+                log.error("Could not perform get transactions by id operation as there was a problem! {}", e.toString());
+                throw new SQLException("Could not perform get transactions by id operation as there was a problem!");
+            }
+        }
+        catch (SQLException e) {
+            log.error("Could not perform get transactions by id operation as there was a problem! {}", e.toString());
+            throw new SQLException("Could not perform get transactions by id operation as there was a problem!");
+        }
+
+        return transactions;
     }
 
     @Override

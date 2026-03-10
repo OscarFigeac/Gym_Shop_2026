@@ -1,14 +1,12 @@
 package org.example.gym_shop_2026.security;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.persistence.UserDAO;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
 import org.example.gym_shop_2026.services.TwoFactorAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
