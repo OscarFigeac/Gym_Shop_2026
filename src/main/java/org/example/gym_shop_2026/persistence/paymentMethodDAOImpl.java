@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @Repository
-public class paymentMethodDAOImpl {
+public class paymentMethodDAOImpl implements paymentMethodDAO{
     private Connector connector;
 
     public paymentMethodDAOImpl(Connector connector){
