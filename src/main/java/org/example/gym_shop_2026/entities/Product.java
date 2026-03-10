@@ -29,5 +29,9 @@ public class Product {
     @NonNull
     private final int inStock;
 
+    @Min(value = 0, message = "Price cannot be negative.")
+    @NonNull
+    private double price;
+
     private final int storeId;
 }
