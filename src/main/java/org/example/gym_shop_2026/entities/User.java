@@ -2,7 +2,6 @@ package org.example.gym_shop_2026.entities;
 
 import lombok.*;
 
-
 import java.util.Date;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
