@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -46,7 +47,7 @@ public class SecurityConfig {
     private final UserDAO userDAO;
 
     @Autowired
-    public SecurityConfig(CustomAuthenticationProvider authProvider,
+    public SecurityConfig(@Lazy CustomAuthenticationProvider authProvider,
                           CustomAuthenticationDetailsSource detailsSource,
                           UserDAO userDAO){
         this.authProvider = authProvider;
