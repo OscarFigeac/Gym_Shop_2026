@@ -33,5 +33,4 @@ public class Product {
     @NonNull
     private double price;
 
-    private final int storeId;
 }
