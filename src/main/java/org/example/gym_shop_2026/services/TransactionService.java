@@ -1,8 +1,13 @@
 package org.example.gym_shop_2026.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.gym_shop_2026.entities.Transaction;
 import org.example.gym_shop_2026.persistence.TransactionDAO;
 import org.springframework.stereotype.Service;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A service class for interactions with transactions.
@@ -21,22 +26,91 @@ public class TransactionService {
     public TransactionService(TransactionDAO transactionDAO) {
         this.transactionDAO = transactionDAO;
     }
-//
-//    /**
-//     * Provides all transactions for a user with matching id
-//     * @param user_id Given id of user in system
-//     * @return {@link List<Transaction>} objects with data from configured {@link TransactionDAO}
-//     */
-//    public List<Transaction> getAllTransactionsForUser(int user_id) {
-//        if(user_id <= 0) {
-//            log.error("Cannot get transactions for user with ID " + user_id + " as given user id must be > 0!");
-//            throw new IllegalArgumentException("Cannot get transactions for user with ID " + user_id + " as given user id must be > 0!");
-//
-//            try {
-//                transactionDAO.getTransactions();
-//            }
-//            catch (SQLException e) {
-//
-//            }
-//        }
+
+    /**
+     * Provides all transactions for a user with matching id
+     * @param user_id Given id of user in system
+     * @return {@link List<Transaction>} objects with data from configured {@link TransactionDAO}
+     */
+    public List<Transaction> getAllTransactionsForUser(int user_id) {
+        if(user_id <= 0) {
+            log.error("Cannot get transactions for user with ID " + user_id + " as given user id must be > 0!");
+            throw new IllegalArgumentException("Cannot get transactions for user with ID " + user_id + " as given user id must be > 0!");
+        }
+
+        List<Transaction> foundTransactions = new ArrayList<>();
+
+        try {
+            foundTransactions = transactionDAO.getTransactionsByUserId(user_id);
+        }
+        catch (SQLException e) {
+            log.error("Could not perform get all transactions service operation due to error! {}", e.toString());
+        }
+
+        return foundTransactions;
     }
+
+    /**
+     * Adds a new transaction to persistence with given {@link Transaction} object.
+     * @param transaction Given {@link Transaction} object
+     * @return True if transaction added successfully, else false
+     */
+    public boolean addTransaction(Transaction transaction) {
+        if(transaction == null) {
+            log.error("Cannot perform add transaction operation service as given Transaction object was null!");
+            throw new IllegalArgumentException("Cannot add transaction as given Transaction was null!");
+        }
+
+        boolean addResult = false;
+
+        try {
+            addResult = transactionDAO.createTransaction(transaction);
+        }
+        catch (SQLException e) {
+            log.error("Could not perform add transaction service operation due to error! {}", e.toString());
+        }
+
+        return addResult;
+
+    }
+
+    /**
+     * Updates transaction status to new given {@link Transaction} object's transaction status.
+     * @param transaction Given {@link Transaction} object
+     * @return True if one update occurred in persistence.
+     *
+     * @apiNote Must be same transaction id as original transaction that exists in persistence
+     */
+    public boolean updateTransactionStatus(Transaction transaction) {
+        if(transaction == null) {
+            log.error("Cannot perform update transaction status service as given Transaction object was null!");
+            throw new IllegalArgumentException("Cannot perform update transaction status service as given Transaction object was null!");
+        }
+
+        int updatedRows = 0;
+
+        Transaction foundTransaction = null;
+
+        //Lookup transaction
+        try {
+           foundTransaction = transactionDAO.findTransactionById(transaction.getTransactionId());
+           if(foundTransaction == null) {
+               log.info("Could not perform update transaction status service operation as given Transaction object was not found in system!");
+               return false;
+           }
+        }
+        catch (SQLException e) {
+            log.error("Could not perform update transaction service operation due to error in transaction lookup! {}", e.toString());
+        }
+
+        //Actual update operation
+        try {
+            updatedRows = transactionDAO.updateTransactionById(transaction.getTransactionId(), transaction);
+        }
+        catch (Exception e) {
+            log.error("Could not perform update transaction service operation due to error! {}", e.toString());
+        }
+
+        return updatedRows == 1;
+    }
+}
