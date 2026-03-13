@@ -13,7 +13,8 @@ import lombok.*;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class Subscription {
+@Slf4j
+public class Subscription implements Comparable<Subscription> {
     @Setter(AccessLevel.NONE)
     @EqualsAndHashCode.Include private int planId = 1;
 
