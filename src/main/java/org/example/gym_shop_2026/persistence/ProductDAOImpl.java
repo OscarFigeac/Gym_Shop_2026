@@ -118,7 +118,7 @@ public class ProductDAOImpl implements ProductDAO{
      */
     public boolean reduceStock(int productId, int quantity) throws SQLException {
         Connection conn = connector.getConnection();
-        String sql = "UPDATE products SET in_stock = in_stock - ? WHERE product_id = ? AND in_stock >= ?";
+        String sql = "UPDATE products SET quantity = quantity - ? WHERE product_id = ? AND quantity >= ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, quantity);
