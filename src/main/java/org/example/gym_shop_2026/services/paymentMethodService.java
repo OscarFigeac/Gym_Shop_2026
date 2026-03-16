@@ -2,10 +2,12 @@ package org.example.gym_shop_2026.services;
 
 import org.example.gym_shop_2026.entities.paymentMethod;
 import org.example.gym_shop_2026.persistence.paymentMethodDAO;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class paymentMethodService {
     private final paymentMethodDAO paymentMethodDao;
 
