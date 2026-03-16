@@ -158,6 +158,26 @@ public class BasketDAOImpl implements BasketDAO {
         throw new SQLException("Creating basket failed, no ID obtained.");
     }
 
+    /**
+     * @author Oscar
+     * Deletes all the items in the existing basket
+     * @param basketId The basket being cleared
+     * @throws SQLException if the connection to the database fails at any point
+     */
+    @Override
+    public void clearBasket(int basketId) throws SQLException {
+        String sql = "DELETE FROM basket_item WHERE basket_id = ?";
+        try (Connection conn = connector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, basketId);
+            ps.executeUpdate();
+            log.info("Basket {} cleared after successful purchase.", basketId);
+        } catch (SQLException e) {
+            log.error("Error clearing basket {}: {}", basketId, e.getMessage());
+            throw e;
+        }
+    }
+
     //Private Methods
 
     private static Basket mapBasketRow(ResultSet rs) throws SQLException {
