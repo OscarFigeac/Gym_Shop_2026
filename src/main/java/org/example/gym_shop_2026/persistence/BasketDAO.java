@@ -12,4 +12,5 @@ public interface BasketDAO {
     void addItemToBasket(int basketId, int productId, int quantity) throws SQLException;
     void updateItemQuantity(int itemId, int newQuantity) throws SQLException;
     void removeItem(int itemId) throws SQLException;
+    public Basket createBasket(int userId) throws SQLException;
 }

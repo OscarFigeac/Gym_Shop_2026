@@ -7,10 +7,7 @@ import org.example.gym_shop_2026.entities.BasketItem;
 import org.example.gym_shop_2026.entities.User;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,6 +130,34 @@ public class BasketDAOImpl implements BasketDAO {
             ps.executeUpdate();
         }
     }
+
+    /**
+     * @author Oscar
+     * creates a basket for a user. The userId is passed as a parameter
+     * @param userId The owner of the basket being created
+     * @return The full Basket Object so that the service can handle it immediately
+     * @throws SQLException If the connection to the database fails at any point
+     */
+    @Override
+    public Basket createBasket(int userId) throws SQLException {
+        String sql = "INSERT INTO basket (user_id, status, created_at) VALUES (?, 'Active', CURRENT_TIMESTAMP)";
+
+        try (Connection conn = connector.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setInt(1, userId);
+            ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int newId = rs.getInt(1);
+                    return findByUserID(userId);
+                }
+            }
+        }
+        throw new SQLException("Creating basket failed, no ID obtained.");
+    }
+
     //Private Methods
 
     private static Basket mapBasketRow(ResultSet rs) throws SQLException {
