@@ -6,10 +6,7 @@ import org.example.gym_shop_2026.entities.Basket;
 import org.example.gym_shop_2026.entities.User;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 @Repository
 @Slf4j
@@ -44,6 +41,35 @@ public class BasketDAOImpl implements BasketDAO {
             throw e;
         }
         return found;
+    }
+
+    @Override
+    public boolean updateStatus(int basketId, String status) throws SQLException{
+        if(basketId <= 0){
+            throw new IllegalArgumentException("ID - ID cannot be less than or equal to zero for search process !");
+        }
+
+        Connection conn = connector.getConnection();
+        if(conn == null){
+            throw new SQLException("updateStatus - Unable to establish a connection to the database !");
+        }
+
+        try(PreparedStatement ps = conn.prepareStatement("UPDATE basket SET status = ? WHERE basket_id = ?")){
+            ps.setString(1, status);
+            ps.setInt(2, basketId);
+
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected == 0) {
+                log.warn("updateStatus() - No User Found With User_ID: {}", basketId);
+            }
+
+            return rowsAffected == 1;
+
+        } catch (SQLException e) {
+            log.error("findByUsername(): SQL error. \nException: {}", e.getMessage());
+            throw e;
+        }
     }
 
     //Private Methods
