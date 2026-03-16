@@ -30,9 +30,8 @@ public class ProductDAOImpl implements ProductDAO{
                 .productId(rs.getInt("product_id"))
                 .productCategory(rs.getString("product_category"))
                 .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .inStock(rs.getInt("in_stock"))
-                .storeId(rs.getInt("store_id"))
+                .price(rs.getInt("price"))
+                .quantity(rs.getInt("quantity"))
                 .build();
     }
 
@@ -72,15 +71,14 @@ public class ProductDAOImpl implements ProductDAO{
         if(p == null) throw new IllegalArgumentException("Product cannot be null");
 
         Connection conn = connector.getConnection();
-        String sql = "INSERT INTO products (product_id, product_category, name, description, in_stock, store_id) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products (product_id, product_category, name, price, quantity) VALUES (?, ?, ?, ?, ?)";
 
         try(PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, p.getProductId());
             ps.setString(2, p.getProductCategory());
             ps.setString(3, p.getName());
-            ps.setString(4, p.getDescription());
-            ps.setInt(5, p.getInStock());
-            ps.setInt(6, p.getStoreId());
+            ps.setDouble(4, p.getPrice());
+            ps.setInt(5, p.getQuantity());
 
             return ps.executeUpdate() == 1;
         } catch(SQLException e) {
@@ -120,7 +118,7 @@ public class ProductDAOImpl implements ProductDAO{
      */
     public boolean reduceStock(int productId, int quantity) throws SQLException {
         Connection conn = connector.getConnection();
-        String sql = "UPDATE products SET in_stock = in_stock - ? WHERE product_id = ? AND in_stock >= ?";
+        String sql = "UPDATE products SET quantity = quantity - ? WHERE product_id = ? AND quantity >= ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, quantity);
@@ -139,7 +137,7 @@ public class ProductDAOImpl implements ProductDAO{
      */
     public List<Product> searchProductsByName(String keyword) throws SQLException {
         Connection conn = connector.getConnection();
-        if(conn == null) throw new SQLException("AWS Connection failed.");
+        if(conn == null) throw new SQLException("Database Connection failed.");
 
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM products WHERE LOWER(name) LIKE LOWER(?)";
