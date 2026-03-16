@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -125,15 +124,15 @@ public class MVController {
     }
 
     /**
-     *
-     * @param model
-     * @return
+     * Controller method to load transactions section of dashboard.
+     * @param model Given {@link Model} for passing information to page
+     * @return {@link String} representing a html file-name to display
      */
     @GetMapping(path = "/dashboard/viewtransactions")
     public String dashboardTransactions(Model model) {
         if(model == null) {
             log.error("Could not load page view transactions in dashboard as given Model object was null, redirecting to homepage...");
-            return "redirect:/?dashboardStatus=Failed%20to%20Load";
+            return "redirect:/?dashboardStatus=failed%20to%20load";
         }
 
         List<Transaction> transactions = transactionService.getAllTransactionsForUser(1);
