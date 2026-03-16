@@ -58,7 +58,7 @@ public class ProductService {
     public boolean purchaseProduct(int productId, int quantity) {
         try {
             Product product = productDAO.getProductById(productId);
-            if (product != null && product.getInStock() >= quantity) {
+            if (product != null && product.getQuantity() >= quantity) {
                 return productDAO.reduceStock(productId, quantity);
             }
             log.warn("Purchase failed: Insufficient stock for ID {}", productId);
