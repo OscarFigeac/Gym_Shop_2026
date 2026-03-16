@@ -98,4 +98,17 @@ public class BasketService {
     public void removeItem(int itemId) throws SQLException {
         basketDAO.removeItem(itemId);
     }
+
+    /**
+     * @author Oscar
+     * Clears the basket of the user provided
+     * @param userId The identifier of the user whose basket is being cleared.
+     * @throws SQLException If the connection to the database fails at any point.
+     */
+    public void clearUserBasket(int userId) throws SQLException {
+        Basket basket = basketDAO.findByUserID(userId);
+        if (basket != null) {
+            basketDAO.clearBasket(basket.getBasketId());
+        }
+    }
 }
