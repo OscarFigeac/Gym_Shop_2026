@@ -7,6 +7,8 @@ import org.example.gym_shop_2026.entities.User;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 @Slf4j
@@ -70,6 +72,30 @@ public class BasketDAOImpl implements BasketDAO {
             log.error("findByUsername(): SQL error. \nException: {}", e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public List<Basket> findByStatus (int user_id, String status) throws SQLException{
+        Connection conn = connector.getConnection();
+        if(conn == null){
+            throw new SQLException("findUserByID - Unable to establish a connection to the database !");
+        }
+
+        List<Basket> foundBaskets = new ArrayList<>();
+
+        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM basket WHERE user_id = ? AND status = ?")){
+            ps.setInt(1, user_id);
+            ps.setString(2, status);
+
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()) foundBaskets.add(mapBasketRow(rs));
+            }
+
+        } catch (SQLException e) {
+            log.error("findByStatus(): SQL error. \nException: {}", e.getMessage());
+            throw e;
+        }
+        return foundBaskets;
     }
 
     //Private Methods
