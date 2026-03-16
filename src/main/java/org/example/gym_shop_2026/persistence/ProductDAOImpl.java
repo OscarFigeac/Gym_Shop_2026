@@ -118,7 +118,7 @@ public class ProductDAOImpl implements ProductDAO{
      */
     public boolean reduceStock(int productId, int quantity) throws SQLException {
         Connection conn = connector.getConnection();
-        String sql = "UPDATE products SET quantity = quantity - ? WHERE product_id = ? AND quantity >= ?";
+        String sql = "UPDATE products SET in_stock = in_stock - ? WHERE product_id = ? AND in_stock >= ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, quantity);
@@ -137,7 +137,7 @@ public class ProductDAOImpl implements ProductDAO{
      */
     public List<Product> searchProductsByName(String keyword) throws SQLException {
         Connection conn = connector.getConnection();
-        if(conn == null) throw new SQLException("Database Connection failed.");
+        if(conn == null) throw new SQLException("AWS Connection failed.");
 
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM products WHERE LOWER(name) LIKE LOWER(?)";

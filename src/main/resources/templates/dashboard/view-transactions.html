@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta name="description" content="A section of the user dashboard to view all past transactions.">
+  <title>View Transactions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="">
+  <header th:replace="~{fragments/header::header}">
+  </header>
+  <main class="mt-4 container">
+    <div id="transactions-box-outer" class="" style=" width: 100%; margin: auto; text-align: center">
+      <div id="transactions-box-inner" style="width: 50%; text-align: center">
+        <h4>View Transactions</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Transaction Id</th>
+              <th>User Id</th>
+              <th>Plan Id</th>
+              <th>Method id</th>
+              <th>Amount Paid</th>
+              <th>Transaction Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${transactions.isEmpty}">
+              <td colspan="7" style="text-align: center">No transactions found!</td>
+            </tr>
+            <tr th:each="transaction : ${transactions}">
+              <td><span th:text="${transaction.transactionId}">Transaction Id</span></td>
+              <td><span th:text="${transaction.userId}">User Id</span></td>
+              <td><span th:text="${transaction.planId}">Plan Id</span></td>
+              <td><span th:text="${transaction.methodId}">Method Id</span></td>
+              <td><span th:text="${transaction.amountPaid}">Amount Paid</span></td>
+              <td><span th:text="${transaction.transactionDate}">Transaction Date</span></td>
+              <td><span th:text="${transaction.status}">Status</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

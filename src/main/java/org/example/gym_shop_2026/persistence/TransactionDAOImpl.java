@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,16 @@ public class TransactionDAOImpl implements TransactionDAO {
         this.connector = connector;
     }
 
+    /**
+     * Creates new transaction in database using a custom {@link Transaction} object.
+     * @param newTransaction {@link Transaction} object to use for adding record
+     * @return True if {@link Transaction} object inserted successfully
+     * @throws SQLException If there is a problem cvommunicating with database
+     *
+     * @implNote Ignores {@link Transaction} object's int transaction id and
+     * {@link LocalDateTime} transactionDate attributes as they are dependent on database & this
+     * method
+     */
     @Override
     public boolean createTransaction(Transaction newTransaction) throws SQLException {
         if(newTransaction == null) {
@@ -29,16 +40,15 @@ public class TransactionDAOImpl implements TransactionDAO {
         }
 
 
-        try(PreparedStatement ps = connector.getConnection().prepareStatement("INSERT INTO transactions " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+        try(PreparedStatement ps = connector.getConnection().prepareStatement("INSERT INTO transactions(user_id, plan_id, method_id, amount_paid, transaction_date, status)" +
+                "VALUES (?, ?, ?, ?, ?, ?)")) {
 
-            ps.setInt(1, newTransaction.getTransactionId());
-            ps.setInt(2, newTransaction.getUserId());
-            ps.setInt(3, newTransaction.getPlanId());
-            ps.setInt(4, newTransaction.getMethodId());
-            ps.setDouble(5, newTransaction.getAmountPaid());
-            ps.setTimestamp(6, Timestamp.valueOf(newTransaction.getTransactionDate()));
-            ps.setString(7, newTransaction.getStatus());
+            ps.setInt(1, newTransaction.getUserId());
+            ps.setInt(2, newTransaction.getPlanId());
+            ps.setInt(3, newTransaction.getMethodId());
+            ps.setDouble(4, newTransaction.getAmountPaid());
+            ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setString(6, newTransaction.getStatus());
 
             return ps.executeUpdate() > 0;
         }

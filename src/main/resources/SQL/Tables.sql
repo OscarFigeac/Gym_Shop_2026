@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS products(
     product_category VARCHAR(255),
     name VARCHAR(255) NOT NULL,
     price DECIMAL(8, 2) NOT NULL,
-    in_stock TINYINT NOT NULL
+    quantity INT NOT NULL
 );
 
 # CREATE TABLE IF NOT EXISTS locations(
