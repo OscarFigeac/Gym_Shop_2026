@@ -71,24 +71,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                //enable this for production, testing purposes only for disabling it
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.disable())
+
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/register", "/confirm-2fa", "/setup-2fa", "/css/**", "/js/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/register",
+                                "/products/**",
+                                "/basket/**",
+                                "/confirm-2fa",
+                                "/setup-2fa",
+                                "/favicon.ico",
+                                "/error"
+                        ).permitAll()
+
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .usernameParameter("username")
-                        .passwordParameter("password")
-                        .authenticationDetailsSource(detailsSource)
                         .defaultSuccessUrl("/", true)
                         .permitAll()
                 )
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 );
 
