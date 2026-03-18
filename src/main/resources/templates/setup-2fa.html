@@ -1,172 +1,188 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org/">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Secure Your Gains | Gym Shop 2026</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Secure Your Account | GYMSHOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --brand-orange: #f47920;
+            --brand-dark: #232323;
+            --brand-light: #f8f9fa;
+        }
+
         body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--brand-light);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--brand-dark);
         }
 
-        .gym-container {
-            border: 2px solid #adff2f;
-            background-color: #111;
-            padding: 30px;
-            margin-top: 60px;
-        }
-
-        .gym-title {
-            background-color: #adff2f;
-            color: #000;
-            display: inline-block;
-            padding: 5px 20px;
-            font-weight: 900;
-            text-transform: uppercase;
-            margin-bottom: 30px;
-        }
-
-        .form-label {
-            color: #adff2f;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .form-control {
-            background-color: #000;
-            border: 1px solid #444;
-            color: #fff;
-            border-radius: 0;
-            padding: 12px;
-        }
-
-        .form-control:focus {
-            background-color: #000;
-            border-color: #adff2f;
-            color: #fff;
-            box-shadow: 0 0 5px rgba(173, 255, 47, 0.5);
-        }
-
-        .btn-gym {
-            background-color: #adff2f;
-            color: #000;
-            font-weight: 900;
-            text-transform: uppercase;
+        .setup-card {
             border: none;
-            border-radius: 0;
-            width: 100%;
-            padding: 15px;
-            transition: all 0.2s ease-in-out;
+            border-top: 4px solid var(--brand-orange);
+            background: #ffffff;
+            padding: 40px;
+            margin-top: 60px;
+            margin-bottom: 60px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 8px;
         }
 
-        .btn-gym:hover {
-            box-shadow: 0 0 15px #adff2f;
-            transform: scale(1.02);
-            background-color: #fff;
-            color: #000;
-        }
-
-        .gym-alert {
-            background-color: #000;
-            border: 2px solid #ff0000;
-            color: #ff0000;
-            padding: 10px;
-            font-weight: bold;
+        .setup-header {
+            font-weight: 800;
             text-transform: uppercase;
-            margin-bottom: 20px;
-            text-align: center;
+            letter-spacing: -0.5px;
+            color: var(--brand-dark);
+            margin-bottom: 10px;
+        }
+
+        .instruction-text {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
         }
 
         .qr-wrapper {
             background-color: #fff;
             padding: 15px;
+            border: 1px solid #eee;
             display: inline-block;
-            margin-bottom: 20px;
-        }
-
-        .secret-key {
-            color: #adff2f;
-            font-family: monospace;
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-            background: #222;
-            padding: 5px 10px;
+            margin-bottom: 25px;
+            border-radius: 4px;
         }
 
         .manual-box {
-            border: 1px dashed #adff2f;
-            background-color: #000;
+            background-color: var(--brand-light);
+            border: 1px solid #ddd;
             padding: 20px;
-            margin-top: 25px;
+            border-radius: 4px;
+            text-align: left;
+        }
+
+        .secret-key-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--brand-orange);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .secret-key-value {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            background: #fff;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            display: block;
+            text-align: center;
+            letter-spacing: 2px;
+            font-size: 1.1rem;
+        }
+
+        .form-control-otp {
+            font-size: 2rem !important;
+            letter-spacing: 10px;
+            text-align: center;
+            font-weight: 800;
+            border: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .form-control-otp:focus {
+            border-color: var(--brand-orange);
+            box-shadow: 0 0 0 3px rgba(244, 121, 32, 0.1);
+        }
+
+        .btn-verify {
+            background-color: var(--brand-dark);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            width: 100%;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .btn-verify:hover {
+            background-color: var(--brand-orange);
+            transform: translateY(-1px);
+        }
+
+        .alert-custom {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
 
-<header th:replace="~{fragments/header :: mainHeader}"></header>
+<header th:replace="~{fragments/header :: header}"></header>
 
 <main class="container">
     <div class="row justify-content-center">
-        <div class="col-md-6 gym-container text-center">
-            <h2 class="gym-title">DON'T LOSE YOUR GAINS!</h2>
+        <div class="col-md-6 col-lg-5 text-center">
+            <div class="setup-card">
+                <h2 class="setup-header">Secure Your Account</h2>
+                <p class="instruction-text">Scan the QR code below with Google Authenticator or Authy to enable Two-Factor Authentication.</p>
 
-            <p class="mb-4 small text-uppercase" style="letter-spacing: 1px;">
-                Scan the code with Google Authenticator to enable security
-            </p>
-
-            <div th:if="${param.error}" class="gym-alert">
-                INVALID CODE - PLEASE TRY AGAIN
-            </div>
-
-            <div class="qr-wrapper">
-                <img th:src="${qrCodeUrl}" alt="2FA QR Code" width="200" height="200">
-            </div>
-
-            <div class="manual-box">
-                <p class="small text-uppercase mb-2" style="color: #adff2f;">Can't scan the code?</p>
-                <p class="small mb-3 text-muted">Tap "+" in the app and select "Enter a setup key"</p>
-
-                <div class="mb-3">
-                    <label class="form-label d-block" style="font-size: 0.7rem;">Account Name</label>
-                    <span class="text-white">GymShop: <span th:text="${username}">Username</span></span>
+                <div th:if="${param.error}" class="alert alert-danger alert-custom mb-4">
+                    Invalid Code - Please Try Again
                 </div>
 
-                <div>
-                    <label class="form-label d-block" style="font-size: 0.7rem;">Your Secret Key</label>
-                    <span class="secret-key" th:text="${secret}">SECRETKEY123</span>
-                </div>
-            </div>
-
-            <hr style="border-color: #444; margin: 30px 0;">
-
-            <form id="setupForm" th:action="@{/confirm-2fa}" method="post">
-                <input type="hidden" name="username" th:value="${username}">
-                <input type="hidden" name="secret" th:value="${secret}">
-
-                <div class="mb-4 text-start">
-                    <label for="code" class="form-label">Enter 6-Digit Authenticator Code</label>
-                    <input type="text" class="form-control text-center fw-bold" id="code" name="code"
-                           placeholder="000 000" maxlength="6" inputmode="numeric" required
-                           style="font-size: 1.5rem; letter-spacing: 5px;">
+                <div class="qr-wrapper">
+                    <img th:src="${qrCodeUrl}" alt="2FA QR Code" width="200" height="200">
                 </div>
 
-                <button type="submit" class="btn-gym">Verify & Finish Setup</button>
-            </form>
+                <div class="manual-box mb-4">
+                    <p class="small fw-bold mb-3 text-center text-muted">CAN'T SCAN THE CODE?</p>
 
-            <div class="mt-4">
-                <a th:href="@{/login}" class="text-muted text-decoration-none small">
-                    CANCEL AND RETURN TO <span style="color: #adff2f;">LOGIN</span>
-                </a>
+                    <div class="mb-3">
+                        <span class="secret-key-label">Account Name</span>
+                        <div class="p-2 border bg-white small">GymShop: <span th:text="${username}" class="fw-bold">Username</span></div>
+                    </div>
+
+                    <div>
+                        <span class="secret-key-label">Manual Setup Key</span>
+                        <span class="secret-key-value" th:text="${secret}">SECRETKEY123</span>
+                    </div>
+                </div>
+
+                <hr class="my-4" style="opacity: 0.1;">
+
+                <form id="setupForm" th:action="@{/confirm-2fa}" method="post" class="needs-validation" novalidate>
+                    <input type="hidden" name="username" th:value="${username}">
+                    <input type="hidden" name="secret" th:value="${secret}">
+
+                    <div class="mb-3 text-start">
+                        <label for="code" class="form-label d-block text-center fw-bold small text-uppercase text-muted">Enter 6-Digit Verification Code</label>
+                        <input type="text" class="form-control form-control-otp" id="code" name="code"
+                               placeholder="000000" maxlength="6" inputmode="numeric" required autocomplete="one-time-code">
+                    </div>
+
+                    <button type="submit" class="btn-verify">Complete Setup</button>
+                </form>
+
+                <div class="mt-4">
+                    <a th:href="@{/login}" class="text-muted text-decoration-none small fw-bold">
+                        CANCEL AND RETURN TO <span style="color: var(--brand-orange);">LOGIN</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    window.onload = function() {
+        document.getElementById('code').focus();
+    };
+</script>
 </body>
 </html>

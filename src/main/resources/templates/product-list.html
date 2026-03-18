@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shop Supplements & Gear | GYMSHOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --brand-orange: #f47920;
+            --brand-dark: #232323;
+            --brand-light: #f8f9fa;
+        }
+
+        body {
+            background-color: var(--brand-light);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--brand-dark);
+        }
+
+        .page-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin: 40px 0;
+            border-left: 5px solid var(--brand-orange);
+            padding-left: 15px;
+        }
+
+        /* Product Card Styling */
+        .product-card {
+            background: #fff;
+            border: none;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .product-img-container {
+            background-color: #eee;
+            height: 200px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            overflow: hidden;
+        }
+
+        .category-badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--brand-orange);
+            letter-spacing: 1px;
+        }
+
+        .product-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 10px 0;
+            color: var(--brand-dark);
+            text-decoration: none;
+        }
+
+        .product-name:hover {
+            color: var(--brand-orange);
+        }
+
+        .stock-text {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .price-tag {
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--brand-dark);
+        }
+
+        .btn-buy {
+            background-color: var(--brand-dark);
+            color: #fff;
+            border: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .btn-buy:hover {
+            background-color: var(--brand-orange);
+            color: #fff;
+        }
+
+        .btn-details {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #888;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .btn-details:hover {
+            color: var(--brand-dark);
+        }
+    </style>
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <h2 class="page-title">Our <span style="color: var(--brand-orange)">Supplements</span></h2>
+
+        <form th:action="@{/products/search}" method="get" class="d-flex gap-2 mb-3">
+            <input type="text" name="query" class="form-control" placeholder="Search products..." th:value="${query}" style="width: 250px;">
+            <button type="submit" class="btn btn-dark fw-bold">SEARCH</button>
+        </form>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="col" th:each="product : ${products}">
+            <div class="card product-card p-3">
+                <div class="product-img-container mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-box-seam" viewBox="0 0 16 16">
+                        <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0L14.958 2.71c.537.215.854.733.854 1.314v9.924c0 .581-.317 1.1-.854 1.314l-6.5 2.6a1.5 1.5 0 0 1-1.114 0l-6.5-2.6c-.537-.215-.854-.733-.854-1.314V4.024c0-.581.317-1.1.854-1.314L7.443.184z"/>
+                    </svg>
+                </div>
+
+                <div class="flex-grow-1">
+                    <span class="category-badge" th:text="${product.productCategory}">Category</span>
+                    <a th:href="@{/products/{id}(id=${product.productId})}" class="product-name d-block" th:text="${product.name}">Product Name</a>
+                    <p class="stock-text mb-2">In Stock: <span th:text="${product.inStock}" th:classappend="${product.inStock < 5} ? 'text-danger fw-bold' : ''">0</span></p>
+                </div>
+
+                <div class="mt-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="price-tag" th:text="${product.price != null ? '€' + product.price : '€19.99'}">€0.00</span>
+                        <a th:href="@{/products/{id}(id=${product.productId})}" class="btn-details">Details &rarr;</a>
+                    </div>
+
+                    <form th:action="@{/basket/add}" method="post">
+                        <input type="hidden" name="productId" th:value="${product.productId}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn-buy" th:disabled="${product.inStock <= 0}">
+                            <span th:text="${product.inStock > 0 ? 'Add to Basket' : 'Out of Stock'}">Add to Basket</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
+        <h3 class="text-muted">No products found matching your search.</h3>
+        <a th:href="@{/products}" class="btn btn-orange mt-3" style="background-color: var(--brand-orange); color: white; font-weight: bold;">Browse All Products</a>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

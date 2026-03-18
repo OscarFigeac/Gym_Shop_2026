@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -18,9 +19,14 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String home(Model model) throws SQLException {
-        List<Product> products = productService.getAllProducts();
-        model.addAttribute("products", products);
+    public String home(Model model) {
+        try {
+            List<Product> products = productService.getAllProducts();
+            model.addAttribute("products", (products != null) ? products : new ArrayList<>());
+        } catch (Exception e) {
+            System.err.println("Database Error: " + e.getMessage());
+            model.addAttribute("products", new ArrayList<>());
+        }
         return "index";
     }
 }
