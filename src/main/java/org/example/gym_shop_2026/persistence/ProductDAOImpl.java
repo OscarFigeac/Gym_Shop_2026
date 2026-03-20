@@ -173,4 +173,26 @@ public class ProductDAOImpl implements ProductDAO{
         }
         return toBeStocked;
     }
+
+    @Override
+    public List<Product> getBestSellers (int sellLimit) throws SQLException{
+        Connection conn = connector.getConnection();
+        if(conn == null) throw new SQLException("AWS Connection failed.");
+
+        List<Product> bestSellers = new ArrayList<>();
+
+        try (PreparedStatement ps = conn.prepareStatement("SELECT p.*, SUM(b.itemQuantity) AS total_sold FROM products p JOIN basket_item b ON p.product_id = b,product_id GROUP BY p.product_id ORDER BY total_sold DESC LIMIT ?")) {
+            ps.setInt(1, sellLimit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    bestSellers.add(mapProductRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error calculating best sellers: {}", e.getMessage());
+            throw e;
+        }
+
+        return bestSellers;
+    }
 }
