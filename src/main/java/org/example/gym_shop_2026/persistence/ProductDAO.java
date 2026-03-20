@@ -11,4 +11,5 @@ public interface ProductDAO {
     Product getProductById(int id) throws SQLException;
     boolean reduceStock(int productId, int quantity) throws SQLException;
     List<Product> searchProductsByName(String keyword) throws SQLException;
+    List<Product> getProductsLowStock(int reOrder) throws SQLException;
 }

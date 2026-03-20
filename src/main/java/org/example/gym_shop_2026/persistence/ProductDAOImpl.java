@@ -155,4 +155,22 @@ public class ProductDAOImpl implements ProductDAO{
         }
         return products;
     }
+
+    @Override
+    public List<Product> getProductsLowStock (int reOrder) throws SQLException{
+        Connection conn = connector.getConnection();
+        if(conn == null) throw new SQLException("AWS Connection failed.");
+
+        List<Product> toBeStocked = new ArrayList<>();
+
+        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM products WHERE quantity = ?")){
+            ps.setInt(1, reOrder);
+            try(ResultSet rs = ps.executeQuery()){
+                while(rs.next()){
+                    toBeStocked.add(mapProductRow(rs));
+                }
+            }
+        }
+        return toBeStocked;
+    }
 }
