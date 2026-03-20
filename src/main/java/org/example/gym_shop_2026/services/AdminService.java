@@ -4,10 +4,13 @@ package org.example.gym_shop_2026.services;
 import org.example.gym_shop_2026.entities.Product;
 import org.example.gym_shop_2026.persistence.ProductDAO;
 import org.example.gym_shop_2026.persistence.ProductDAOImpl;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
 
+
+@Service
 public class AdminService {
 
     public final ProductDAO pDAO;
