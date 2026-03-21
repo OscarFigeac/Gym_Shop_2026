@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS products(
 # CREATE TABLE IF NOT EXISTS subscriptions_users(
 #     plan_id INT NOT NULL,
 #     user_id INT NOT NULL,
+#     expiry_date DATE NOT NULL,
 #     CONSTRAINT fk_subscriptionsusers_subscriptions FOREIGN KEY(plan_id) REFERENCES subscriptions(plan_id),
 #     CONSTRAINT fk_subscriptionsusers_users FOREIGN KEY(user_id) REFERENCES users(user_id)
 # );
