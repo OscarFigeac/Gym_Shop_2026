@@ -2,6 +2,7 @@ package org.example.gym_shop_2026.services;
 
 import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.persistence.UserDAO;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -10,9 +11,11 @@ import java.sql.SQLException;
 @Service
 public class UserService {
     private final UserDAO userDao;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserDAO userDao){
+    public UserService(UserDAO userDao, PasswordEncoder pwordEncoder){
         this.userDao = userDao;
+        this.passwordEncoder = pwordEncoder;
     }
 
     //Functionality Methods
@@ -22,7 +25,8 @@ public class UserService {
     }
 
     public boolean registerUser (String username, String fullName, String userType, String eMail, String password, Date DoB) throws SQLException{
-        return userDao.register(username, fullName, userType, eMail, password, DoB);
+        String encodedPassword = passwordEncoder.encode(password);
+        return userDao.register(username, fullName, userType, eMail, encodedPassword, DoB);
     }
 
     public User findUser (String toBeFound) throws SQLException{

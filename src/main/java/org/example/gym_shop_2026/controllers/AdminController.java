@@ -33,6 +33,7 @@ public class AdminController {
             return "AdminDashboard";
         }catch (SQLException e){
             log.error("Failed to load Admin Dashboard: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Could not load admin data.");
             return "Error";
         }
     }
