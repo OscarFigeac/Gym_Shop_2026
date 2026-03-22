@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 <div th:fragment="header">
     <style>
@@ -21,11 +21,10 @@
             font-size: 1.6rem;
             color: var(--brand-dark) !important;
             letter-spacing: -1px;
+            text-decoration: none;
         }
 
-        .brand-accent {
-            color: var(--brand-orange);
-        }
+        .brand-accent { color: var(--brand-orange); }
 
         .nav-link {
             color: var(--brand-dark) !important;
@@ -33,10 +32,6 @@
             text-transform: uppercase;
             font-size: 0.85rem;
             letter-spacing: 0.5px;
-        }
-
-        .nav-link:hover {
-            color: var(--brand-orange) !important;
         }
 
         .search-group .form-control {
@@ -69,6 +64,7 @@
             color: var(--brand-dark);
             display: flex;
             align-items: center;
+            text-decoration: none;
         }
 
         .cart-count {
@@ -79,8 +75,8 @@
             color: white;
             font-size: 0.65rem;
             font-weight: 900;
-            padding: 2px 5px;
-            border-radius: 50%;
+            padding: 2px 8px;
+            border-radius: 50px;
         }
     </style>
 
@@ -101,21 +97,22 @@
                     </li>
                 </ul>
 
-                <form class="d-flex search-group me-lg-4 w-100 w-lg-50" th:action="@{/products/search}" method="get">
+                <form class="d-flex search-group mx-lg-4 flex-grow-1" style="max-width: 500px;" th:action="@{/products/search}" method="get">
                     <input class="form-control" type="search" name="query" placeholder="Search for supplements..." aria-label="Search">
                     <button class="btn" type="submit">GO</button>
                 </form>
 
                 <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
-                    <div th:if="${session.user == null}" class="d-flex gap-2">
+
+                    <div th:unless="${#authorization.expression('isAuthenticated()')}" class="d-flex gap-2">
                         <a th:href="@{/login}" class="auth-link">Login</a>
                         <span class="text-muted">|</span>
                         <a th:href="@{/register}" class="auth-link" style="color: var(--brand-orange);">Sign Up</a>
                     </div>
 
-                    <div th:if="${session.user != null}">
-                        <a th:href="@{/profile}" class="auth-link">
-                            Welcome, <span th:text="${session.user.username}">User</span>
+                    <div th:if="${#authorization.expression('isAuthenticated()')}">
+                        <a th:href="@{/dashboard}" class="auth-link">
+                            Welcome, <span th:text="${#authentication.name}">User</span>
                         </a>
                     </div>
 
@@ -123,7 +120,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-bag" viewBox="0 0 16 16">
                             <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
                         </svg>
-                        <span class="cart-count" th:text="${session.basketCount != null ? session.basketCount : '0'}">0</span>
+                        <span class="cart-count" th:if="${basketCount > 0}" th:text="${basketCount}">0</span>
                     </a>
                 </div>
             </div>

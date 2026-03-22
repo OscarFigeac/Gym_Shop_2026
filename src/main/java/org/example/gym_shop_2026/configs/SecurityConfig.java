@@ -71,42 +71,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-
+                .csrf(csrf -> csrf.disable()) // Disable for local dev; enable & config for production
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/login",
-                                "/register",
-                                "/products/**",
-                                "/basket/**",
-                                "/confirm-2fa",
-                                "/setup-2fa",
-                                "/favicon.ico",
-                                "/error"
-                        ).permitAll()
+                        .requestMatchers("/", "/products/**", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
 
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+                        .requestMatchers("/basket/**").authenticated()
+                        .requestMatchers("/payment-methods/**").authenticated()
+                        .requestMatchers("/checkout/**").authenticated()
+                        .requestMatchers("/dashboard/**").authenticated()
+                        .requestMatchers("/profile/**").authenticated()
 
                         .anyRequest().authenticated()
                 )
-
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/", true)
                         .permitAll()
                 )
-
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
+                        .logoutSuccessUrl("/")
                         .permitAll()
                 );
-
-        http.authenticationProvider(authProvider);
 
         return http.build();
     }
