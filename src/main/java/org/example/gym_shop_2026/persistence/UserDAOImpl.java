@@ -51,10 +51,8 @@ public class UserDAOImpl implements UserDAO {
             throw new SQLException("Unable to establish a connection to the database.");
         }
 
-        // 1. Hash the password
         String hashPassword = PasswordHasher.hashPassword(pWord);
 
-        // 2. Updated SQL with ALL columns
         String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob, " +
                 "address, eircode, secret_key, is_2fa_enabled) VALUES (?,?,?,?,?,?,?,?,?,?)";
 
@@ -67,8 +65,8 @@ public class UserDAOImpl implements UserDAO {
             ps.setDate(6, dob);
             ps.setString(7, address);
             ps.setString(8, eircode);
-            ps.setString(9, "NOT_SET"); // Default secret for now
-            ps.setBoolean(10, false);   // 2FA disabled by default
+            ps.setString(9, "NOT_SET");
+            ps.setBoolean(10, false);
 
             int addedRows = ps.executeUpdate();
             return addedRows == 1;
