@@ -4,11 +4,11 @@ package org.example.gym_shop_2026.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.services.AdminService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
+//import org.springframework.ui.Model;
+//import org.springframework.web.bind.annotation.GetMapping;
+//
+//import java.sql.SQLException;
+//import java.util.ArrayList;
 
 @Slf4j
 @Controller
