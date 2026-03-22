@@ -3,7 +3,7 @@ package org.example.gym_shop_2026.persistence;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.entities.User;
-import org.example.gym_shop_2026.utils.PasswordHasher;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 
@@ -13,9 +13,11 @@ import java.sql.*;
 @Slf4j
 public class UserDAOImpl implements UserDAO {
     private final Connector connector;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserDAOImpl(Connector connector) {
+    public UserDAOImpl(Connector connector, PasswordEncoder pEncoder) {
         this.connector = connector;
+        this.passwordEncoder = pEncoder;
     }
 
     //Functionality:
@@ -30,7 +32,7 @@ public class UserDAOImpl implements UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String hashPassword = rs.getString("password");
-                    return PasswordHasher.verifyPassword(pWord, hashPassword);
+                    return passwordEncoder.matches(pWord, hashPassword);
                 }
                 return false;
             } catch (SQLException e) {
@@ -51,7 +53,7 @@ public class UserDAOImpl implements UserDAO {
             throw new SQLException("Unable to establish a connection to the database.");
         }
 
-        String hashPassword = PasswordHasher.hashPassword(pWord);
+        String hashPassword = passwordEncoder.encode(pWord);
 
         String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob, " +
                 "address, eircode, secret_key, is_2fa_enabled) VALUES (?,?,?,?,?,?,?,?,?,?)";
@@ -115,13 +117,13 @@ public class UserDAOImpl implements UserDAO {
 
         int addedRows = 0;
 
-        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO users (username, fullname, usertype, email, password, dob) VALUES (?,?,?,?,?,?)")){
+        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO users (username, full_name, user_type, email, password, dob) VALUES (?,?,?,?,?,?)")){
             ps.setString(1, toBeCreated.getUsername());
             ps.setString(2, toBeCreated.getFullName());
             ps.setString(3, toBeCreated.getUserType());
             ps.setString(4, toBeCreated.getEmail());
-            ps.setString(5, toBeCreated.getPassword());
-            ps.setDate(6, (Date) toBeCreated.getDob());
+            ps.setString(5, passwordEncoder.encode(toBeCreated.getPassword()));
+            ps.setDate(6, new java.sql.Date(toBeCreated.getDob().getTime()));
 
             addedRows = ps.executeUpdate();
         }catch(SQLIntegrityConstraintViolationException e){
@@ -168,13 +170,13 @@ public class UserDAOImpl implements UserDAO {
             throw new SQLException("updateUser() - Unable to establish a connection to the database !");
         }
 
-        try (PreparedStatement ps = conn.prepareStatement("UPDATE users SET username = ?, fullName = ?, userType = ?, email = ?, password = ?, dob = ?, secret_key = ?, is_2fa_enabled = ? WHERE user_id = ?")) {
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE users SET username = ?, full_name = ?, user_type = ?, email = ?, password = ?, dob = ?, secret_key = ?, is_2fa_enabled = ? WHERE user_id = ?")) {
             ps.setString(1, toBeUpdated.getUsername());
             ps.setString(2, toBeUpdated.getFullName());
             ps.setString(3, toBeUpdated.getUserType());
             ps.setString(4, toBeUpdated.getEmail());
             ps.setString(5, toBeUpdated.getPassword());
-            ps.setDate(6, (Date) toBeUpdated.getDob());
+            ps.setDate(6, new java.sql.Date(toBeUpdated.getDob().getTime()));
             // 2FA fields
             ps.setString(7, toBeUpdated.getSecretKey());
             ps.setBoolean(8, toBeUpdated.is2faEnabled());
