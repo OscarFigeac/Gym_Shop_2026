@@ -123,8 +123,8 @@ public class UserDAOImpl implements UserDAO {
             ps.setString(2, toBeCreated.getFullName());
             ps.setString(3, toBeCreated.getUserType());
             ps.setString(4, toBeCreated.getEmail());
-            ps.setString(5, toBeCreated.getPassword());
-            ps.setDate(6, (Date) toBeCreated.getDob());
+            ps.setString(5, passwordEncoder.encode(toBeCreated.getPassword()));
+            ps.setDate(6, new java.sql.Date(toBeCreated.getDob().getTime()));
 
             addedRows = ps.executeUpdate();
         }catch(SQLIntegrityConstraintViolationException e){
@@ -177,7 +177,7 @@ public class UserDAOImpl implements UserDAO {
             ps.setString(3, toBeUpdated.getUserType());
             ps.setString(4, toBeUpdated.getEmail());
             ps.setString(5, toBeUpdated.getPassword());
-            ps.setDate(6, (Date) toBeUpdated.getDob());
+            ps.setDate(6, new java.sql.Date(toBeUpdated.getDob().getTime()));
             // 2FA fields
             ps.setString(7, toBeUpdated.getSecretKey());
             ps.setBoolean(8, toBeUpdated.is2faEnabled());
