@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.util.Date;
 
+@Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 @Builder
@@ -25,7 +26,6 @@ public class User {
     @NonNull
     private Date dob;
     //2FA
-    @NonNull
     private String secretKey;
     @NonNull
     private boolean is2faEnabled;

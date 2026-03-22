@@ -1,95 +1,76 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org/">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | Gym Shop 2026</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Login | GYMSHOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --brand-orange: #f47920;
+            --brand-dark: #232323;
+            --brand-light: #f8f9fa;
+        }
+
         body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--brand-light);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--brand-dark);
         }
 
-        .gym-container {
-            border: 2px solid #adff2f;
-            background-color: #111;
-            padding: 30px;
-            margin-top: 60px;
+        .login-card {
+            border: none;
+            border-top: 4px solid var(--brand-orange);
+            background: #ffffff;
+            padding: 40px;
+            margin-top: 80px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 8px;
         }
 
-        .gym-title {
-            background-color: #adff2f;
-            color: #000;
-            display: inline-block;
-            padding: 5px 20px;
-            font-weight: 900;
+        .login-header {
+            font-weight: 800;
             text-transform: uppercase;
+            letter-spacing: -0.5px;
             margin-bottom: 30px;
+            color: var(--brand-dark);
         }
 
         .form-label {
-            color: #adff2f;
+            font-weight: 700;
+            font-size: 0.85rem;
             text-transform: uppercase;
-            font-size: 0.8rem;
-            font-weight: bold;
-            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 8px;
         }
 
         .form-control {
-            background-color: #000;
-            border: 1px solid #444;
-            color: #fff;
-            border-radius: 0;
-            padding: 12px;
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            border-radius: 4px;
+            font-size: 0.95rem;
         }
 
         .form-control:focus {
-            background-color: #000;
-            border-color: #adff2f;
+            border-color: var(--brand-orange);
+            box-shadow: 0 0 0 3px rgba(244, 121, 32, 0.15);
+        }
+
+        .btn-primary-gym {
+            background-color: var(--brand-dark);
             color: #fff;
-            box-shadow: 0 0 5px rgba(173, 255, 47, 0.5);
-        }
-
-        .btn-gym {
-            background-color: #adff2f;
-            color: #000;
-            font-weight: 900;
-            text-transform: uppercase;
             border: none;
-            border-radius: 0;
-            width: 100%;
-            padding: 15px;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .btn-gym:hover {
-            box-shadow: 0 0 15px #adff2f;
-            transform: scale(1.02);
-            background-color: #fff;
-            color: #000;
-        }
-
-        .gym-alert {
-            background-color: #000;
-            border: 2px solid #ff0000;
-            color: #ff0000;
-            padding: 10px;
-            font-weight: bold;
+            padding: 14px;
+            font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 20px;
-            text-align: center;
+            width: 100%;
+            transition: all 0.2s;
+            border-radius: 4px;
         }
 
-        /* Validation*/
-        .was-validated .form-control:valid {
-            border-color: #adff2f !important;
-            background-image: none;
-        }
-
-        .was-validated .form-control:invalid {
-            border-color: #ff0000 !important;
+        .btn-primary-gym:hover {
+            background-color: var(--brand-orange);
+            transform: translateY(-1px);
         }
 
         .password-wrapper {
@@ -102,58 +83,87 @@
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #adff2f;
-            font-size: 0.9rem;
-            font-weight: bold;
+            color: var(--brand-orange);
+            font-weight: 700;
+            font-size: 0.75rem;
             user-select: none;
+        }
+
+        .signup-footer {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .signup-footer a {
+            color: var(--brand-orange);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .was-validated .form-control:invalid {
+            border-color: #dc3545;
+        }
+
+        .alert-custom {
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
-<header th:replace="~{fragments/header :: mainHeader}"></header>
+<header th:replace="~{fragments/header :: header}"></header>
 
 <main class="container">
     <div class="row justify-content-center">
-        <div class="col-md-5 gym-container">
-            <h2 class="gym-title">User Login</h2>
+        <div class="col-md-5 col-lg-4">
+            <div class="login-card">
+                <h2 class="login-header text-center">Login to <span style="color: var(--brand-orange)">Gym</span>Shop</h2>
 
-            <div th:if="${param.registered}" class="mb-3 text-success fw-bold text-uppercase">
-                Registration Successful! Please Log In.
-            </div>
-
-            <form id="loginForm" th:action="@{/login}" method="post" class="needs-validation" novalidate>
-                <div class="mb-4">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="ENTER USERNAME" required>
+                <div th:if="${param.registered}" class="alert alert-success alert-custom text-center mb-4">
+                    Registration Successful!
                 </div>
 
-                <div class="mb-4">
-                    <label for="password" class="form-label">Password</label>
-                    <div class="password-wrapper">
-                        <input type="password" class="form-control" id="password" name="password" placeholder="ENTER PASSWORD" required>
-                        <span class="toggle-password" onclick="togglePass('password')">SHOW</span>
+                <div th:if="${param.error}" class="alert alert-danger alert-custom text-center mb-4">
+                    Invalid Credentials
+                </div>
+
+                <form id="loginForm" th:action="@{/login}" method="post" class="needs-validation" novalidate>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
                     </div>
-                </div>
 
-                <div class="mb-4">
-                    <label for="code" class="form-label">2FA Security Code</label>
-                    <input type="text" class="form-control" id="code" name="code" placeholder="6-DIGIT CODE" maxlength="6">
-                </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+                            <span class="toggle-password" onclick="togglePass('password')">SHOW</span>
+                        </div>
+                    </div>
 
-                <button type="submit" class="btn-gym">Secure Login</button>
+                    <div class="mb-4">
+                        <label for="code" class="form-label">2FA Security Code</label>
+                        <input type="text" class="form-control" id="code" name="code" placeholder="6-digit code (if enabled)" maxlength="6">
+                    </div>
 
-                <div class="text-center mt-4">
-                    <a th:href="@{/register}" class="text-muted text-decoration-none small">
-                        DON'T HAVE AN ACCOUNT? <span style="color: #adff2f; font-weight: bold;">SIGN UP</span>
-                    </a>
-                </div>
-            </form>
+                    <button type="submit" class="btn-primary-gym">Secure Login</button>
+
+                    <div class="text-center signup-footer">
+                        Don't have an account? <a th:href="@{/register}">Sign Up Now</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/validation.js"></script>
+
 </body>
 </html>

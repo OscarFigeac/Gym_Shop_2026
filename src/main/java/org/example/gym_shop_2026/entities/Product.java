@@ -27,10 +27,10 @@ public class Product {
 
     @Min(value = 0, message = "In stock quantity cannot be negative")
     @NonNull
-    private final int inStock;
+    private final int quantity;
 
-    @Min(value = 0, message = "Price cannot be negative.")
+    @Min(value = 0, message = "Price cannot be negative")
     @NonNull
-    private double price;
+    private final int price;
 
 }

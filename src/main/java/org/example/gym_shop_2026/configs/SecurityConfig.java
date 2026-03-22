@@ -71,28 +71,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                //enable this for production, testing purposes only for disabling it
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.disable()) // Disable for local dev; enable & config for production
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/register", "/confirm-2fa", "/setup-2fa", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/products/**", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+
+                        .requestMatchers("/basket/**").authenticated()
+                        .requestMatchers("/payment-methods/**").authenticated()
+                        .requestMatchers("/checkout/**").authenticated()
+                        .requestMatchers("/dashboard/**").authenticated()
+                        .requestMatchers("/profile/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .usernameParameter("username")
-                        .passwordParameter("password")
-                        .authenticationDetailsSource(detailsSource)
                         .defaultSuccessUrl("/", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/")
                         .permitAll()
                 );
-
-        http.authenticationProvider(authProvider);
 
         return http.build();
     }

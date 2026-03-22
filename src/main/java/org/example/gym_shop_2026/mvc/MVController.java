@@ -44,10 +44,10 @@ public class MVController {
      *
      * @return A {@link String} representing a view index.html web page.
      */
-    @GetMapping(path = "/")
-    public String index() {
-        return "index";
-    }
+//    @GetMapping(path = "/")
+//    public String index() {
+//        return "index";
+//    }
 
     /**
      * Loads login.html page when get requesting /login.

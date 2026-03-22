@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Payment Methods | GYMSHOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --brand-orange: #f47920;
+            --brand-dark: #232323;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .payment-card {
+            background: linear-gradient(135deg, #232323 0%, #444 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            min-height: 190px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border: none;
+        }
+
+        .chip {
+            width: 45px;
+            height: 32px;
+            background: linear-gradient(135deg, #d4af37, #f1d592);
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .card-number {
+            font-size: 1.3rem;
+            letter-spacing: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn-orange {
+            background: var(--brand-orange);
+            color: white;
+            font-weight: 800;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div th:if="${param.error == 'no_card_found'}" class="alert alert-warning border-0 shadow-sm mb-4">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <strong>Almost there!</strong> Please add a payment method to finalize your order.
+            </div>
+
+            <div class="row">
+                <div class="col-md-7">
+                    <h2 class="fw-bold mb-4">SAVED <span style="color: var(--brand-orange)">CARDS</span></h2>
+
+                    <div class="row g-4">
+                        <div class="col-12" th:each="method : ${methods}">
+                            <div class="card payment-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="chip"></div>
+                                    <form th:action="@{'/payment-methods/delete/' + ${method.methodId}}" method="post">
+                                        <button type="submit" class="btn btn-link text-white opacity-50 p-0"><i
+                                                class="bi bi-trash3-fill h5"></i></button>
+                                    </form>
+                                </div>
+                                <div class="card-number">**** **** **** <span
+                                        th:text="${method.lastFourDigits}">4242</span></div>
+                                <div class="d-flex justify-content-between align-items-end mt-4">
+                                    <div>
+                                        <small class="text-uppercase opacity-50 d-block" style="font-size: 0.7rem;">Expires</small>
+                                        <span class="fw-bold" th:text="${method.expiryDate}">MM/YY</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-light text-dark fw-bold px-3 py-2"
+                                              th:text="${method.cardType}">VISA</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(methods)}"
+                             class="col-12 text-center py-5 bg-white rounded border border-dashed">
+                            <i class="bi bi-credit-card-2-front display-1 text-muted opacity-25"></i>
+                            <p class="text-muted mt-3">You haven't added any cards yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <div class="card border-0 shadow-sm p-4 mt-5 mt-md-0">
+                        <h4 class="fw-bold mb-4">Add New Card</h4>
+                        <form th:action="@{/payment-methods/add}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">CARD TYPE</label>
+                                <select name="cardType" class="form-select" required>
+                                    <option value="VISA">Visa</option>
+                                    <option value="MASTERCARD">Mastercard</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">CARDHOLDER NAME</label>
+                                <input type="text" name="cardHolderName" class="form-control" placeholder="Full Name"
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">CARD NUMBER</label>
+                                <input type="text" name="cardNumber" class="form-control" placeholder="16 Digits"
+                                       maxlength="16" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="form-label small fw-bold">EXPIRY</label>
+                                    <input type="text" name="expiry" class="form-control" placeholder="MM/YY" required>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="form-label small fw-bold">CVV</label>
+                                    <input type="password" class="form-control" placeholder="***" maxlength="3"
+                                           required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-orange w-100 py-3 mt-3">SECURELY SAVE CARD</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <a th:href="@{/basket}" class="text-dark text-decoration-none small fw-bold"><i
+                        class="bi bi-arrow-left"></i> BACK TO BASKET</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
