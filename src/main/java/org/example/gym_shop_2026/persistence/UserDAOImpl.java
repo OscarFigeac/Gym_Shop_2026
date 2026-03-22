@@ -22,6 +22,20 @@ public class UserDAOImpl implements UserDAO {
 
     //Functionality:
 
+    /**
+     *Method to allow the user to log-in
+     * <p>
+     * Let's the user enter their username and password, which are checked in the database to see if they match a specific user and if so they can log-in
+     *
+     * @param uName The username the user has entered
+     * @param pWord The password of the same user
+     *
+     * @return True if the user can log in and False if the user can't
+     *
+     * @throws SQLException If their is a problem with the SQL query accessing the database
+     *
+     * @author Eoghan Carroll
+     */
     @Override
     public boolean login(String uName, String pWord) throws SQLException {
         if (connector == null) {
@@ -42,6 +56,26 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
+    /**
+     * Method to allow the user to register for the app
+     * <p>
+     * Takes in the appropriate fields for the user to create an account and returns a boolean if all the fields are entered correctly and uniquely
+     *
+     * @param uName The username chosen by the user
+     * @param fName The users full name
+     * @param type The type of customer the user chooses to be
+     * @param eMail The users email address
+     * @param pWord The password of the user
+     * @param dob The users date of birth
+     * @param address The users address
+     * @param eircode The eircode of the user
+     *
+     * @return True if the registration is a success and False if not
+     *
+     * @throws SQLException If there is an error with the SQL Statement accessing the database
+     *
+     * @author Eoghan Carroll
+     */
     @Override
     public boolean register(String uName, String fName, String type, String eMail, String pWord,
                             Date dob, String address, String eircode) throws SQLException {
@@ -78,6 +112,19 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
+    /**
+     * Searches the user table via usernames
+     * <p>
+     * Takes in a username and searches through the database for the user with corresponding username as usernames are a unique field
+     *
+     * @param Username Username being searched for
+     *
+     * @return The user with the corresponding username
+     *
+     * @throws SQLException If there is an error with the SQL Statement accessing the database
+     *
+     * @author Eoghan Carroll
+     */
     @Override
     public User findByUsername(String Username) throws SQLException {
         if (stringValidation(Username)) {
@@ -104,6 +151,19 @@ public class UserDAOImpl implements UserDAO {
 
     //CRUD Methods:
 
+    /**
+     * CRUD Method to create a new User
+     * <p>
+     * Adds a new user to the user table with a premade user entity instead of allowing the user to manually enter each detail
+     *
+     * @param toBeCreated The user being added to the database
+     *
+     * @return True if the user is successfully added and false if not
+     *
+     * @throws SQLException If there is an error with the SQL Statement accessing the database
+     *
+     * @author Eoghan Carroll
+     */
     @Override
     public boolean createUser(User toBeCreated) throws SQLException{
         if(toBeCreated == null){
@@ -135,6 +195,19 @@ public class UserDAOImpl implements UserDAO {
         return addedRows == 1;
     }
 
+    /**
+     * CRUD Method for searching through the user table
+     * <p>
+     * Takes in a unique user ID  and searches through the table for the user with that ID and returns the user
+     *
+     * @param ID The ID of the user being searched for
+     *
+     * @return The user if found, Null if the user isn't found
+     *
+     * @throws SQLException If there is an error with the SQL Statement accessing the database
+     *
+     * @author Eoghan Carroll
+     */
     @Override
     public User findUserByID(int ID) throws SQLException{
         if(ID <= 0){
@@ -159,6 +232,19 @@ public class UserDAOImpl implements UserDAO {
         return found;
     }
 
+    /**
+     * CRUD Method for updating a user in the table
+     * <p>
+     * Takes in a user entity with the same ID as one already in the table but with other different fields (eg. Username) and changes the details of the user in the table with the user that was inserted into this method.
+     *
+     * @param toBeUpdated The user with the updated details for the table
+     *
+     * @return True if the user was updated, false if not
+     *
+     * @throws SQLException If there is an error with the SQL Statement accessing the database
+     *
+     * @author Eoghan Carroll
+     */
     @Override
     public boolean updateUser(User toBeUpdated) throws SQLException {
         if (toBeUpdated == null) {
@@ -194,6 +280,19 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
+    /**
+     * CRUD Method for deleting users from the table
+     * <p>
+     * Takes in a user entity and searches the table for the same user and deletes it from the table
+     *
+     * @param toBeDeleted The user to deleted from the table
+     *
+     * @return True if the user has successfully deleted, False if not
+     *
+     * @throws SQLException If there is an error with the SQL Statement accessing the database
+     *
+     *  @author Eoghan Carroll
+     */
     @Override
     public boolean deleteUser (User toBeDeleted) throws SQLException{
         if(toBeDeleted == null){
