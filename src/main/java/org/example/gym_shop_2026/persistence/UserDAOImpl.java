@@ -41,48 +41,39 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean register(String uName, String fName, String type, String eMail, String pWord, Date dob) throws SQLException {
-        if (stringValidation(uName)) {
-            throw new IllegalArgumentException("Username - Field cannot be null or empty for registration process !");
-        }
-        if (stringValidation(fName)) {
-            throw new IllegalArgumentException("Full Name - Field cannot be null or empty for registration process !");
-        }
-        if (stringValidation(type)) {
-            throw new IllegalArgumentException("User Type - Field cannot be null or empty for registration process !");
-        }
-        if (stringValidation(eMail)) {
-            throw new IllegalArgumentException("E-Mail - Field cannot be null or empty for registration process !");
-        }
-        if (stringValidation(pWord)) {
-            throw new IllegalArgumentException("Password - Field cannot be null or empty for registration process !");
-        }
-        if (dob == null) {
-            throw new IllegalArgumentException("Date of Birth - Field cannot be null or empty for registration process !");
-        }
-        if (connector.getConnection() == null) {
-            throw new SQLException("register() - Unable to establish connection to the database !");
+    public boolean register(String uName, String fName, String type, String eMail, String pWord,
+                            Date dob, String address, String eircode) throws SQLException {
+
+        Connection conn = connector.getConnection();
+
+        if (conn == null) {
+            log.error("DATABASE CONNECTION IS NULL - Check your Connector class and DB credentials!");
+            throw new SQLException("Unable to establish a connection to the database.");
         }
 
         String hashPassword = PasswordHasher.hashPassword(pWord);
-        int addedRows = 0;
 
-        try (PreparedStatement ps = connector.getConnection().prepareStatement("INSERT INTO users (username, full_name, user_type, email, password, dob) VALUES (?,?,?,?,?,?)")) {
+        String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob, " +
+                "address, eircode, secret_key, is_2fa_enabled) VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+        try (PreparedStatement ps = connector.getConnection().prepareStatement(sql)) {
             ps.setString(1, uName);
             ps.setString(2, fName);
             ps.setString(3, type);
             ps.setString(4, eMail);
             ps.setString(5, hashPassword);
             ps.setDate(6, dob);
+            ps.setString(7, address);
+            ps.setString(8, eircode);
+            ps.setString(9, "NOT_SET");
+            ps.setBoolean(10, false);
 
-            addedRows = ps.executeUpdate();
-        } catch (SQLIntegrityConstraintViolationException e) {
-            log.error("register() - Username \"{}\" unavailable !", uName);
+            int addedRows = ps.executeUpdate();
+            return addedRows == 1;
         } catch (SQLException e) {
-            log.error("register() - The SQL query could not be executed or prepared by the program. Exception: {}", e.getMessage());
+            log.error("Registration SQL failed: {}", e.getMessage());
             throw e;
         }
-        return addedRows == 1;
     }
 
     @Override
@@ -238,12 +229,13 @@ public class UserDAOImpl implements UserDAO {
         return User.builder()
                 .user_id(rs.getInt("user_id"))
                 .username(rs.getString("username"))
-                .fullName(rs.getString("fullName"))
-                .userType(rs.getString("userType"))
+                .fullName(rs.getString("full_name"))
+                .userType(rs.getString("user_type"))
                 .email(rs.getString("email"))
                 .password(rs.getString("password"))
                 .dob(rs.getDate("dob"))
-                //2FA fields
+                .address(rs.getString("address"))
+                .eircode(rs.getString("eircode"))
                 .secretKey(rs.getString("secret_key"))
                 .is2faEnabled(rs.getBoolean("is_2fa_enabled"))
                 .build();

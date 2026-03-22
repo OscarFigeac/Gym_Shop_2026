@@ -7,7 +7,8 @@ import java.sql.SQLException;
 
 public interface UserDAO {
     boolean login(String username, String password) throws SQLException;
-    boolean register(String username, String fullName, String userType, String eMail, String passWord, Date birthDay) throws SQLException;
+    public boolean register(String uName, String fName, String type, String eMail, String pWord,
+                            Date dob, String address, String eircode) throws SQLException;
     User findByUsername(String Username) throws SQLException;
     boolean createUser(User toBeCreated) throws SQLException;
     User findUserByID(int userId) throws SQLException;
