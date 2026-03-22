@@ -76,6 +76,22 @@ CREATE TABLE IF NOT EXISTS transactions(
     CONSTRAINT fk_transactions_paymentmethods FOREIGN KEY(method_id) REFERENCES payment_methods(method_id)
 );
 
+CREATE TABLE IF NOT EXISTS basket(
+    basket_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    CONSTRAINT fk_basket_users FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+CREATE TABLE IF NOT EXISTS basket_item(
+    itemId INT AUTO_INCREMENT PRIMARY KEY,
+    productId INT NOT NULL,
+    basketId INT NOT NULL,
+    itemQuantity INT NOT NULL,
+    CONSTRAINT fk_basketItem_products FOREIGN KEY(productId) REFERENCES products(product_id),
+    CONSTRAINT fk_basketItem_basket FOREIGN KEY(basketId) REFERENCES basket(basket_id),
+    CONSTRAINT ck_basketItem_itemQuantity CHECK(itemQuantity >= 0)
+);
 # CREATE TABLE IF NOT EXISTS productslocations(
 #     product_id INT NOT NULL,
 #     location_id INT NOT NULL,
