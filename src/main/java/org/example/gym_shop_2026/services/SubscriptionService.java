@@ -19,7 +19,7 @@ public class SubscriptionService {
     }
 
     /**
-     * Gets all subscriptions as {@link Subscription} objects
+     * Gets all subscriptions as {@link Subscription} objects.
      * @return {@link List<Subscription>} with all found subscriptions
      */
     public List<Subscription> getAllSubscriptions() {
@@ -35,12 +35,12 @@ public class SubscriptionService {
     }
 
     /**
-     * Gets {@link Subscription} with a given plan id for viewing, deleting
-     * @param planId
-     * @return
+     * Gets {@link Subscription} with a given plan id for viewing, deleting.
+     * @param planId Given subscription plan id
+     * @return True if subscription 
      * @throws SQLException
      */
-    public Subscription getPlanById(int planId) throws SQLException {
+    public Subscription getSubscriptionPlanById(int planId) throws SQLException {
         if(planId < 1) {
             log.error("Could not perform get subscription service operation as planId was less than 1");
             throw new IllegalArgumentException("Plan id must be greater than or equal to 1.");
