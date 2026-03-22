@@ -21,9 +21,9 @@ public class Product {
     @NonNull
     private final String name;
 
-    @NotBlank(message = "Description is required")
-    @NonNull
-    private final String description;
+//    @NotBlank(message = "Description is required")
+//    @NonNull
+//    private final String description;
 
     @Min(value = 0, message = "In stock quantity cannot be negative")
     @NonNull
@@ -31,6 +31,6 @@ public class Product {
 
     @Min(value = 0, message = "Price cannot be negative")
     @NonNull
-    private final int price;
+    private final double price;
 
 }
