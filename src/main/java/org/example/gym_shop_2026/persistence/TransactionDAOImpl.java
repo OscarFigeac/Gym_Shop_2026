@@ -70,12 +70,10 @@ public class TransactionDAOImpl implements TransactionDAO {
             }
             catch (SQLException e) {
                 log.error("Could not perform get transactions operation as there was a problem preparing sql statement! {}", e);
-                throw new SQLException("Could not perform get transactions operation as there was a problem preparing sql statement!");
             }
         }
         catch (SQLException e) {
             log.error("Could not perform get transactions operation! {}", e);
-            throw new SQLException("Could not perform get transactions operation! ");
         }
 
         return transactions;
