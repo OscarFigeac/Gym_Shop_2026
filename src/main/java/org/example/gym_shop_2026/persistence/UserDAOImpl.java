@@ -3,7 +3,6 @@ package org.example.gym_shop_2026.persistence;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.entities.User;
-import org.example.gym_shop_2026.utils.PasswordHasher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
