@@ -39,10 +39,6 @@ public class SecurityConfig {
         this.detailsSource = detailsSource;
         this.userDAO = userDAO;
     }
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);
-    }
 
 //    public UserDetailsService userDetailsService() {
 //        return username -> {
