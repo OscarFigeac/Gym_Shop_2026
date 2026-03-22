@@ -59,4 +59,5 @@ class UserDAOImplTest {
             this.userDAO.login("testUser123", "test123");
         });
     }
+
 }

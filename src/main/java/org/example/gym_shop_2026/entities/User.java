@@ -2,12 +2,11 @@ package org.example.gym_shop_2026.entities;
 
 import lombok.*;
 
-
 import java.util.Date;
 
+@Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
-@Getter
 @Builder
 @AllArgsConstructor
 public class User {
@@ -27,8 +26,45 @@ public class User {
     @NonNull
     private Date dob;
     //2FA
-    @NonNull
     private String secretKey;
     @NonNull
     private boolean is2faEnabled;
+
+    @NonNull
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public @NonNull String getUsername() {
+        return username;
+    }
+
+    public @NonNull String getFullName() {
+        return fullName;
+    }
+
+    public @NonNull String getUserType() {
+        return userType;
+    }
+
+    public @NonNull String getEmail() {
+        return email;
+    }
+
+    public @NonNull String getPassword() {
+        return password;
+    }
+
+    public @NonNull Date getDob() {
+        return dob;
+    }
+
+    public @NonNull String getSecretKey() {
+        return secretKey;
+    }
+
+    @NonNull
+    public boolean is2faEnabled() {
+        return is2faEnabled;
+    }
 }

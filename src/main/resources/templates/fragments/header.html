@@ -1,36 +1,127 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 <div th:fragment="header">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom" style="border-color: #adff2f !important; border-width: 3px !important;">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/" style="color: #adff2f;">
-                [Logo - In development]
+    <style>
+        :root {
+            --brand-orange: #f47920;
+            --brand-dark: #232323;
+            --brand-white: #ffffff;
+        }
+
+        .main-nav {
+            background-color: var(--brand-white);
+            border-bottom: 1px solid #e0e0e0;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .navbar-brand {
+            font-weight: 900;
+            font-size: 1.6rem;
+            color: var(--brand-dark) !important;
+            letter-spacing: -1px;
+            text-decoration: none;
+        }
+
+        .brand-accent { color: var(--brand-orange); }
+
+        .nav-link {
+            color: var(--brand-dark) !important;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .search-group .form-control {
+            border-radius: 4px 0 0 4px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            height: 40px;
+        }
+
+        .search-group .btn {
+            border-radius: 0 4px 4px 0;
+            background-color: var(--brand-dark);
+            color: white;
+            padding: 0 20px;
+            font-weight: 600;
+            height: 40px;
+            border: none;
+        }
+
+        .auth-link {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--brand-dark);
+            text-decoration: none;
+        }
+
+        .cart-wrapper {
+            position: relative;
+            padding: 5px;
+            color: var(--brand-dark);
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -2px;
+            right: -5px;
+            background-color: var(--brand-orange);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 50px;
+        }
+    </style>
+
+    <nav class="navbar navbar-expand-lg main-nav sticky-top">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                GYM<span class="brand-accent">SHOP</span>
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            Products
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-dark">
-                            <li><a class="dropdown-item" href="#">Supplements</a></li>
-                            <li><a class="dropdown-item" href="#">Equipment</a></li>
-                        </ul>
-                    </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="#">Locations</a>
+                        <a class="nav-link" th:href="@{/products}">Products</a>
                     </li>
                 </ul>
 
-                <div class="d-flex">
-                    <a th:href="@{/login}" class="btn btn-outline-light me-2">Login</a>
-                    <a th:href="@{/register}" class="btn text-black fw-bold" style="background-color: #adff2f;">Sign Up</a>
+                <form class="d-flex search-group mx-lg-4 flex-grow-1" style="max-width: 500px;" th:action="@{/products/search}" method="get">
+                    <input class="form-control" type="search" name="query" placeholder="Search for supplements..." aria-label="Search">
+                    <button class="btn" type="submit">GO</button>
+                </form>
+
+                <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+
+                    <div th:unless="${#authorization.expression('isAuthenticated()')}" class="d-flex gap-2">
+                        <a th:href="@{/login}" class="auth-link">Login</a>
+                        <span class="text-muted">|</span>
+                        <a th:href="@{/register}" class="auth-link" style="color: var(--brand-orange);">Sign Up</a>
+                    </div>
+
+                    <div th:if="${#authorization.expression('isAuthenticated()')}">
+                        <a th:href="@{/dashboard}" class="auth-link">
+                            Welcome, <span th:text="${#authentication.name}">User</span>
+                        </a>
+                    </div>
+
+                    <a th:href="@{/basket}" class="cart-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-bag" viewBox="0 0 16 16">
+                            <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
+                        </svg>
+                        <span class="cart-count" th:if="${basketCount > 0}" th:text="${basketCount}">0</span>
+                    </a>
                 </div>
             </div>
         </div>

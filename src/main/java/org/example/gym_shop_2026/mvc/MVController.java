@@ -1,7 +1,9 @@
 package org.example.gym_shop_2026.mvc;
 
-import org.example.gym_shop_2026.entities.User;
+import lombok.extern.slf4j.Slf4j;
+import org.example.gym_shop_2026.entities.Transaction;
 import org.example.gym_shop_2026.persistence.UserDAO;
+import org.example.gym_shop_2026.services.TransactionService;
 import org.example.gym_shop_2026.services.TwoFactorAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,24 +15,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * An MVC controller for handling redirects to named views.
  *
  * @author Oscar Figeac & Cal Woods
  */
+@Slf4j
 @Controller
 public class MVController {
 
     private final PasswordEncoder passwordEncoder;
     private final UserDAO userDAO;
     private final TwoFactorAuthenticationService tfaService;
+    private final TransactionService transactionService;
 
     @Autowired
-    public MVController(PasswordEncoder passwordEncoder, UserDAO userDAO, TwoFactorAuthenticationService tfaService) {
+    public MVController(PasswordEncoder passwordEncoder, UserDAO userDAO, TwoFactorAuthenticationService tfaService, TransactionService transactionService) {
         this.passwordEncoder = passwordEncoder;
         this.userDAO = userDAO;
         this.tfaService = tfaService;
+        this.transactionService = transactionService;
     }
 
     /**
@@ -38,10 +44,10 @@ public class MVController {
      *
      * @return A {@link String} representing a view index.html web page.
      */
-    @GetMapping(path = "/")
-    public String index() {
-        return "index";
-    }
+//    @GetMapping(path = "/")
+//    public String index() {
+//        return "index";
+//    }
 
     /**
      * Loads login.html page when get requesting /login.
@@ -117,6 +123,21 @@ public class MVController {
         return "redirect:/setup-2fa?error=invalid_code&username=" + username + "&secret=" + secret;
     }
 
+    /**
+     * Controller method to load transactions section of dashboard.
+     * @param model Given {@link Model} for passing information to page
+     * @return {@link String} representing a html file-name to display
+     */
+    @GetMapping(path = "/dashboard/viewtransactions")
+    public String dashboardTransactions(Model model) {
+        if(model == null) {
+            log.error("Could not load page view transactions in dashboard as given Model object was null, redirecting to homepage...");
+            return "redirect:/?dashboardStatus=failed%20to%20load";
+        }
 
+        List<Transaction> transactions = transactionService.getAllTransactionsForUser(1);
 
+        model.addAttribute("transactions", transactions);
+        return "dashboard/view-transactions";
+    }
 }

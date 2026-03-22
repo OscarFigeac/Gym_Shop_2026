@@ -7,16 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.sql.SQLException;
 
 /**
  * Configuration class for Spring Security.
@@ -35,7 +32,7 @@ public class SecurityConfig {
     private final UserDAO userDAO;
 
     @Autowired
-    public SecurityConfig(CustomAuthenticationProvider authProvider,
+    public SecurityConfig(@Lazy CustomAuthenticationProvider authProvider,
                           CustomAuthenticationDetailsSource detailsSource,
                           UserDAO userDAO){
         this.authProvider = authProvider;
@@ -47,56 +44,55 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> {
-            try{
-                org.example.gym_shop_2026.entities.User user = userDAO.findByUsername(username);
-                if (user == null){
-                    throw new UsernameNotFoundException("User not found: " + username);
-                }
-
-                // returns the spring security user object mapped from our database user
-                return org.springframework.security.core.userdetails.User.builder()
-                        .username(user.getUsername())
-                        .password(user.getPassword())
-                        .disabled(false)
-                        .accountExpired(false)
-                        .credentialsExpired(false)
-                        .accountLocked(false)
-                        .authorities("USER")
-                        .build();
-            } catch (SQLException e){
-                throw new UsernameNotFoundException("Database error during authentication", e);
-            }
-        };
-    }
+//    public UserDetailsService userDetailsService() {
+//        return username -> {
+//            try{
+//                org.example.gym_shop_2026.entities.User user = userDAO.findByUsername(username);
+//                if (user == null){
+//                    throw new UsernameNotFoundException("User not found: " + username);
+//                }
+//
+//                // returns the spring security user object mapped from our database user
+//                return org.springframework.security.core.userdetails.User.builder()
+//                        .username(user.getUsername())
+//                        .password(user.getPassword())
+//                        .disabled(false)
+//                        .accountExpired(false)
+//                        .credentialsExpired(false)
+//                        .accountLocked(false)
+//                        .authorities("USER")
+//                        .build();
+//            } catch (SQLException e){
+//                throw new UsernameNotFoundException("Database error during authentication", e);
+//            }
+//        };
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                //enable this for production, testing purposes only for disabling it
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.disable()) // Disable for local dev; enable & config for production
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/register", "/confirm-2fa", "/setup-2fa", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/products/**", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+
+                        .requestMatchers("/basket/**").authenticated()
+                        .requestMatchers("/payment-methods/**").authenticated()
+                        .requestMatchers("/checkout/**").authenticated()
+                        .requestMatchers("/dashboard/**").authenticated()
+                        .requestMatchers("/profile/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .usernameParameter("username")
-                        .passwordParameter("password")
-                        .authenticationDetailsSource(detailsSource)
                         .defaultSuccessUrl("/", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/")
                         .permitAll()
                 );
-
-        http.authenticationProvider(authProvider);
 
         return http.build();
     }

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Account Settings | GYMSHOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --brand-orange: #f47920;
+            --brand-dark: #232323;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .settings-card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-orange {
+            background: var(--brand-orange);
+            color: white;
+            font-weight: bold;
+            border: none;
+        }
+
+        .btn-orange:hover {
+            background: #d36618;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="fw-bold mb-4">ACCOUNT <span style="color: var(--brand-orange)">SETTINGS</span></h2>
+
+            <div class="card settings-card mb-4 p-4">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">User Profile</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="small fw-bold text-muted">USERNAME</label>
+                        <p class="mb-0 fw-bold" th:text="${user.username}">Username</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card settings-card p-4">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Security & Privacy</h5>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-0 fw-bold">Two-Factor Authentication (2FA)</p>
+                        <p class="small text-muted mb-0">Secure your gains with a secondary mobile code.</p>
+                    </div>
+
+                    <div>
+                        <form th:action="@{/dashboard/2fa/toggle}" method="post">
+                            <button type="submit"
+                                    th:class="${user.is2faEnabled} ? 'btn btn-outline-danger btn-sm' : 'btn btn-orange btn-sm'"
+                                    th:text="${user.is2faEnabled} ? 'DISABLE 2FA' : 'ENABLE 2FA'">
+                                Action
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div th:if="${user.is2faEnabled}" class="mt-3 p-2 bg-light rounded border text-center">
+                    <span class="text-success small fw-bold">● YOUR ACCOUNT IS CURRENTLY PROTECTED</span>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a th:href="@{/dashboard}" class="text-dark small text-decoration-none">&larr; BACK TO DASHBOARD</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
