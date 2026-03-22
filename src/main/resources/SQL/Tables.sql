@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS payment_methods(
     user_id INT NOT NULL,
     processor_token VARCHAR(255) NOT NULL,
     last_four_digits INT NOT NULL,
-    expiry_date DATE NOT NULL,
+    expiry_date VARCHAR(255) NOT NULL,
     card_type VARCHAR(12) NOT NULL,
     is_valid TINYINT NOT NULL,
     is_primary TINYINT NOT NULL,
