@@ -141,20 +141,20 @@
                 <div class="flex-grow-1">
                     <span class="category-badge" th:text="${product.productCategory}">Category</span>
                     <a th:href="@{/products/{id}(id=${product.productId})}" class="product-name d-block" th:text="${product.name}">Product Name</a>
-                    <p class="stock-text mb-2">In Stock: <span th:text="${product.inStock}" th:classappend="${product.inStock < 5} ? 'text-danger fw-bold' : ''">0</span></p>
+                    <p class="stock-text mb-2">In Stock: <span th:text="${product.quantity}" th:classappend="${product.quantity < 5} ? 'text-danger fw-bold' : ''">0</span></p>
                 </div>
 
                 <div class="mt-auto">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="price-tag" th:text="${product.price != null ? '€' + product.price : '€19.99'}">€0.00</span>
+                        <span class="price-tag" th:text="${'€' + #numbers.formatDecimal(product.price, 1, 2)}">€0.00</span>
                         <a th:href="@{/products/{id}(id=${product.productId})}" class="btn-details">Details &rarr;</a>
                     </div>
 
                     <form th:action="@{/basket/add}" method="post">
                         <input type="hidden" name="productId" th:value="${product.productId}">
                         <input type="hidden" name="quantity" value="1">
-                        <button type="submit" class="btn-buy" th:disabled="${product.inStock <= 0}">
-                            <span th:text="${product.inStock > 0 ? 'Add to Basket' : 'Out of Stock'}">Add to Basket</span>
+                        <button type="submit" class="btn-buy" th:disabled="${product.quantity <= 0}">
+                            <span th:text="${product.quantity > 0 ? 'Add to Basket' : 'Out of Stock'}">Add to Basket</span>
                         </button>
                     </form>
                 </div>

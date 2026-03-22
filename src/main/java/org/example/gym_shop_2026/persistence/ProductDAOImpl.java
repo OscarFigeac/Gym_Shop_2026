@@ -30,7 +30,7 @@ public class ProductDAOImpl implements ProductDAO{
                 .productId(rs.getInt("product_id"))
                 .productCategory(rs.getString("product_category"))
                 .name(rs.getString("name"))
-                .price(rs.getInt("price"))
+                .price(rs.getDouble("price"))
                 .quantity(rs.getInt("quantity"))
                 .build();
     }
@@ -176,7 +176,7 @@ public class ProductDAOImpl implements ProductDAO{
 
         List<Product> toBeStocked = new ArrayList<>();
 
-        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM products WHERE quantity = ?")){
+        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM products WHERE quantity <= ?")){
             ps.setInt(1, reOrder);
             try(ResultSet rs = ps.executeQuery()){
                 while(rs.next()){
@@ -207,7 +207,12 @@ public class ProductDAOImpl implements ProductDAO{
 
         List<Product> bestSellers = new ArrayList<>();
 
-        try (PreparedStatement ps = conn.prepareStatement("SELECT p.*, SUM(b.itemQuantity) AS total_sold FROM products p JOIN basket_item b ON p.product_id = b,product_id GROUP BY p.product_id ORDER BY total_sold DESC LIMIT ?")) {
+        String sql = "SELECT p.*, SUM(b.itemQuantity) AS total_sold " +
+                "FROM products p " +
+                "JOIN basket_item b ON p.product_id = b.product_id " +
+                "GROUP BY p.product_id ORDER BY total_sold DESC LIMIT ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, sellLimit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
