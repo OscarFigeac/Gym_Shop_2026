@@ -30,7 +30,7 @@ public class ProductDAOImpl implements ProductDAO{
                 .productId(rs.getInt("product_id"))
                 .productCategory(rs.getString("product_category"))
                 .name(rs.getString("name"))
-                .price(rs.getInt("price"))
+                .price(rs.getDouble("price"))
                 .quantity(rs.getInt("quantity"))
                 .build();
     }
@@ -154,5 +154,76 @@ public class ProductDAOImpl implements ProductDAO{
             throw e;
         }
         return products;
+    }
+
+    /**
+     * Method to find all the products that are need or restocking
+     * <p>
+     * Searches through the product table for products that are at the quantity of the reorder limit and will then be put into a list for the admin to know what to reorder
+     *
+     * @param reOrder The set limit for the stock quantity to be at or under before the product is restocked
+     *
+     * @return A list of products at a low stock
+     *
+     * @throws SQLException If there is an error with the SQL Statement accessing the database
+     *
+     * @author Eoghan Carroll
+     */
+    @Override
+    public List<Product> getProductsLowStock (int reOrder) throws SQLException{
+        Connection conn = connector.getConnection();
+        if(conn == null) throw new SQLException("AWS Connection failed.");
+
+        List<Product> toBeStocked = new ArrayList<>();
+
+        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM products WHERE quantity <= ?")){
+            ps.setInt(1, reOrder);
+            try(ResultSet rs = ps.executeQuery()){
+                while(rs.next()){
+                    toBeStocked.add(mapProductRow(rs));
+                }
+            }
+        }
+        return toBeStocked;
+    }
+
+    /**
+     * Method for finding the bestselling products for the Admin
+     * <p>
+     * Searches through the products table joined with the transaction table to see which are the bestselling products and only shows the top most (eg. SellLimit = 5 then the top 5 bestsellers)
+     *
+     * @param sellLimit The limit for displaying the bestsellers
+     *
+     * @return A list of the selected amount of bestselling items
+     *
+     * @throws SQLException If there is an error with the SQL Statement accessing the database
+     *
+     * @author Eoghan Carroll
+     */
+    @Override
+    public List<Product> getBestSellers (int sellLimit) throws SQLException{
+        Connection conn = connector.getConnection();
+        if(conn == null) throw new SQLException("AWS Connection failed.");
+
+        List<Product> bestSellers = new ArrayList<>();
+
+        String sql = "SELECT p.*, SUM(b.itemQuantity) AS total_sold " +
+                "FROM products p " +
+                "JOIN basket_item b ON p.product_id = b.product_id " +
+                "GROUP BY p.product_id ORDER BY total_sold DESC LIMIT ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, sellLimit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    bestSellers.add(mapProductRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error calculating best sellers: {}", e.getMessage());
+            throw e;
+        }
+
+        return bestSellers;
     }
 }

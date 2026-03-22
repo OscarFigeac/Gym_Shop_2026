@@ -57,7 +57,6 @@
             box-shadow: 0 0 0 3px rgba(244, 121, 32, 0.15);
         }
 
-        /* Matches the class used in your JavaScript .querySelector */
         .btn-primary-gym {
             background-color: var(--brand-dark);
             color: #fff;
@@ -104,7 +103,6 @@
             font-weight: 700;
         }
 
-        /* Error/Validation styles */
         .was-validated .form-control:invalid {
             border-color: #dc3545;
         }
@@ -121,25 +119,43 @@
                 <h2 class="register-header text-center">Create Your Account</h2>
 
                 <form id="registerForm" th:action="@{/register}" method="post" class="needs-validation" novalidate>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="fName" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="fName" name="fName" placeholder="Enter first name" required>
+                            <input type="text" class="form-control" id="fName" name="fName" placeholder="Name" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="lName" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="lName" name="lName" placeholder="Enter last name" required>
+                            <input type="text" class="form-control" id="lName" name="lName" placeholder="Surname" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="reg-username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="reg-username" name="username" placeholder="Username" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="dob" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="dob" name="dob" required>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="eMail" class="form-label">Email Address</label>
-                        <input type="email" class="form-control" id="eMail" name="eMail" placeholder="name@example.com" required>
+                        <input type="email" class="form-control" id="eMail" name="email" placeholder="name@example.com" required>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="reg-username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="reg-username" name="username" placeholder="Choose a unique username" required>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="address" class="form-label">Shipping Address</label>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="123 Protein Lane" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="eircode" class="form-label">Eircode</label>
+                            <input type="text" class="form-control" id="eircode" name="eircode" placeholder="D02 X123" required>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -159,7 +175,9 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-primary-gym">Join the Club</button>
+                    <input type="hidden" name="userType" value="CUSTOMER">
+
+                    <button type="submit" class="btn-primary-gym mt-4">Join the Club</button>
 
                     <div class="text-center login-footer">
                         Already a member? <a th:href="@{/login}">Log In Here</a>

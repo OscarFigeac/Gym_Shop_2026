@@ -111,7 +111,7 @@ public class TwoFactorAuthenticationService {
     public void finalize2faSetup(String username, String generatedSecret) throws SQLException {
         log.info("Finalising setup for User: {}", username);
         User existingUser = userDAO.findByUsername(username);
-        
+
         if (existingUser != null) {
             User updatedUser = User.builder()
                     .user_id(existingUser.getUser_id())
@@ -120,14 +120,16 @@ public class TwoFactorAuthenticationService {
                     .userType(existingUser.getUserType())
                     .email(existingUser.getEmail())
                     .password(existingUser.getPassword())
-                    .dob(existingUser.getDob())
+                    .dob(new java.sql.Date(existingUser.getDob().getTime()))
+                    .address(existingUser.getAddress())
+                    .eircode(existingUser.getEircode())
                     .secretKey(generatedSecret)
                     .is2faEnabled(true)
                     .build();
 
             userDAO.updateUser(updatedUser);
-        }else{
-            log.error("2FA: Failed to finalise setup. User: {} could not be found in the database.", username);
+        } else {
+            log.error("2FA: Failed to finalise. User: {} not found.", username);
             throw new SQLException("User not found during 2FA finalisation.");
         }
     }

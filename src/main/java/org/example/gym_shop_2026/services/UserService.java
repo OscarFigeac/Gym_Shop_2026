@@ -21,8 +21,9 @@ public class UserService {
         return userDao.login(username, password);
     }
 
-    public boolean registerUser (String username, String fullName, String userType, String eMail, String password, Date DoB) throws SQLException{
-        return userDao.register(username, fullName, userType, eMail, password, DoB);
+    public boolean registerUser(String username, String fullName, String userType, String eMail,
+                                                            String password, Date DoB, String address, String eircode) throws SQLException {
+        return userDao.register(username, fullName, userType, eMail, password, DoB, address, eircode);
     }
 
     public User findUser (String toBeFound) throws SQLException{
