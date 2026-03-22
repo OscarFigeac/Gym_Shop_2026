@@ -156,6 +156,19 @@ public class ProductDAOImpl implements ProductDAO{
         return products;
     }
 
+    /**
+     * Method to find all the products that are need or restocking
+     * <p>
+     * Searches through the product table for products that are at the quantity of the reorder limit and will then be put into a list for the admin to know what to reorder
+     *
+     * @param reOrder The set limit for the stock quantity to be at or under before the product is restocked
+     *
+     * @return A list of products at a low stock
+     *
+     * @throws SQLException If there is an error with the SQL Statement accessing the database
+     *
+     * @author Eoghan Carroll
+     */
     @Override
     public List<Product> getProductsLowStock (int reOrder) throws SQLException{
         Connection conn = connector.getConnection();
@@ -174,6 +187,19 @@ public class ProductDAOImpl implements ProductDAO{
         return toBeStocked;
     }
 
+    /**
+     * Method for finding the bestselling products for the Admin
+     * <p>
+     * Searches through the products table joined with the transaction table to see which are the bestselling products and only shows the top most (eg. SellLimit = 5 then the top 5 bestsellers)
+     *
+     * @param sellLimit The limit for displaying the bestsellers
+     *
+     * @return A list of the selected amount of bestselling items
+     *
+     * @throws SQLException If there is an error with the SQL Statement accessing the database
+     *
+     * @author Eoghan Carroll
+     */
     @Override
     public List<Product> getBestSellers (int sellLimit) throws SQLException{
         Connection conn = connector.getConnection();
