@@ -16,7 +16,8 @@ import java.sql.SQLException;
  */
 @Slf4j
 public class MySqlConnector implements Connector {
-    @Getter private Connection connection;
+    @Getter
+    private Connection connection;
 
     /**
      * Instantiates a MySqlConnector object that stores a connection to an SQL database with {@link Environment}
@@ -25,7 +26,7 @@ public class MySqlConnector implements Connector {
      * @implNote Meant for Spring-use only.
      */
     public MySqlConnector(Environment env) {
-        if(env == null) {
+        if (env == null) {
             log.error("Could not construct provided Environment env as it is null!");
             throw new NullPointerException("The Environment env is null");
         }
@@ -39,8 +40,7 @@ public class MySqlConnector implements Connector {
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://" + url + "/" + database, user, password);
             this.connection = conn;
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             log.error("Could not connect to database: {}", e.toString());
         }
     }
@@ -55,8 +55,7 @@ public class MySqlConnector implements Connector {
     public MySqlConnector(String server, String username, String password, String dbName) {
         try {
             this.connection = DriverManager.getConnection("jdbc:mysql://" + server + "/" + dbName, username, password);
-        }
-        catch(SQLException e) {
+        } catch (SQLException e) {
             log.error("Could not connect to database: {}", e.toString());
         }
     }
@@ -66,8 +65,7 @@ public class MySqlConnector implements Connector {
         try {
             this.connection.close();
             return true;
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             log.error("Could not close connection {}", e.toString());
             return false;
         }
