@@ -85,13 +85,13 @@ CREATE TABLE IF NOT EXISTS basket(
     CONSTRAINT fk_basket_users FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 CREATE TABLE IF NOT EXISTS basket_item(
-    itemId INT AUTO_INCREMENT PRIMARY KEY,
-    productId INT NOT NULL,
-    basketId INT NOT NULL,
-    itemQuantity INT NOT NULL,
-    CONSTRAINT fk_basketItem_products FOREIGN KEY(productId) REFERENCES products(product_id),
-    CONSTRAINT fk_basketItem_basket FOREIGN KEY(basketId) REFERENCES basket(basket_id),
-    CONSTRAINT ck_basketItem_itemQuantity CHECK(itemQuantity >= 0)
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    basket_id INT NOT NULL,
+    item_quantity INT NOT NULL,
+    CONSTRAINT fk_basketItem_products FOREIGN KEY(product_id) REFERENCES products(product_id),
+    CONSTRAINT fk_basketItem_basket FOREIGN KEY(basket_id) REFERENCES basket(basket_id),
+    CONSTRAINT ck_basketItem_itemQuantity CHECK(item_quantity >= 0)
 );
 # CREATE TABLE IF NOT EXISTS productslocations(
 #     product_id INT NOT NULL,
