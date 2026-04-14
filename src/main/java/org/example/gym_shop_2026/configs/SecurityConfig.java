@@ -33,7 +33,7 @@ public class SecurityConfig {
     @Autowired
     public SecurityConfig(@Lazy CustomAuthenticationProvider authProvider,
                           CustomAuthenticationDetailsSource detailsSource,
-                          UserDAO userDAO){
+                          @Lazy UserDAO userDAO){
         this.authProvider = authProvider;
         this.detailsSource = detailsSource;
         this.userDAO = userDAO;

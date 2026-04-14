@@ -3,6 +3,7 @@ package org.example.gym_shop_2026.persistence;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.entities.User;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
@@ -13,11 +14,11 @@ import java.sql.*;
 @Slf4j
 public class UserDAOImpl implements UserDAO {
     private final Connector connector;
-    private final PasswordEncoder passwordEncoder;
+    //private final PasswordEncoder passwordEncoder;
 
-    public UserDAOImpl(Connector connector, PasswordEncoder pEncoder) {
+    public UserDAOImpl(Connector connector) {
         this.connector = connector;
-        this.passwordEncoder = pEncoder;
+        //this.passwordEncoder = pEncoder;
     }
 
     //Functionality:
@@ -36,25 +37,9 @@ public class UserDAOImpl implements UserDAO {
      *
      * @author Eoghan Carroll
      */
-    @Override
-    public boolean login(String uName, String pWord) throws SQLException {
-        if (connector == null) {
-            throw new SQLException("login() - Unable to establish a connection to the database !");
-        }
-        try (PreparedStatement ps = connector.getConnection().prepareStatement("SELECT * FROM users WHERE username = ?")) {
-            ps.setString(1, uName);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String hashPassword = rs.getString("password");
-                    return passwordEncoder.matches(pWord, hashPassword);
-                }
-                return false;
-            } catch (SQLException e) {
-                log.error("login() - An issue has arisen when the query was executed or processing the result set. Exception - {}", e.getMessage());
-                throw e;
-            }
-        }
-    }
+     public boolean login(String uName, String pWord) {
+         throw new UnsupportedOperationException("Not supported yet.");
+     }
 
     /**
      * Method to allow the user to register for the app
@@ -87,7 +72,7 @@ public class UserDAOImpl implements UserDAO {
             throw new SQLException("Unable to establish a connection to the database.");
         }
 
-        String hashPassword = passwordEncoder.encode(pWord);
+        //String hashPassword = passwordEncoder.encode(pWord);
 
         String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob, " +
                 "address, eircode, secret_key, is_2fa_enabled) VALUES (?,?,?,?,?,?,?,?,?,?)";
@@ -97,7 +82,7 @@ public class UserDAOImpl implements UserDAO {
             ps.setString(2, fName);
             ps.setString(3, type);
             ps.setString(4, eMail);
-            ps.setString(5, hashPassword);
+            ps.setString(5, pWord);
             ps.setDate(6, dob);
             ps.setString(7, address);
             ps.setString(8, eircode);
@@ -182,7 +167,7 @@ public class UserDAOImpl implements UserDAO {
             ps.setString(2, toBeCreated.getFullName());
             ps.setString(3, toBeCreated.getUserType());
             ps.setString(4, toBeCreated.getEmail());
-            ps.setString(5, passwordEncoder.encode(toBeCreated.getPassword()));
+            ps.setString(5, toBeCreated.getPassword());
             ps.setDate(6, new java.sql.Date(toBeCreated.getDob().getTime()));
 
             addedRows = ps.executeUpdate();
