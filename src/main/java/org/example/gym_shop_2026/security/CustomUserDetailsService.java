@@ -12,12 +12,11 @@ import java.sql.SQLException;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserDAO userDAO;
-
     public CustomUserDetailsService(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
-        @Override
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
             User user = userDAO.findByUsername(username);
