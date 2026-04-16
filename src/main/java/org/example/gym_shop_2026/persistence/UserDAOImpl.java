@@ -3,6 +3,7 @@ package org.example.gym_shop_2026.persistence;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.entities.User;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,7 @@ public class UserDAOImpl implements UserDAO {
     private final Connector connector;
     private final PasswordEncoder passwordEncoder;
 
-    public UserDAOImpl(Connector connector, PasswordEncoder pEncoder) {
+    public UserDAOImpl(Connector connector, @Lazy PasswordEncoder pEncoder) {
         this.connector = connector;
         this.passwordEncoder = pEncoder;
     }
