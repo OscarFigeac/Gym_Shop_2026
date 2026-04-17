@@ -19,7 +19,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        DelegatingPasswordEncoder encoder =DelegatingPasswordEncoder = new DelegatingPasswordEncoder();
         try {
             User user = userDAO.findByUsername(username);
             if (user == null) throw new UsernameNotFoundException("User not found");
