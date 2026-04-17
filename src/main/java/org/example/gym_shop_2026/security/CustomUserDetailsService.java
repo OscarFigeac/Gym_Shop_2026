@@ -5,6 +5,7 @@ import org.example.gym_shop_2026.persistence.UserDAO;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
@@ -12,12 +13,11 @@ import java.sql.SQLException;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserDAO userDAO;
-
     public CustomUserDetailsService(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
-        @Override
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
             User user = userDAO.findByUsername(username);
