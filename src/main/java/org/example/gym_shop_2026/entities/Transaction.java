@@ -20,6 +20,7 @@ public class Transaction {
     private int methodId;
     private double amountPaid;
     private LocalDateTime transactionDate;
+    private String stripePaymentIntentId;
 
     @Setter
     private String status;
