@@ -1,12 +1,16 @@
 package org.example.gym_shop_2026.security;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.persistence.UserDAO;
 import org.example.gym_shop_2026.services.TwoFactorAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
@@ -19,7 +23,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     private UserDAO userDAO;
 
     @Autowired
-    public CustomAuthenticationProvider(UserDetailsServiceImpl userDetailsService,
+    public CustomAuthenticationProvider(CustomUserDetailsService userDetailsService,
                                         TwoFactorAuthenticationService tfaService,
                                         UserDAO userDAO) {
         super(userDetailsService);
@@ -27,6 +31,10 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         this.userDAO = userDAO;
     }
 
+    @Override
+    public PasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder(12);
+    }
     /**
      * @author Oscar
      * Retrieves the user's information from the database for authentication. Verifies
@@ -40,9 +48,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     public Authentication authenticate(Authentication auth){
          Authentication result = super.authenticate(auth);
 
-         org.springframework.security.core.userdetails.User springUser =
-                 (org.springframework.security.core.userdetails.User) result.getPrincipal();
-
+        org.springframework.security.core.userdetails.User springUser = (org.springframework.security.core.userdetails.User) result.getPrincipal();
          org.example.gym_shop_2026.entities.User dbUser;
 
          try{

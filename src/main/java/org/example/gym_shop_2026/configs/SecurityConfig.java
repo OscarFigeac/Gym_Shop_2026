@@ -10,9 +10,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Configuration class for Spring Security.
@@ -33,12 +39,25 @@ public class SecurityConfig {
     @Autowired
     public SecurityConfig(@Lazy CustomAuthenticationProvider authProvider,
                           CustomAuthenticationDetailsSource detailsSource,
-                          UserDAO userDAO){
+                          @Lazy UserDAO userDAO){
         this.authProvider = authProvider;
         this.detailsSource = detailsSource;
         this.userDAO = userDAO;
     }
 
+    @Bean
+    public PasswordEncoder PasswordEncoder() {
+        PasswordEncoder defaultEncoder = new Argon2PasswordEncoder(12, 60, 2, 2, 4);
+        Map<String, PasswordEncoder> encoders = new HashMap<>();
+        encoders.put("bcrypt", new BCryptPasswordEncoder(12));
+        encoders.put("scrypt", new SCryptPasswordEncoder(2, 2, 2, 4, 12));
+
+        DelegatingPasswordEncoder passwordEncoder = new DelegatingPasswordEncoder(
+                "bcrypt", encoders);
+        passwordEncoder.setDefaultPasswordEncoderForMatches(defaultEncoder);
+
+        return passwordEncoder;
+    }
 //    public UserDetailsService userDetailsService() {
 //        return username -> {
 //            try{
