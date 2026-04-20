@@ -1,5 +1,7 @@
 package org.example.gym_shop_2026.services;
 
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.entities.Basket;
 import org.example.gym_shop_2026.entities.BasketItem;
@@ -20,55 +22,62 @@ public class PaymentService {
     private final BasketService basketService;
     private final ProductService productService;
     private final TransactionService transactionService;
-    private final paymentMethodDAO paymentDAO;
 
-    @Autowired
-    public PaymentService(BasketService basketService, ProductService productService,
-                          TransactionService transactionService, paymentMethodDAO paymentDAO) {
+    public PaymentService(BasketService basketService, ProductService productService, TransactionService transactionService) {
         this.basketService = basketService;
         this.productService = productService;
         this.transactionService = transactionService;
-        this.paymentDAO = paymentDAO;
     }
 
-    public boolean completePurchase(int userId, int methodId) {
-        try {
-            Basket basket = basketService.getBasketForUser(userId);
-            if (basket == null || basket.getItems() == null || basket.getItems().isEmpty()) {
-                return false;
-            }
+    public String initiatePayment(int userId) throws Exception{
+        Basket basket = basketService.getBasketForUser(userId);
+        double totalAmount = calculateTotal(basket);
 
-            double totalAmount = 0;
-            for (BasketItem item : basket.getItems()) {
-                Product p = productService.getDetails(item.getProductId());
-                if (p == null || p.getQuantity() < item.getItemQuantity()) {
-                    log.warn("Insufficient stock for product ID: {}", item.getProductId());
-                    return false;
-                }
-                totalAmount += p.getPrice() * item.getItemQuantity();
-            }
+        PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+                .setAmount((long) (totalAmount * 100)) // using cents
+                .setCurrency("eur")
+                .putMetadata("userId", String.valueOf(userId))
+                .build();
 
-            Transaction txn = Transaction.builder()
-                    .userId(userId)
-                    .planId(0) // Default for shop purchases instead of subs
-                    .methodId(methodId)
-                    .amountPaid(totalAmount)
-                    .status("SUCCESS")
-                    .build();
+        PaymentIntent intent = PaymentIntent.create(params);
 
-            boolean txnSaved = transactionService.addTransaction(txn);
-            if (!txnSaved) return false;
+        Transaction t = Transaction.builder()
+                .userId(userId)
+                .amountPaid(totalAmount)
+                .stripePaymentIntentId(intent.getId())
+                .status("PENDING")
+                .build();
+        transactionService.addTransaction(t);
 
-            for (BasketItem item : basket.getItems()) {
-                productService.purchaseProduct(item.getProductId(), item.getItemQuantity());
-            }
+        return intent.getClientSecret();
+    }
 
-            basketService.clearUserBasket(userId);
+    public void fulfillOrder(String paymentIntentId) throws SQLException {
+        Transaction txn = transactionService.getTransactionByStripeId(paymentIntentId);
 
-            return true;
-        } catch (SQLException e) {
-            log.error("Payment Process Error: {}", e.getMessage());
-            return false;
+        if (txn == null || !"PENDING".equals(txn.getStatus())) {
+            log.warn("Transaction not found or already processed: {}", paymentIntentId);
+            return;
         }
+
+        int userId = txn.getUserId();
+        Basket basket = basketService.getBasketForUser(userId);
+
+        for (BasketItem item : basket.getItems()) {
+            productService.purchaseProduct(item.getProductId(), item.getItemQuantity());
+            log.info("Stock reduced for Product ID: {}", item.getProductId());
+        }
+
+        txn.setStatus("SUCCESS");
+        transactionService.updateTransaction(txn);
+
+        basketService.clearUserBasket(userId);
+        log.info("Fulfilling order for PaymentIntent: {}", paymentIntentId);
+    }
+
+    private double calculateTotal(Basket basket) {
+        return basket.getItems().stream()
+                .mapToDouble(item -> productService.getDetails(item.getProductId()).getPrice() * item.getItemQuantity())
+                .sum();
     }
 }
