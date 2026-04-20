@@ -52,4 +52,23 @@ public interface TransactionDAO {
      * @throws SQLException If operation fails.
      */
     Transaction deleteTransactionById(int transactionId) throws SQLException;
+
+    /**
+     * @author oscar
+     * Takes in an identifier string and looks for the transaction correlated to the
+     * provided string.
+     * @param stripeId the identifier being looked for
+     * @return A Transaction object if found; null otherwise
+     * @throws SQLException if the connection to the database fails at any point.
+     */
+    Transaction findTransactionByStripeId(String stripeId) throws SQLException;
+
+    /**
+     * @author oscar
+     * Takes in a transaction to update its status (PENDING, SUCCESS, etc.)
+     * @param txn The transaction object being updated
+     * @return true if updated; false otherwise
+     * @throws SQLException if the connection to the database fails at any point.
+     */
+    boolean updateTransaction(Transaction txn) throws SQLException;
 }

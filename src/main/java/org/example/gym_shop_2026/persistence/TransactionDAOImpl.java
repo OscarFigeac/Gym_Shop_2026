@@ -35,26 +35,25 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public boolean createTransaction(Transaction newTransaction) throws SQLException {
         if(newTransaction == null) {
-            log.error("Could not perform create transaction operation as given Transaction object was null!");
-            throw new IllegalArgumentException("Could not perform create transaction operation as given Transaction object was null!");
+            throw new IllegalArgumentException("Transaction object was null!");
         }
 
+            String sql = "INSERT INTO transactions(user_id, plan_id, method_id, amount_paid, transaction_date, status, stripe_payment_intent_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try(PreparedStatement ps = connector.getConnection().prepareStatement("INSERT INTO transactions(user_id, plan_id, method_id, amount_paid, transaction_date, status)" +
-                "VALUES (?, ?, ?, ?, ?, ?)")) {
-
+        try(PreparedStatement ps = connector.getConnection().prepareStatement(sql)) {
             ps.setInt(1, newTransaction.getUserId());
             ps.setInt(2, newTransaction.getPlanId());
             ps.setInt(3, newTransaction.getMethodId());
             ps.setDouble(4, newTransaction.getAmountPaid());
             ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
             ps.setString(6, newTransaction.getStatus());
+            ps.setString(7, newTransaction.getStripePaymentIntentId()); // New Field
 
             return ps.executeUpdate() > 0;
         }
         catch (SQLException e) {
-            log.error("Could not perform create transaction operation as sql insert failed! {}", e);
-            throw new SQLException("Could not perform create transaction operation as sql insert failed!");
+            log.error("Create transaction failed! {}", e);
+            throw new SQLException("Create transaction failed!");
         }
     }
 
@@ -82,7 +81,7 @@ public class TransactionDAOImpl implements TransactionDAO {
     @Override
     public Transaction findTransactionById(int transactionId) throws SQLException {
         if(transactionId <= 0) {
-            log.error("Could not perform find transaction operation as given Transaction id {} was invalid!", transactionId);
+            log.error("Transaction id {} was invalid!", transactionId);
             throw new IllegalArgumentException("Could not perform find transaction operation as given Transaction id " + transactionId + " was invalid!");
         }
 
@@ -95,7 +94,7 @@ public class TransactionDAOImpl implements TransactionDAO {
                 }
             }
             catch (SQLException e) {
-                log.error("Could not perform find transaction by id operation as sql SELECT failed! {}", e);
+                log.error("sql SELECT failed! {}", e);
                 throw new SQLException("Could not perform find transaction operation as sql operation failed!");
             }
         }
@@ -148,15 +147,37 @@ public class TransactionDAOImpl implements TransactionDAO {
             throw new IllegalArgumentException("Given new transaction object was null!");
         }
 
-        try(PreparedStatement ps = connector.getConnection().prepareStatement("UPDATE transactions SET status = ? WHERE transaction_id = ?")) {
+        String sql = "UPDATE transactions SET status = ?, stripe_payment_intent_id = ? WHERE transaction_id = ?";
+        try(PreparedStatement ps = connector.getConnection().prepareStatement(sql)) {
             ps.setString(1, newTransaction.getStatus());
-            ps.setInt(2, transactionId);
-
+            ps.setString(2, newTransaction.getStripePaymentIntentId());
+            ps.setInt(3, transactionId);
             return ps.executeUpdate();
         }
         catch(SQLException e) {
-            log.error("Could not perform update transaction by id operation! {}", e);
-            throw new SQLException("Could not perform update transaction by id operation as prepared statement threw exception!" + e);
+            log.error("Could not update transaction! {}", e);
+            throw new SQLException("Update failed.");
+        }
+    }
+
+    @Override
+    public boolean updateTransaction(Transaction txn) throws SQLException {
+        if (txn == null || txn.getTransactionId() <= 0) {
+            throw new IllegalArgumentException("Invalid Transaction object for update");
+        }
+
+        String sql = "UPDATE transactions SET status = ?, stripe_payment_intent_id = ? WHERE transaction_id = ?";
+
+        try(PreparedStatement ps = connector.getConnection().prepareStatement(sql)) {
+            ps.setString(1, txn.getStatus());
+            ps.setString(2, txn.getStripePaymentIntentId());
+            ps.setInt(3, txn.getTransactionId());
+
+            return ps.executeUpdate() > 0;
+        }
+        catch(SQLException e) {
+            log.error("Could not update transaction! {}", e);
+            throw new SQLException("Update failed.");
         }
     }
 
@@ -189,6 +210,20 @@ public class TransactionDAOImpl implements TransactionDAO {
         }
     }
 
+    @Override
+    public Transaction findTransactionByStripeId(String stripeId) throws SQLException {
+        String sql = "SELECT * FROM transactions WHERE stripe_payment_intent_id = ?";
+        try(PreparedStatement ps = connector.getConnection().prepareStatement(sql)) {
+            ps.setString(1, stripeId);
+            try(ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapTransactionRow(rs);
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Helper that maps transaction record data from database to a {@link Transaction} object.
      * @param rs Given {@link ResultSet} object, to be passed from other methods,
@@ -197,21 +232,19 @@ public class TransactionDAOImpl implements TransactionDAO {
      * fails.
      */
     private Transaction mapTransactionRow(ResultSet rs) {
-        if(rs == null) {
-            log.error("Could not map transaction object as given ResultSet was null!");
-            return null;
-        }
+        if(rs == null) return null;
 
         try {
-            Transaction transaction = new Transaction(rs.getInt(1),
-                    rs.getInt(2),
-                    rs.getInt(3),
-                    rs.getInt(4),
-                    rs.getDouble(5),
-                    rs.getTimestamp(6).toLocalDateTime(),
-                    rs.getString(7));
-
-            return transaction;
+            return Transaction.builder()
+                    .transactionId(rs.getInt(1))
+                    .userId(rs.getInt(2))
+                    .planId(rs.getInt(3))
+                    .methodId(rs.getInt(4))
+                    .amountPaid(rs.getDouble(5))
+                    .transactionDate(rs.getTimestamp(6).toLocalDateTime())
+                    .status(rs.getString(7))
+                    .stripePaymentIntentId(rs.getString(8))
+                    .build();
         }
         catch (SQLException e) {
             log.error("Could not map transaction object! {}", e);
