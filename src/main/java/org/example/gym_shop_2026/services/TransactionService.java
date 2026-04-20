@@ -113,4 +113,12 @@ public class TransactionService {
 
         return updatedRows == 1;
     }
+
+    public Transaction getTransactionByStripeId(String stripeId) throws SQLException {
+        return transactionDAO.findTransactionByStripeId(stripeId);
+    }
+
+    public void updateTransaction(Transaction txn) throws SQLException {
+        transactionDAO.updateTransaction(txn);
+    }
 }
