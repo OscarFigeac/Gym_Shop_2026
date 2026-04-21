@@ -1,5 +1,6 @@
 package org.example.gym_shop_2026.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.entities.paymentMethod;
@@ -22,60 +23,27 @@ import java.util.List;
 public class CheckoutController {
 
     private final PaymentService paymentService;
-    private final paymentMethodDAO paymentDAO;
-    private final BasketService basketService;
-    private final UserService userService;
 
-    @Autowired
-    public CheckoutController(PaymentService paymentService, paymentMethodDAO paymentDAO,
-                              BasketService basketService, UserService userService) {
+    public CheckoutController(PaymentService paymentService) {
         this.paymentService = paymentService;
-        this.paymentDAO = paymentDAO;
-        this.basketService = basketService;
-        this.userService = userService;
-    }
-
-    @GetMapping("/begin")
-    public String beginCheckout(Principal principal) throws SQLException {
-        User user = userService.findUser(principal.getName());
-        List<paymentMethod> methods = paymentDAO.findAllMethodsByUserId(user.getUser_id());
-
-        if (methods.isEmpty()) {
-            return "redirect:/payment-methods?error=no_card_found";
-        }
-        return "redirect:/checkout";
     }
 
     @GetMapping
-    public String showCheckout(Principal principal, Model model) throws SQLException {
-        User user = userService.findUser(principal.getName());
-
-        List<paymentMethod> methods = paymentDAO.findAllMethodsByUserId(user.getUser_id());
-        model.addAttribute("paymentMethods", methods);
-        model.addAttribute("basket", basketService.getBasketForUser(user.getUser_id()));
-
-        double total = basketService.getBasketTotal(user.getUser_id());
-        model.addAttribute("orderTotal", total);
-
+    public String showCheckoutPage() {
         return "checkout";
     }
 
-    @PostMapping("/confirm")
-    public String processPayment(@RequestParam("methodId") int methodId, Principal principal) throws SQLException {
-        User user = userService.findUser(principal.getName());
+    @PostMapping("/charge")
+    @ResponseBody
+    public String processPayment(HttpSession session) throws Exception {
+        int userId = (int) session.getAttribute("userId");
 
-        boolean success = paymentService.completePurchase(user.getUser_id(), methodId);
-
-        if (success) {
-            basketService.clearUserBasket(user.getUser_id());
-            return "redirect:/checkout/success";
-        } else {
-            return "redirect:/checkout?error=payment_failed";
-        }
+        return paymentService.initiatePayment(userId);
     }
 
-    @GetMapping("/success")
-    public String showSuccess() {
-        return "checkout-success";
+    @PostMapping("/success")
+    public String paymentSuccess(@RequestParam String payment_intent) throws SQLException {
+        paymentService.fulfillOrder(payment_intent);
+        return "redirect:/dashboard?success=true";
     }
 }
