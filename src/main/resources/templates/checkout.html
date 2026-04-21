@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Confirm Order | GYMSHOP</title>
+    <script src="https://js.stripe.com/v3/"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
@@ -24,24 +25,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
-        .card-selector {
-            border: 2px solid #eee;
-            border-radius: 10px;
-            padding: 15px;
-            cursor: pointer;
-            transition: 0.2s;
-            position: relative;
-        }
-
-        .card-selector:hover {
-            border-color: var(--brand-orange);
-        }
-
-        .form-check-input:checked + .card-selector {
-            border-color: var(--brand-orange);
-            background-color: #fff9f5;
-        }
-
         .order-total-box {
             background: var(--brand-dark);
             color: white;
@@ -55,6 +38,7 @@
             font-weight: 800;
             border: none;
             padding: 15px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -68,14 +52,14 @@
             <div class="checkout-box mb-4">
                 <h4 class="fw-bold mb-4 text-uppercase">Review <span style="color: var(--brand-orange)">Order</span>
                 </h4>
-
                 <div class="table-responsive">
                     <table class="table align-middle">
                         <tbody>
                         <tr th:each="item : ${basket.items}">
                             <td>
                                 <span class="fw-bold" th:text="${item.itemQuantity} + 'x'">1x</span>
-                                <span th:text="${item.productId}">Product Name</span></td>
+                                <span th:text="${item.productId}">Product Name</span>
+                            </td>
                             <td class="text-end fw-bold" th:text="'€' + ${item.itemQuantity * 29.99}">€0.00</td>
                         </tr>
                         </tbody>
@@ -84,37 +68,11 @@
             </div>
 
             <div class="checkout-box">
-                <h4 class="fw-bold mb-4 text-uppercase">Select <span style="color: var(--brand-orange)">Payment</span>
+                <h4 class="fw-bold mb-4 text-uppercase">Secure <span style="color: var(--brand-orange)">Payment</span>
                 </h4>
 
-                <form th:action="@{/checkout/confirm}" method="post" id="checkoutForm">
-                    <div class="row g-3">
-                        <div class="col-12" th:each="method, iter : ${paymentMethods}">
-                            <input type="radio" name="methodId" th:value="${method.methodId}"
-                                   th:id="'card' + ${method.methodId}" class="form-check-input d-none"
-                                   th:checked="${iter.index == 0}" required>
-
-                            <label th:for="'card' + ${method.methodId}"
-                                   class="card-selector d-flex align-items-center w-100">
-                                <i class="bi bi-credit-card-2-front h3 mb-0 me-3 text-muted"></i>
-                                <div class="flex-grow-1">
-                                    <p class="mb-0 fw-bold"
-                                       th:text="${method.cardType} + ' ending in ' + ${method.lastFourDigits}">VISA
-                                        ending in 4242</p>
-                                    <small class="text-muted" th:text="'Expires: ' + ${method.expiryDate}">Exp:
-                                        12/26</small>
-                                </div>
-                                <i class="bi bi-check-circle-fill text-orange h4 mb-0 d-none check-icon"></i>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <a th:href="@{/payment-methods}" class="small text-decoration-none fw-bold text-muted">
-                            <i class="bi bi-plus-lg"></i> Add another card
-                        </a>
-                    </div>
-                </form>
+                <div id="payment-element"></div>
+                <div id="error-message" class="text-danger mt-3"></div>
             </div>
         </div>
 
@@ -126,22 +84,42 @@
                     <h2 class="mb-0 fw-black" style="color: var(--brand-orange)" th:text="'€' + ${orderTotal}">
                         €0.00</h2>
                 </div>
-
-                <p class="small opacity-75 mb-4">By clicking "Place Order", you agree to GymShop's terms of service and
-                    authorize this transaction.</p>
-
-                <button type="submit" form="checkoutForm" class="btn btn-confirm w-100 text-uppercase shadow-sm">
+                <button id="submit-button" class="btn btn-confirm w-100 text-uppercase shadow-sm">
                     Place Order Now <i class="bi bi-shield-check ms-2"></i>
                 </button>
-            </div>
-
-            <div class="text-center mt-4">
-                <p class="text-muted small"><i class="bi bi-lock-fill"></i> Your transaction is secure and encrypted.
-                </p>
             </div>
         </div>
     </div>
 </main>
+
+<script>
+    const stripe = Stripe('pk_test_51TNL8dGnoXtKQ2Pxz0912QSuPECaWZ9DxGDr57GrosRb7bcG39kTP51OFzrwOXChVj0a1BRJaxBEMRkaj4EslagC00Ej6gLYeH');
+    let elements;
+
+    async function initialize() {
+        const response = await fetch("/checkout/charge", {method: "POST"});
+        const clientSecret = await response.text();
+
+        elements = stripe.elements({clientSecret});
+        const paymentElement = elements.create("payment");
+        paymentElement.mount("#payment-element");
+    }
+
+    document.querySelector("#submit-button").addEventListener("click", async () => {
+        const {error} = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: "http://localhost:8080/checkout/success",
+            },
+        });
+
+        if (error) {
+            document.querySelector("#error-message").textContent = error.message;
+        }
+    });
+
+    initialize();
+</script>
 
 </body>
 </html>
