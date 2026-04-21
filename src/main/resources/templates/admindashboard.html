@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Admin Dashboard</title>
+</head>
+<body>
+<h1>Admin Dashboard</h1>
+
+<h2>Products to Restock</h2>
+<ul>
+  <li th:each="product : ${restockProducts}">
+    <span th:text="${product.name}">Product Name</span> -
+    Stock: <span th:text="${product.stockQuantity}">0</span>
+  </li>
+</ul>
+
+<h2>Best Sellers</h2>
+<table>
+  <tr>
+    <th>Product Name</th>
+    <th>Units Sold</th>
+  </tr>
+  <li th:each="seller : ${bestSellers}">
+    <span th:text="${seller.name}">Product Name</span>
+  </li>
+</table>
+
+<div th:if="${errorMessage}" style="color: red;">
+  <p th:text="${errorMessage}"></p>
+</div>
+</body>
+</html>

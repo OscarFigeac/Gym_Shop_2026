@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>System Error - Gym Shop</title>
+</head>
+<body>
+
+<div class="error-container">
+    <h1>Oops! Something went wrong.</h1>
+    <p>The system encountered an error while processing your request.</p>
+
+    <p class="message" th:if="${errorMessage}" th:text="${errorMessage}">
+        An unknown error occurred.
+    </p>
+
+    <hr>
+    <p>If this persists, please contact the database administrator.</p>
+    <br>
+    <a href="/admin/dashboard" class="back-btn">Try Again</a>
+    <a href="/" style="margin-left: 10px;">Return Home</a>
+</div>
+
+</body>
+</html>
