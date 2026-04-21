@@ -35,11 +35,11 @@ public class AdminController {
             model.addAttribute("restockProducts", (restock != null) ? restock : new ArrayList<>());
             model.addAttribute("bestSellers", (sellers != null) ? sellers : new ArrayList<>());
 
-            return "AdminDashboard";
+            return "admindashboard";
         }catch (SQLException e){
             log.error("Failed to load Admin Dashboard: {}", e.getMessage());
             model.addAttribute("errorMessage", "Could not load admin data.");
-            return "Error";
+            return "error";
         }
     }
 
