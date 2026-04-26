@@ -17,9 +17,9 @@ public class paymentMethod {
     @NonNull
     private int userId;
     @NonNull
-    private String processorToken;
+    private String stripePaymentMethodId;;
     @NonNull
-    private int lastFourDigits;
+    private String lastFourDigits;
     @NonNull
     private String expiryDate;
     @NonNull
@@ -32,7 +32,7 @@ public class paymentMethod {
     private String format(){
         return methodId + ": " +
                 "\n\tUserID: " + userId +
-                "\n\tProcessor Token: " + processorToken +
+                "\n\tProcessor Token: " + stripePaymentMethodId +
                 "\n\tLast Four Digits: " + lastFourDigits +
                 "\n\tExpiry Date: " + expiryDate +
                 "\n\tCard Type: " + cardType +
@@ -49,7 +49,7 @@ public class paymentMethod {
     public static boolean deepEquals(paymentMethod p1, paymentMethod p2){
         return Objects.equals(p1.methodId, p2.methodId)
                 && Objects.equals(p1.userId, p2.userId)
-                && Objects.equals(p1.processorToken, p2.processorToken)
+                && Objects.equals(p1.stripePaymentMethodId, p2.stripePaymentMethodId)
                 && Objects.equals(p1.lastFourDigits, p2.lastFourDigits)
                 && Objects.equals(p1.expiryDate, p2.expiryDate)
                 && Objects.equals(p1.cardType, p2.cardType)
