@@ -25,8 +25,8 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
         return new paymentMethod(
                 rs.getInt("method_id"),
                 rs.getInt("user_id"),
-                rs.getString("processor_token"),
-                rs.getInt("last_four_digits"),
+                rs.getString("stripe_payment_method_id"),
+                rs.getString("last_four_digits"),
                 rs.getString("expiry_date"),
                 rs.getString("card_type"),
                 rs.getBoolean("is_valid"),
@@ -176,10 +176,10 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
         if(conn == null) throw new SQLException("insertPaymentMethod(): Connection failed.");
 
         int rows = 0;
-        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO payment_methods (user_id, processor_token, last_four_digits, expiry_date, card_type, is_valid, is_primary) VALUES (?,?,?,?,?,?,?)")){
+        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO payment_methods (user_id, stripe_payment_method_id, last_four_digits, expiry_date, card_type, is_valid, is_primary) VALUES (?,?,?,?,?,?,?)")){
             ps.setInt(1, p.getUserId());
-            ps.setString(2, p.getProcessorToken());
-            ps.setInt(3, p.getLastFourDigits());
+            ps.setString(2, p.getStripePaymentMethodId());
+            ps.setString(3, p.getLastFourDigits());
             ps.setString(4, p.getExpiryDate());
             ps.setString(5, p.getCardType());
             ps.setBoolean(6, p.isValid());
@@ -208,10 +208,10 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
         conn.setAutoCommit(false);
 
         int rows = 0;
-        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO payment_methods (user_id, processor_token, last_four_digits, expiry_date, card_type, is_valid, is_primary) VALUES (?,?,?,?,?,?,?)")){
+        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO payment_methods (user_id, stripe_payment_method_id, last_four_digits, expiry_date, card_type, is_valid, is_primary) VALUES (?,?,?,?,?,?,?)")){
             ps.setInt(1, p.getUserId());
-            ps.setString(2, p.getProcessorToken());
-            ps.setInt(3, p.getLastFourDigits());
+            ps.setString(2, p.getStripePaymentMethodId());
+            ps.setString(3, p.getLastFourDigits());
             ps.setString(4, p.getExpiryDate());
             ps.setString(5, p.getCardType());
             ps.setBoolean(6, p.isValid());
@@ -322,12 +322,12 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
         }
 
         int affectedRows = 0;
-        String sql = "UPDATE payment_methods SET user_id=?, processor_token=?, last_four_digits=?, expiry_date=?, card_type=?, is_valid=?, is_primary=? WHERE method_id=?";
+        String sql = "UPDATE payment_methods SET user_id=?, stripe_payment_method_id=?, last_four_digits=?, expiry_date=?, card_type=?, is_valid=?, is_primary=? WHERE method_id=?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, method.getUserId());
-            ps.setString(2, method.getProcessorToken());
-            ps.setInt(3, method.getLastFourDigits());
+            ps.setString(2, method.getStripePaymentMethodId());
+            ps.setString(3, method.getLastFourDigits());
             ps.setString(4, method.getExpiryDate());
             ps.setString(5, method.getCardType());
             ps.setBoolean(6, method.isValid());
