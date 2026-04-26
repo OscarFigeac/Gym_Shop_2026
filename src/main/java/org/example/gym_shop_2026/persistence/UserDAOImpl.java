@@ -90,8 +90,8 @@ public class UserDAOImpl implements UserDAO {
 
         String hashPassword = passwordEncoder.encode(pWord);
 
-        String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob, " +
-                "address, eircode, secret_key, is_2fa_enabled) VALUES (?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob, \" +\n" +
+                "            \"address, eircode, secret_key, is_2fa_enabled, stripe_customer_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
         try (PreparedStatement ps = connector.getConnection().prepareStatement(sql)) {
             ps.setString(1, uName);
@@ -104,6 +104,7 @@ public class UserDAOImpl implements UserDAO {
             ps.setString(8, eircode);
             ps.setString(9, "NOT_SET");
             ps.setBoolean(10, false);
+            ps.setNull(11, Types.VARCHAR);
 
             int addedRows = ps.executeUpdate();
             return addedRows == 1;
@@ -321,6 +322,16 @@ public class UserDAOImpl implements UserDAO {
         return affectedRows == 1;
     }
 
+    @Override
+    public boolean updateStripeId(int userId, String stripeId) throws SQLException {
+        String sql = "UPDATE users SET stripe_customer_id = ? WHERE user_id = ?";
+        try (PreparedStatement ps = connector.getConnection().prepareStatement(sql)) {
+            ps.setString(1, stripeId);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() == 1;
+        }
+    }
+
     //Private Methods:
 
     private static boolean stringValidation(String x) {
@@ -340,6 +351,7 @@ public class UserDAOImpl implements UserDAO {
                 .eircode(rs.getString("eircode"))
                 .secretKey(rs.getString("secret_key"))
                 .is2faEnabled(rs.getBoolean("is_2fa_enabled"))
+                .stripeCustomerId(rs.getString("stripe_customer_id"))
                 .build();
     }
 }
