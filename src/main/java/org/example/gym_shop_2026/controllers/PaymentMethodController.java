@@ -1,5 +1,6 @@
 package org.example.gym_shop_2026.controllers;
 
+import com.stripe.exception.StripeException;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.entities.User;
@@ -42,7 +43,7 @@ public class PaymentMethodController {
                             @RequestParam String lastFour,
                             @RequestParam String expDate,
                             @RequestParam String brand,
-                            Principal principal) throws SQLException {
+                            Principal principal) throws SQLException, StripeException {
 
         User user = userService.findUser(principal.getName());
 
@@ -61,7 +62,7 @@ public class PaymentMethodController {
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteMethod(@PathVariable int id, Principal principal) throws SQLException {
+    public String deleteMethod(@PathVariable int id, Principal principal) throws SQLException, StripeException {
         User user = userService.findUser(principal.getName());
         paymentMethod target = methodService.getMethodDetails(id);
 
