@@ -30,6 +30,14 @@ public class UserService {
         return userDao.findByUsername(toBeFound);
     }
 
+    public boolean updateStripeCustomerId(int userId, String stripeId) throws SQLException {
+        return userDao.updateStripeId(userId, stripeId);
+    }
+
+    public User getUserById(int userId) throws SQLException {
+        return userDao.findUserByID(userId);
+    }
+
     //CRUD Methods
 
     public boolean createUser (User toBeCreated) throws SQLException{
