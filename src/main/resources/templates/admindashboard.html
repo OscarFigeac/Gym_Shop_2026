@@ -1,32 +1,153 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Admin Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel | GYMSHOP</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --brand-orange: #f47920;
+      --brand-dark: #232323;
+      --brand-light: #f8f9fa;
+    }
+
+    body {
+      background-color: var(--brand-light);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .dashboard-header {
+      background-color: var(--brand-dark);
+      color: white;
+      padding: 40px 0;
+      margin-bottom: 40px;
+      border-bottom: 4px solid var(--brand-orange);
+    }
+
+    .admin-card {
+      background: white;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      height: 100%;
+    }
+
+    .welcome-text {
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+
+    .table-custom thead {
+      background-color: #f1f1f1;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+    }
+
+    .stock-critical {
+      color: #dc3545;
+      font-weight: bold;
+    }
+
+    .accent-line {
+      width: 40px;
+      height: 3px;
+      background-color: var(--brand-orange);
+      margin-bottom: 15px;
+    }
+  </style>
 </head>
 <body>
-<h1>Admin Dashboard</h1>
 
-<h2>Products to Restock</h2>
-<ul>
-  <li th:each="product : ${restockProducts}">
-    <span th:text="${product.name}">Product Name</span> -
-    Stock: <span th:text="${product.stockQuantity}">0</span>
-  </li>
-</ul>
+<header th:replace="~{fragments/header :: header}"></header>
 
-<h2>Best Sellers</h2>
-<table>
-  <tr>
-    <th>Product Name</th>
-    <th>Units Sold</th>
-  </tr>
-  <li th:each="seller : ${bestSellers}">
-    <span th:text="${seller.name}">Product Name</span>
-  </li>
-</table>
-
-<div th:if="${errorMessage}" style="color: red;">
-  <p th:text="${errorMessage}"></p>
+<div class="dashboard-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1 class="welcome-text">Admin <span style="color: var(--brand-orange)">Operations</span></h1>
+        <p class="mb-0 opacity-75">Inventory Management & Sales Performance</p>
+      </div>
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <span class="badge bg-danger">
+            <i class="bi bi-shield-lock-fill"></i> RESTRICTED ACCESS
+        </span>
+      </div>
+    </div>
+  </div>
 </div>
+
+<main class="container mb-5">
+  <div th:if="${errorMessage}" class="alert alert-danger d-flex align-items-center" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <div th:text="${errorMessage}">Error message goes here.</div>
+  </div>
+
+  <div class="row g-4">
+
+    <div class="col-lg-6">
+      <div class="admin-card p-4">
+        <div class="accent-line"></div>
+        <h4 class="fw-bold text-uppercase mb-4">Stock Alerts</h4>
+        <div class="table-responsive">
+          <table class="table align-middle table-hover">
+            <thead class="text-muted">
+            <tr>
+              <th>Product Name</th>
+              <th class="text-end">Current Stock</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product : ${restockProducts}">
+              <td>
+                <i class="bi bi-box-seam me-2 text-muted"></i>
+                <span th:text="${product.name}" class="fw-semibold">Product Name</span>
+              </td>
+              <td class="text-end">
+                <span class="stock-critical" th:text="${product.stockQuantity}">0</span>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(restockProducts)}">
+              <td colspan="2" class="text-center py-4 text-muted small">All items fully stocked.</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="admin-card p-4">
+        <div class="accent-line"></div>
+        <h4 class="fw-bold text-uppercase mb-4">Top Performers</h4>
+        <div class="table-responsive">
+          <table class="table align-middle table-hover">
+            <thead class="text-muted">
+            <tr>
+              <th>Product</th>
+              <th class="text-end">Units Sold</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="seller : ${bestSellers}">
+              <td>
+                <i class="bi bi-graph-up-arrow me-2" style="color: var(--brand-orange)"></i>
+                <span th:text="${seller.name}">Best Seller</span>
+              </td>
+              <td class="text-end fw-bold" th:text="${seller.unitsSold}">0</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
