@@ -60,7 +60,15 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
@@ -71,16 +79,20 @@
     <div class="row g-4">
         <div class="col-lg-7">
             <div class="checkout-box mb-4">
-                <h4 class="fw-bold mb-4 text-uppercase">Review <span style="color: var(--brand-orange)">Order</span></h4>
+                <h4 class="fw-bold mb-4 text-uppercase">Review <span style="color: var(--brand-orange)">Order</span>
+                </h4>
                 <div class="table-responsive">
                     <table class="table align-middle">
                         <tbody>
                         <tr th:each="item : ${basket.items}">
                             <td>
                                 <span class="fw-bold" th:text="${item.itemQuantity} + 'x'">1x</span>
-                                <span th:text="'Product ID: ' + ${item.productId}">Product</span>
+                                <span class="ms-2" th:text="${item.product.name}">Product Name</span>
                             </td>
-                            <td class="text-end fw-bold" th:text="'€' + ${#numbers.formatDecimal(item.itemQuantity * 29.99, 1, 2)}">€0.00</td>
+                            <td class="text-end fw-bold"
+                                th:text="'€' + ${#numbers.formatDecimal(item.itemQuantity * item.product.price, 1, 2)}">
+                                €0.00
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -88,7 +100,8 @@
             </div>
 
             <div class="checkout-box">
-                <h4 class="fw-bold mb-4 text-uppercase">Secure <span style="color: var(--brand-orange)">Payment</span></h4>
+                <h4 class="fw-bold mb-4 text-uppercase">Secure <span style="color: var(--brand-orange)">Payment</span>
+                </h4>
                 <div id="payment-element">
                     <div class="text-center py-4">
                         <div class="spinner-border text-warning" role="status"></div>
@@ -105,7 +118,7 @@
                 <div class="d-flex justify-content-between align-items-end mb-4">
                     <h2 class="mb-0 fw-bold">Grand Total</h2>
                     <h2 class="mb-0 fw-black" style="color: var(--brand-orange)"
-                        th:text="'€' + ${#numbers.formatDecimal(total, 1, 2)}">€0.00</h2>
+                        th:text="'€' + ${#numbers.formatDecimal(grandTotal, 1, 2)}">€0.00</h2>
                 </div>
                 <button id="submit-button" class="btn btn-confirm w-100 text-uppercase shadow-sm py-3" disabled>
                     <span id="button-text">Place Order Now <i class="bi bi-shield-check ms-2"></i></span>
@@ -128,14 +141,12 @@
 
     async function initialize() {
         try {
-            const response = await fetch("/checkout/charge", { method: "POST" });
-
+            const response = await fetch("/checkout/charge", {method: "POST"});
             if (!response.ok) throw new Error("Failed to initialize payment intent.");
 
             const clientSecret = await response.text();
-
-            const appearance = { theme: 'stripe' };
-            elements = stripe.elements({ appearance, clientSecret });
+            const appearance = {theme: 'stripe'};
+            elements = stripe.elements({appearance, clientSecret});
 
             const paymentElement = elements.create("payment");
             paymentElement.mount("#payment-element");
@@ -143,7 +154,6 @@
             paymentElement.on('ready', () => {
                 submitBtn.disabled = false;
             });
-
         } catch (e) {
             console.error(e);
             errorDiv.textContent = "Could not load payment system. Please refresh the page.";
@@ -154,11 +164,9 @@
         e.preventDefault();
         setLoading(true);
 
-        const { error } = await stripe.confirmPayment({
+        const {error} = await stripe.confirmPayment({
             elements,
-            confirmParams: {
-                return_url: window.location.origin + "/checkout/success",
-            },
+            confirmParams: {return_url: window.location.origin + "/checkout/success"},
         });
 
         if (error) {
