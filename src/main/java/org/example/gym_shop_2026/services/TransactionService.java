@@ -82,36 +82,17 @@ public class TransactionService {
      * @apiNote Must be same transaction id as original transaction that exists in persistence
      */
     public boolean updateTransactionStatus(Transaction transaction) {
-        if(transaction == null) {
-            log.error("Cannot perform update transaction status service as given Transaction object was null!");
-            throw new IllegalArgumentException("Cannot perform update transaction status service as given Transaction object was null!");
-        }
+        if (transaction == null) return false;
 
-        int updatedRows = 0;
-
-        Transaction foundTransaction = null;
-
-        //Lookup transaction
         try {
-           foundTransaction = transactionDAO.findTransactionById(transaction.getTransactionId());
-           if(foundTransaction == null) {
-               log.info("Could not perform update transaction status service operation as given Transaction object was not found in system!");
-               return false;
-           }
-        }
-        catch (SQLException e) {
-            log.error("Could not perform update transaction service operation due to error in transaction lookup! {}", e.toString());
-        }
+            Transaction found = transactionDAO.findTransactionById(transaction.getTransactionId());
+            if (found == null) return false;
 
-        //Actual update operation
-        try {
-            updatedRows = transactionDAO.updateTransactionById(transaction.getTransactionId(), transaction);
+            return transactionDAO.updateTransaction(transaction);
+        } catch (SQLException e) {
+            log.error("Error updating transaction status: {}", e.getMessage());
+            return false;
         }
-        catch (Exception e) {
-            log.error("Could not perform update transaction service operation due to error! {}", e.toString());
-        }
-
-        return updatedRows == 1;
     }
 
     public Transaction getTransactionByStripeId(String stripeId) throws SQLException {

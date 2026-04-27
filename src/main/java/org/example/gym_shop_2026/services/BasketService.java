@@ -1,5 +1,6 @@
 package org.example.gym_shop_2026.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.entities.Basket;
 import org.example.gym_shop_2026.entities.BasketItem;
 import org.example.gym_shop_2026.entities.Product;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.sql.SQLException;
 import java.util.List;
 
+@Slf4j
 @Service
 public class BasketService {
 
@@ -30,13 +32,17 @@ public class BasketService {
      * @return The Basket Object
      * @throws SQLException If the connection to the database fails at any point
      */
-    public Basket getBasketForUser(int userId) throws SQLException {
-        Basket basket = basketDAO.findByUserID(userId);
-        if (basket != null) {
-            List<BasketItem> items = basketDAO.findItemsByBasketId(basket.getBasketId());
-            basket.setItems(items);
+    public Basket getBasketForUser(int userId) {
+        try {
+            Basket basket = basketDAO.findByUserID(userId);
+            if (basket != null) {
+                basket.setItems(basketDAO.findItemsByBasketId(basket.getBasketId()));
+            }
+            return basket;
+        } catch (Exception e) {
+            log.error("Error fetching basket for user: {}", userId, e);
+            throw new RuntimeException("Could not retrieve basket.");
         }
-        return basket;
     }
 
     /**
@@ -47,12 +53,19 @@ public class BasketService {
      * @param quantity The amount of products being added
      * @throws SQLException If the connection to the database fails at any point
      */
-    public void addProductToBasket(int userId, int productId, int quantity) throws SQLException {
-        Basket basket = basketDAO.findByUserID(userId);
-        if (basket == null) {
-            basket = basketDAO.createBasket(userId);
+    public void addProductToBasket(int userId, int productId, int quantity) {
+        try {
+            Basket basket = basketDAO.findByUserID(userId);
+
+            if (basket != null) {
+                basketDAO.addProductToBasket(basket.getBasketId(), productId, quantity);
+            } else {
+                log.warn("Attempted to add product to non-existent basket for user: {}", userId);
+            }
+        } catch (Exception e) {
+            log.error("Error adding product {} to basket for user {}", productId, userId, e);
+            throw new RuntimeException("Failed to add item to basket.");
         }
-        basketDAO.addItemToBasket(basket.getBasketId(), productId, quantity);
     }
 
     /**
@@ -62,16 +75,21 @@ public class BasketService {
      * @return A number indicating the total.
      * @throws SQLException If the connection to the database fails at any point.
      */
-    public double getBasketTotal(int basketId) throws SQLException {
-        List<BasketItem> items = basketDAO.findItemsByBasketId(basketId);
-        double total = 0;
-        for (BasketItem item : items) {
-            Product p = productDAO.getProductById(item.getProductId());
-            if (p != null) {
-                total += p.getPrice() * item.getItemQuantity();
+    public double getBasketTotal(int basketId) {
+        try {
+            List<BasketItem> items = basketDAO.findItemsByBasketId(basketId);
+            double total = 0;
+            for (BasketItem item : items) {
+                Product p = productDAO.getProductById(item.getProductId());
+                if (p != null) {
+                    total += p.getPrice() * item.getItemQuantity();
+                }
             }
+            return total;
+        } catch (SQLException e) {
+            log.error("Error calculating total for basket: {}", basketId, e);
+            throw new RuntimeException("Error calculating basket total");
         }
-        return total;
     }
 
     /**
@@ -81,11 +99,16 @@ public class BasketService {
      * @param quantity The new amount desired in the basket
      * @throws SQLException If the connection to the database fails at any point.
      */
-    public void updateQuantity(int itemId, int quantity) throws SQLException {
-        if (quantity <= 0) {
-            basketDAO.removeItem(itemId);
-        } else {
-            basketDAO.updateItemQuantity(itemId, quantity);
+    public void updateProductQuantity(int basketId, int productId, int quantity) {
+        try {
+            if (quantity <= 0) {
+                basketDAO.removeProduct(basketId, productId);
+            } else {
+                basketDAO.addProductToBasket(basketId, productId, quantity);
+            }
+        } catch (Exception e) {
+            log.error("Error updating quantity for product {} in basket {}", productId, basketId, e);
+            throw new RuntimeException("Error updating quantity.");
         }
     }
 
@@ -95,8 +118,13 @@ public class BasketService {
      * @param itemId The identifier of the item being removed
      * @throws SQLException If the connection to the database fails at any point.
      */
-    public void removeItem(int itemId) throws SQLException {
-        basketDAO.removeItem(itemId);
+    public void removeProductFromBasket(int basketId, int productId) {
+        try {
+            basketDAO.removeProduct(basketId, productId);
+        } catch (Exception e) {
+            log.error("Error removing product {} from basket {}", productId, basketId, e);
+            throw new RuntimeException("Error removing item.");
+        }
     }
 
     /**
@@ -105,10 +133,15 @@ public class BasketService {
      * @param userId The identifier of the user whose basket is being cleared.
      * @throws SQLException If the connection to the database fails at any point.
      */
-    public void clearUserBasket(int userId) throws SQLException {
-        Basket basket = basketDAO.findByUserID(userId);
-        if (basket != null) {
-            basketDAO.clearBasket(basket.getBasketId());
+    public void clearUserBasket(int userId) {
+        try {
+            Basket basket = basketDAO.findByUserID(userId);
+            if (basket != null) {
+                basketDAO.clearBasket(basket.getBasketId());
+            }
+        } catch (Exception e) {
+            log.error("Error clearing basket for user: {}", userId, e);
+            throw new RuntimeException("Error clearing basket.");
         }
     }
 }

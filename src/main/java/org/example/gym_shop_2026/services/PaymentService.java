@@ -21,6 +21,7 @@ public class PaymentService {
     private final TransactionService transactionService;
     private final UserService userService;
 
+    @Autowired
     public PaymentService(BasketService basketService, ProductService productService,
                           TransactionService transactionService, UserService userService) {
         this.basketService = basketService;
