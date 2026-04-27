@@ -16,4 +16,7 @@ public class BasketItem {
     private int basketId;
     @NonNull
     private int itemQuantity;
+    private String productName;
+    private double price;
+    private double subtotal;
 }
