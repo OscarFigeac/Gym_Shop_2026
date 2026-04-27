@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/basket")
@@ -35,11 +36,15 @@ public class BasketController {
         if (user == null) return "redirect:/login";
 
         Basket basket = basketService.getBasketForUser(user.getUser_id());
-        model.addAttribute("basket", basket);
 
         if (basket != null) {
-            model.addAttribute("total", basketService.getBasketTotal(basket.getBasketId()));
+            model.addAttribute("basketItems", basket.getItems());
+
+            model.addAttribute("totalPrice", basketService.getBasketTotal(basket.getBasketId()));
+        } else {
+            model.addAttribute("basketItems", new ArrayList<>());
         }
+
         return "basket";
     }
 
