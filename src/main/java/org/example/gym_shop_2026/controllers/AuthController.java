@@ -1,6 +1,8 @@
 package org.example.gym_shop_2026.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.services.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,20 +33,26 @@ public class AuthController {
         return "register";
     }
 
-//    @PostMapping("/login")
-//    public String login(@RequestParam("username") String username, @RequestParam("password") String password, Model model) {
-//        try {
-//            if(userService.loginUser(username, password)) {
-//                return "redirect:/";
-//            }
-//            else {
-//                return "redirect:/login?error=Login%20failed%20due%20to%20incorrect%20credentials";
-//            }
-//        }
-//        catch (SQLException ex) {
-//            return "redirect:/login?error=Login%20failed%20due%20to%20connection%20error";
-//        }
-//    }
+    @PostMapping("/login")
+    public String login(@RequestParam("username") String username,
+                        @RequestParam("password") String password,
+                        HttpSession session,
+                        Model model) {
+        try {
+            if(userService.loginUser(username, password)) {
+                User user = userService.findUser(username);
+
+                session.setAttribute("user", user);
+                session.setAttribute("userId", user.getUser_id());
+
+                return "redirect:/"; // Redirect to homepage
+            } else {
+                return "redirect:/login?error=Invalid%20credentials";
+            }
+        } catch (SQLException ex) {
+            return "redirect:/login?error=Connection%20error";
+        }
+    }
     @PostMapping("/register")
     public String handleRegistration(
             @RequestParam String username,
@@ -75,6 +83,11 @@ public class AuthController {
             );
 
             if (success) {
+//                User newUser = userService.findUser(username);
+//                session.setAttribute("user", newUser);
+//                session.setAttribute("userId", newUser.getUser_id());
+//
+//                return "redirect:/dashboard";
                 return "redirect:/login?success";
             } else {
                 model.addAttribute("error", "Username already exists. Try another one!");

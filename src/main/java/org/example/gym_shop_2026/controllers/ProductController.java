@@ -26,7 +26,7 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public String search(@RequestParam("keyword") String keyword, Model model) {
+    public String search(@RequestParam(value = "query", required = false) String keyword, Model model) {
         List<Product> results = productService.searchProducts(keyword);
         model.addAttribute("products", results);
         model.addAttribute("keyword", keyword);

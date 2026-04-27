@@ -36,14 +36,15 @@ public class CheckoutController {
     @PostMapping("/charge")
     @ResponseBody
     public String processPayment(HttpSession session) throws Exception {
-        int userId = (int) session.getAttribute("userId");
+        int userId = (int) session.getAttribute("user"); //old userId but basket looking for user.
+        // If crashes,
+        // return to the old type and switch on BasketController as well
 
         return paymentService.initiatePayment(userId);
     }
 
-    @PostMapping("/success")
-    public String paymentSuccess(@RequestParam String payment_intent) throws SQLException {
-        paymentService.fulfillOrder(payment_intent);
-        return "redirect:/dashboard?success=true";
+    @GetMapping("/success")
+    public String showSuccessPage() {
+        return "checkout-success";
     }
 }
