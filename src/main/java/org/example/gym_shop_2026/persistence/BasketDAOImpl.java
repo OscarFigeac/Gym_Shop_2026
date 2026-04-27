@@ -49,8 +49,8 @@ public class BasketDAOImpl implements BasketDAO {
 
     @Override
     public boolean addProductToBasket(int basketId, int productId, int quantity) {
-        String sql = "INSERT INTO basket_item (basket_id, product_id, itemQuantity) VALUES (?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE itemQuantity = itemQuantity + ?";
+        String sql = "INSERT INTO basket_item (basket_id, product_id, item_quantity) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE item_quantity = item_quantity + ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -102,7 +102,11 @@ public class BasketDAOImpl implements BasketDAO {
     @Override
     public List<BasketItem> findItemsByBasketId(int basketId) {
         List<BasketItem> items = new ArrayList<>();
-        String sql = "SELECT * FROM basket_item WHERE basket_id = ?";
+
+        String sql = "SELECT bi.*, p.name, p.price " +
+                "FROM basket_item bi " +
+                "JOIN products p ON bi.product_id = p.product_id " +
+                "WHERE bi.basket_id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -110,9 +114,15 @@ public class BasketDAOImpl implements BasketDAO {
             ps.setInt(1, basketId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
+                    int quantity = rs.getInt("item_quantity");
+                    double price = rs.getDouble("price");
+
                     items.add(BasketItem.builder()
                             .productId(rs.getInt("product_id"))
-                            .itemQuantity(rs.getInt("itemQuantity"))
+                            .itemQuantity(quantity)
+                            .productName(rs.getString("name"))
+                            .price(price)
+                            .subtotal(quantity * price)
                             .build());
                 }
             }
