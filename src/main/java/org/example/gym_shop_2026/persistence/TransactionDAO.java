@@ -34,15 +34,15 @@ public interface TransactionDAO {
      */
     Transaction findTransactionById(int transactionId) throws SQLException;
 
-    /**
-     * Updates a {@link Transaction} object with a given id using a
-     * new Transaction object.
-     * @param transactionId Given transaction id
-     * @param newTransaction Given {@link Transaction} object with changed data.
-     * @return Number of rows affected by delete.
-     * @throws SQLException If operation fails
-     */
-    int updateTransactionById(int transactionId, Transaction newTransaction) throws SQLException;
+//    /**
+//     * Updates a {@link Transaction} object with a given id using a
+//     * new Transaction object.
+//     * @param transactionId Given transaction id
+//     * @param newTransaction Given {@link Transaction} object with changed data.
+//     * @return Number of rows affected by delete.
+//     * @throws SQLException If operation fails
+//     */
+//    int updateTransactionById(int transactionId, Transaction newTransaction) throws SQLException;
 
     /**
      * Deletes a transaction using transaction id.
