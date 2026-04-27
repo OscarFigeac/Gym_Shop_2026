@@ -36,7 +36,14 @@ public class BasketService {
         try {
             Basket basket = basketDAO.findByUserID(userId);
             if (basket != null) {
-                basket.setItems(basketDAO.findItemsByBasketId(basket.getBasketId()));
+                List<BasketItem> items = basketDAO.findItemsByBasketId(basket.getBasketId());
+
+                for (BasketItem item : items) {
+                    Product p = productDAO.getProductById(item.getProductId());
+                    item.setProduct(p);
+                }
+
+                basket.setItems(items);
             }
             return basket;
         } catch (Exception e) {
