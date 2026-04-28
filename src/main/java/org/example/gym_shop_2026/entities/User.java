@@ -20,7 +20,7 @@ public class User {
     @NonNull
     private String fullName;
     @NonNull //change to enum
-    private String userType;
+    private UserType userType;
     @NonNull
     private String email;
     @NonNull
@@ -48,7 +48,7 @@ public class User {
         return fullName;
     }
 
-    public @NonNull String getUserType() {
+    public @NonNull UserType getUserType() {
         return userType;
     }
 

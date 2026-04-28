@@ -1,8 +1,11 @@
 package org.example.gym_shop_2026.services;
 
 import org.example.gym_shop_2026.entities.User;
+import org.example.gym_shop_2026.entities.UserType;
+import org.example.gym_shop_2026.persistence.BasketDAO;
 import org.example.gym_shop_2026.persistence.UserDAO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -10,9 +13,11 @@ import java.sql.SQLException;
 @Service
 public class UserService {
     private final UserDAO userDao;
+    private final BasketDAO basketDAO;
 
-    public UserService(UserDAO userDao){
+    public UserService(UserDAO userDao, BasketDAO basketDAO){
         this.userDao = userDao;
+        this.basketDAO = basketDAO;
     }
 
     //Functionality Methods
@@ -21,9 +26,17 @@ public class UserService {
         return userDao.login(username, password);
     }
 
-    public boolean registerUser(String username, String fullName, String userType, String eMail,
-                                                            String password, Date DoB, String address, String eircode) throws SQLException {
-        return userDao.register(username, fullName, userType, eMail, password, DoB, address, eircode);
+    @Transactional
+    public boolean registerUser(String uName, String fName, UserType type, String eMail, String pWord,
+                                Date dob, String address, String eircode) throws SQLException {
+
+        int newUserId = userDao.register(uName, fName, type, eMail, pWord, dob, address, eircode);
+
+        if (newUserId != -1) {
+            return basketDAO.createBasket(newUserId);
+        }
+
+        return false;
     }
 
     public User findUser (String toBeFound) throws SQLException{
