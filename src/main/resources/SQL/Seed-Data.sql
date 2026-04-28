@@ -14,5 +14,5 @@ INSERT INTO products (product_category, name, price, quantity) VALUES(
     ('Equipment', 'Foam Roller - High Density', 25, 15.00);
 
 INSERT INTO users (username, fullName, userType, email, password, dob, secretKey, is2faEnabled, address, eircode) VALUES
-    ('admin', 'GymShop Administrator', 'Admin', 'admin@gymshop.com', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqvOa', '1990-01-01', 'AL3X4ND3R', 0, '123 Iron Street', 'A65 F8P3'),
-    ('OscarLove2Talk', 'John Doe', 'Member', 'john@example.com', '$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOAK7khz5Bde.tALTY87xI.bY7y6', '1995-05-20', 'J0HN123', 0, '45 Muscle Lane', 'D02 XY45');
+    ('admin', 'GymShop Administrator', 'ROLE_ADMIN', 'admin@gymshop.com', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqvOa', '1990-01-01', 'AL3X4ND3R', 0, '123 Iron Street', 'A65 F8P3'),
+    ('OscarLove2Talk', 'John Doe', 'ROLE_MEMBER', 'john@example.com', '$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOAK7khz5Bde.tALTY87xI.bY7y6', '1995-05-20', 'J0HN123', 0, '45 Muscle Lane', 'D02 XY45');

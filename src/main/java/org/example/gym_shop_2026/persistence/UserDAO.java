@@ -1,13 +1,14 @@
 package org.example.gym_shop_2026.persistence;
 
 import org.example.gym_shop_2026.entities.User;
+import org.example.gym_shop_2026.entities.UserType;
 
 import java.sql.Date;
 import java.sql.SQLException;
 
 public interface UserDAO {
     boolean login(String username, String password) throws SQLException;
-    public boolean register(String uName, String fName, String type, String eMail, String pWord,
+    public boolean register(String uName, String fName, UserType type, String eMail, String pWord,
                             Date dob, String address, String eircode) throws SQLException;
     User findByUsername(String Username) throws SQLException;
     boolean createUser(User toBeCreated) throws SQLException;
