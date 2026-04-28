@@ -26,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getUsername())
                     .password(user.getPassword())
-                    .roles(user.getUserType())
+                    .authorities(user.getUserType().name())
                     .build();
         } catch (SQLException e) {
             throw new UsernameNotFoundException("Database error during login");
