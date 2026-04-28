@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS users(
     address VARCHAR(255),
     eircode CHAR(8),
     secret_key VARCHAR(255) NOT NULL,
-    is_2fa_enabled BOOLEAN NOT NULL
+    is_2fa_enabled BOOLEAN NOT NULL,
+    stripe_customer_id VARCHAR(255)
 );
 CREATE TABLE IF NOT EXISTS subscriptions(
     plan_id INT AUTO_INCREMENT PRIMARY KEY,
