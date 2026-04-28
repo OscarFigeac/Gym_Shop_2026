@@ -3,6 +3,7 @@ package org.example.gym_shop_2026.controllers;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.entities.User;
+import org.example.gym_shop_2026.entities.UserType;
 import org.example.gym_shop_2026.services.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -63,7 +64,7 @@ public class AuthController {
             @RequestParam String dob,
             @RequestParam String address,
             @RequestParam String eircode,
-            @RequestParam String userType,
+            @RequestParam UserType userType,
             Model model) {
 
         try {
