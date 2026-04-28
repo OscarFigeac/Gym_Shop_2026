@@ -64,7 +64,7 @@ public class AuthController {
             @RequestParam String dob,
             @RequestParam String address,
             @RequestParam String eircode,
-            @RequestParam String userType,
+            @RequestParam UserType userType,
             Model model) {
 
         try {

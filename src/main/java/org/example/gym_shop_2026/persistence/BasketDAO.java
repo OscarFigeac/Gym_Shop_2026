@@ -12,4 +12,5 @@ public interface BasketDAO {
     boolean addProductToBasket(int basketId, int productId, int quantity);
     boolean removeProduct(int basketId, int productId);
     boolean clearBasket(int basketId);
+    boolean createBasket(int userId);
 }
