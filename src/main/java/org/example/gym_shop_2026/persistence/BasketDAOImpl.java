@@ -131,4 +131,23 @@ public class BasketDAOImpl implements BasketDAO {
         }
         return items;
     }
+
+    @Override
+    public boolean createBasket(int userId) {
+        String sql = "INSERT INTO basket (user_id, status, created_at) VALUES (?, ?, ?)";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setString(2, "ACTIVE");
+            ps.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis()));
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            log.error("createBasket(): SQL error for user ID {}. Exception: {}", userId, e.getMessage());
+            return false;
+        }
+    }
 }
+
