@@ -2,14 +2,6 @@ CREATE DATABASE IF NOT EXISTS `gymshopdb`;
 CREATE DATABASE IF NOT EXISTS gymshopdbtest;
 
 -- Run in each database
-# CREATE TABLE IF NOT EXISTS addresses (
-#     address_id INT AUTO_INCREMENT PRIMARY KEY,
-#     user_id INT NOT NULL,
-#     address VARCHAR(255),
-#     eircode CHAR(8) NOT NULL,
-#     CONSTRAINT fk_addresses_users FOREIGN KEY(user_id) REFERENCES users(user_id)
-# );
-
 CREATE TABLE IF NOT EXISTS users(
 	user_id INT AUTO_INCREMENT PRIMARY KEY,
 	username VARCHAR(255) NOT NULL,
@@ -38,20 +30,6 @@ CREATE TABLE IF NOT EXISTS products(
     price DECIMAL(8, 2) NOT NULL,
     quantity INT NOT NULL
 );
-
-# CREATE TABLE IF NOT EXISTS locations(
-# 	location_id INT AUTO_INCREMENT PRIMARY KEY,
-# 	location_address_code VARCHAR(255) NOT NULL
-# );
-
-
-# CREATE TABLE IF NOT EXISTS subscriptions_users(
-#     plan_id INT NOT NULL,
-#     user_id INT NOT NULL,
-#     expiry_date DATE NOT NULL,
-#     CONSTRAINT fk_subscriptionsusers_subscriptions FOREIGN KEY(plan_id) REFERENCES subscriptions(plan_id),
-#     CONSTRAINT fk_subscriptionsusers_users FOREIGN KEY(user_id) REFERENCES users(user_id)
-# );
 
 CREATE TABLE IF NOT EXISTS payment_methods(
     method_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -94,14 +72,3 @@ CREATE TABLE IF NOT EXISTS basket_item(
     CONSTRAINT fk_basketItem_basket FOREIGN KEY(basket_id) REFERENCES basket(basket_id),
     CONSTRAINT ck_basketItem_itemQuantity CHECK(item_quantity >= 0)
 );
-# CREATE TABLE IF NOT EXISTS productslocations(
-#     product_id INT NOT NULL,
-#     location_id INT NOT NULL,
-#     CONSTRAINT fk_productslocationsproducts FOREIGN KEY(product_id) REFERENCES products(product_id),
-#     CONSTRAINT fk_productslocationslocations FOREIGN KEY(location_id) REFERENCES locations(location_id)
-# );
-
-ALTER TABLE users ADD COLUMN stripe_customer_id VARCHAR(255);
-
-ALTER TABLE payment_methods RENAME COLUMN processor_token TO stripe_payment_method_id;
-ALTER TABLE payment_methods MODIFY COLUMN last_four_digits VARCHAR(4);
