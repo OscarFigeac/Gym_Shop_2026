@@ -55,8 +55,8 @@ CREATE TABLE IF NOT EXISTS products(
 CREATE TABLE IF NOT EXISTS payment_methods(
     method_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    processor_token VARCHAR(255) NOT NULL,
-    last_four_digits INT NOT NULL,
+    stripe_payment_method_id VARCHAR(255) NOT NULL,
+    last_four_digits VARCHAR(4) NOT NULL,
     expiry_date VARCHAR(255) NOT NULL,
     card_type VARCHAR(12) NOT NULL,
     is_valid TINYINT NOT NULL,
