@@ -3,6 +3,7 @@ package org.example.gym_shop_2026.controllers;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.entities.User;
+import org.example.gym_shop_2026.entities.UserType;
 import org.example.gym_shop_2026.services.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -71,10 +72,12 @@ public class AuthController {
 
             Date sqlDate = Date.valueOf(dob);
 
+            UserType typeEnum = UserType.valueOf(userType);
+
             boolean success = userService.registerUser(
                     username,
                     fullName,
-                    userType,
+                    typeEnum,
                     email,
                     password,
                     sqlDate,

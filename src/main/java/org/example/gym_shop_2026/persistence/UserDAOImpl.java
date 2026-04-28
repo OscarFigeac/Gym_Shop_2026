@@ -3,6 +3,7 @@ package org.example.gym_shop_2026.persistence;
 import lombok.extern.slf4j.Slf4j;
 //import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.entities.User;
+import org.example.gym_shop_2026.entities.UserType;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -379,7 +380,7 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean register(String uName, String fName, String type, String eMail, String pWord,
+    public boolean register(String uName, String fName, UserType type, String eMail, String pWord,
                             Date dob, String address, String eircode) throws SQLException {
 
         String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob, address, eircode, secret_key, is_2fa_enabled) VALUES (?,?,?,?,?,?,?,?,?,?)";
@@ -388,7 +389,7 @@ public class UserDAOImpl implements UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, uName);
             ps.setString(2, fName);
-            ps.setString(3, type);
+            ps.setString(3, type.name());
             ps.setString(4, eMail);
             ps.setString(5, passwordEncoder.encode(pWord));
             ps.setDate(6, dob);
@@ -425,7 +426,7 @@ public class UserDAOImpl implements UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getFullName());
-            ps.setString(3, user.getUserType());
+            ps.setString(3, user.getUserType().name());
             ps.setString(4, user.getEmail());
             ps.setString(5, passwordEncoder.encode(user.getPassword()));
             ps.setDate(6, new java.sql.Date(user.getDob().getTime()));
@@ -453,7 +454,7 @@ public class UserDAOImpl implements UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getFullName());
-            ps.setString(3, user.getUserType());
+            ps.setString(3, user.getUserType().name());
             ps.setString(4, user.getEmail());
             ps.setString(5, user.getPassword());
             ps.setDate(6, new java.sql.Date(user.getDob().getTime()));
@@ -491,7 +492,7 @@ public class UserDAOImpl implements UserDAO {
                 .user_id(rs.getInt("user_id"))
                 .username(rs.getString("username"))
                 .fullName(rs.getString("full_name"))
-                .userType(rs.getString("user_type"))
+                .userType(UserType.valueOf(rs.getString("user_type")))
                 .email(rs.getString("email"))
                 .password(rs.getString("password"))
                 .dob(rs.getDate("dob"))
