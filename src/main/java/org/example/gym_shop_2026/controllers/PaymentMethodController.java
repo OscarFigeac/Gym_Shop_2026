@@ -1,5 +1,6 @@
 package org.example.gym_shop_2026.controllers;
 
+import com.stripe.exception.StripeException;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.entities.User;
@@ -38,25 +39,20 @@ public class PaymentMethodController {
     }
 
     @PostMapping("/add")
-    public String addMethod(@RequestParam String cardNumber,
-                            @RequestParam String cardHolderName,
-                            @RequestParam String expiry,
-                            @RequestParam String cardType,
-                            Principal principal) throws SQLException {
+    public String addMethod(@RequestParam String stripePaymentMethodId,
+                            @RequestParam String lastFour,
+                            @RequestParam String expDate,
+                            @RequestParam String brand,
+                            Principal principal) throws SQLException, StripeException {
 
         User user = userService.findUser(principal.getName());
 
-        String lastFourStr = cardNumber.substring(cardNumber.length() - 4);
-        int lastFour = Integer.parseInt(lastFourStr);
-
-        String token = "tok_" + UUID.randomUUID().toString().substring(0, 8);
-
         paymentMethod newMethod = paymentMethod.builder()
                 .userId(user.getUser_id())
-                .processorToken(token)
+                .stripePaymentMethodId(stripePaymentMethodId)
                 .lastFourDigits(lastFour)
-                .expiryDate(expiry)
-                .cardType(cardType) // e.g. VISA, MASTERCARD, AMEX ETC
+                .expiryDate(expDate)
+                .cardType(brand)
                 .isValid(true)
                 .isPrimary(false)
                 .build();
@@ -66,7 +62,7 @@ public class PaymentMethodController {
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteMethod(@PathVariable int id, Principal principal) throws SQLException {
+    public String deleteMethod(@PathVariable int id, Principal principal) throws SQLException, StripeException {
         User user = userService.findUser(principal.getName());
         paymentMethod target = methodService.getMethodDetails(id);
 

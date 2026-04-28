@@ -1,10 +1,11 @@
 package org.example.gym_shop_2026.persistence;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.gym_shop_2026.connector.Connector;
+//import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.entities.paymentMethod;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,18 +16,18 @@ import java.util.List;
 @Slf4j
 @Repository
 public class paymentMethodDAOImpl implements paymentMethodDAO{
-    private Connector connector;
+    private final DataSource dataSource;
 
-    public paymentMethodDAOImpl(Connector connector){
-        this.connector = connector;
+    public paymentMethodDAOImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     private static paymentMethod mapPaymentRow(ResultSet rs) throws SQLException {
         return new paymentMethod(
                 rs.getInt("method_id"),
                 rs.getInt("user_id"),
-                rs.getString("processor_token"),
-                rs.getInt("last_four_digits"),
+                rs.getString("stripe_payment_method_id"),
+                rs.getString("last_four_digits"),
                 rs.getString("expiry_date"),
                 rs.getString("card_type"),
                 rs.getBoolean("is_valid"),
@@ -47,13 +48,14 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
      * @author Oscar Figeac
      */
     public paymentMethod findMethodById(int id) throws SQLException {
-        Connection conn = connector.getConnection();
-        if(conn == null) throw new SQLException("findMethodById(): Connection failed.");
-
         paymentMethod method = null;
-        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM payment_methods WHERE method_id = ?")){
+        String sql = "SELECT * FROM payment_methods WHERE method_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()){
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) method = mapPaymentRow(rs);
             } catch (SQLException e) {
                 log.error("findMethodById(): Error processing result set. \nException: {}", e.getMessage());
@@ -78,13 +80,14 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
      * @author Oscar Figeac
      */
     public boolean isUserPaymentMethodAvailable(int userId) throws SQLException {
-        Connection conn = connector.getConnection();
-        if(conn == null) throw new SQLException("isUserPaymentMethodAvailable(): Connection failed.");
-
         boolean available = false;
-        try(PreparedStatement ps = conn.prepareStatement("SELECT EXISTS(SELECT 1 FROM payment_methods WHERE user_id = ? AND is_valid = TRUE) AS available")){
+        String sql = "SELECT EXISTS(SELECT 1 FROM payment_methods WHERE user_id = ? AND is_valid = TRUE) AS available";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()){
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) available = rs.getBoolean("available");
             } catch (SQLException e) {
                 log.error("isUserPaymentMethodAvailable(): Error processing result set. \nException: {}", e.getMessage());
@@ -109,13 +112,14 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
      * @author Oscar Figeac
      */
     public boolean isPaymentTokenUnique(String processorToken) throws SQLException {
-        Connection conn = connector.getConnection();
-        if(conn == null) throw new SQLException("isPaymentTokenUnique(): Connection failed.");
-
         boolean exists = false;
-        try(PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM payment_methods WHERE processor_token = ?")){
+        String sql = "SELECT COUNT(*) FROM payment_methods WHERE processor_token = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, processorToken);
-            try(ResultSet rs = ps.executeQuery()){
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next() && rs.getInt(1) > 0) exists = true;
             } catch (SQLException e) {
                 log.error("isPaymentTokenUnique(): Error processing result set. \nException: {}", e.getMessage());
@@ -125,7 +129,7 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
             log.error("isPaymentTokenUnique(): SQL query could not be prepared. \nException: {}", e.getMessage());
             throw e;
         }
-        return !exists; // Returns true if unique (not exists)
+        return !exists;
     }
 
     /**
@@ -140,13 +144,14 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
      * @author Oscar Figeac
      */
     public List<paymentMethod> findAllMethodsByUserId(int userId) throws SQLException {
-        Connection conn = connector.getConnection();
-        if(conn == null) throw new SQLException("findAllMethodsByUserId(): Connection failed.");
-
         List<paymentMethod> methods = new ArrayList<>();
-        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM payment_methods WHERE user_id = ?")) {
+        String sql = "SELECT * FROM payment_methods WHERE user_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, userId);
-            try(ResultSet rs = ps.executeQuery()){
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) methods.add(mapPaymentRow(rs));
             } catch (SQLException e) {
                 log.error("findAllMethodsByUserId(): Error processing result set. \nException: {}", e.getMessage());
@@ -172,14 +177,15 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
      */
     public boolean insertPaymentMethod(paymentMethod p) throws SQLException {
         if (p == null) throw new IllegalArgumentException("Cannot insert null payment method");
-        Connection conn = connector.getConnection();
-        if(conn == null) throw new SQLException("insertPaymentMethod(): Connection failed.");
-
         int rows = 0;
-        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO payment_methods (user_id, processor_token, last_four_digits, expiry_date, card_type, is_valid, is_primary) VALUES (?,?,?,?,?,?,?)")){
+        String sql = "INSERT INTO payment_methods (user_id, stripe_payment_method_id, last_four_digits, expiry_date, card_type, is_valid, is_primary) VALUES (?,?,?,?,?,?,?)";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, p.getUserId());
-            ps.setString(2, p.getProcessorToken());
-            ps.setInt(3, p.getLastFourDigits());
+            ps.setString(2, p.getStripePaymentMethodId());
+            ps.setString(3, p.getLastFourDigits());
             ps.setString(4, p.getExpiryDate());
             ps.setString(5, p.getCardType());
             ps.setBoolean(6, p.isValid());
@@ -202,23 +208,23 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
      */
     public boolean insertPaymentMethodTesting(paymentMethod p) throws SQLException {
         if (p == null) throw new IllegalArgumentException("Cannot insert null payment method");
-
-        Connection conn = connector.getConnection();
-        if(conn == null) throw new SQLException("insertPaymentMethod(): Connection failed.");
-        conn.setAutoCommit(false);
-
         int rows = 0;
-        try(PreparedStatement ps = conn.prepareStatement("INSERT INTO payment_methods (user_id, processor_token, last_four_digits, expiry_date, card_type, is_valid, is_primary) VALUES (?,?,?,?,?,?,?)")){
+        String sql = "INSERT INTO payment_methods (user_id, stripe_payment_method_id, last_four_digits, expiry_date, card_type, is_valid, is_primary) VALUES (?,?,?,?,?,?,?)";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false);
             ps.setInt(1, p.getUserId());
-            ps.setString(2, p.getProcessorToken());
-            ps.setInt(3, p.getLastFourDigits());
+            ps.setString(2, p.getStripePaymentMethodId());
+            ps.setString(3, p.getLastFourDigits());
             ps.setString(4, p.getExpiryDate());
             ps.setString(5, p.getCardType());
             ps.setBoolean(6, p.isValid());
             ps.setBoolean(7, p.isPrimary());
             rows = ps.executeUpdate();
         } catch (SQLException e) {
-            log.error("insertPaymentMethod(): SQL query could not be prepared. \nException: {}", e.getMessage());
+            log.error("insertPaymentMethodTesting(): SQL query could not be prepared. \nException: {}", e.getMessage());
             throw e;
         }
         return rows == 1;
@@ -238,10 +244,10 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
         paymentMethod removed = findMethodById(id);
         if (removed == null) return null;
 
-        Connection conn = connector.getConnection();
-        if(conn == null) throw new SQLException("deleteMethodById(): Connection failed.");
+        String sql = "DELETE FROM payment_methods WHERE method_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        try(PreparedStatement ps = conn.prepareStatement("DELETE FROM payment_methods WHERE method_id = ?")){
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -263,15 +269,15 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
         paymentMethod removed = findMethodById(id);
         if (removed == null) return null;
 
-        Connection conn = connector.getConnection();
-        if(conn == null) throw new SQLException("deleteMethodById(): Connection failed.");
-        conn.setAutoCommit(false);
+        String sql = "DELETE FROM payment_methods WHERE method_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        try(PreparedStatement ps = conn.prepareStatement("DELETE FROM payment_methods WHERE method_id = ?")){
+            conn.setAutoCommit(false);
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
-            log.error("deleteMethodById(): SQL query could not be prepared. \nException: {}", e.getMessage());
+            log.error("deleteMethodByIdTesting(): SQL query could not be prepared. \nException: {}", e.getMessage());
             throw e;
         }
         return removed;
@@ -289,13 +295,12 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
      * @author Oscar Figeac
      */
     public paymentMethod findPrimaryMethodByUserId(int userId) throws SQLException {
-        Connection conn = connector.getConnection();
-        if (conn == null) {
-            throw new SQLException("findPrimaryMethodByUserId(): Could not establish connection to database.");
-        }
-
         paymentMethod method = null;
-        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM payment_methods WHERE user_id = ? AND is_primary = TRUE")) {
+        String sql = "SELECT * FROM payment_methods WHERE user_id = ? AND is_primary = TRUE";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -313,21 +318,17 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
     }
 
     public boolean updatePaymentMethod(paymentMethod method) throws SQLException {
-        if (method == null) {
-            throw new IllegalArgumentException("Cannot update a null payment method");
-        }
-        Connection conn = connector.getConnection();
-        if (conn == null) {
-            throw new SQLException("updatePaymentMethod(): Could not establish connection to database.");
-        }
+        if (method == null) throw new IllegalArgumentException("Cannot update a null payment method");
 
         int affectedRows = 0;
-        String sql = "UPDATE payment_methods SET user_id=?, processor_token=?, last_four_digits=?, expiry_date=?, card_type=?, is_valid=?, is_primary=? WHERE method_id=?";
+        String sql = "UPDATE payment_methods SET user_id=?, stripe_payment_method_id=?, last_four_digits=?, expiry_date=?, card_type=?, is_valid=?, is_primary=? WHERE method_id=?";
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, method.getUserId());
-            ps.setString(2, method.getProcessorToken());
-            ps.setInt(3, method.getLastFourDigits());
+            ps.setString(2, method.getStripePaymentMethodId());
+            ps.setString(3, method.getLastFourDigits());
             ps.setString(4, method.getExpiryDate());
             ps.setString(5, method.getCardType());
             ps.setBoolean(6, method.isValid());
@@ -343,13 +344,12 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
     }
 
     public boolean updateMethodValidity(int methodId, boolean isValid) throws SQLException {
-        Connection conn = connector.getConnection();
-        if (conn == null) {
-            throw new SQLException("updateMethodValidity(): Could not establish connection to database.");
-        }
-
         int affectedRows = 0;
-        try (PreparedStatement ps = conn.prepareStatement("UPDATE payment_methods SET is_valid = ? WHERE method_id = ?")) {
+        String sql = "UPDATE payment_methods SET is_valid = ? WHERE method_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setBoolean(1, isValid);
             ps.setInt(2, methodId);
 

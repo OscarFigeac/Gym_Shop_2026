@@ -3,10 +3,7 @@ package org.example.gym_shop_2026.services;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 import lombok.extern.slf4j.Slf4j;
-import org.example.gym_shop_2026.entities.Basket;
-import org.example.gym_shop_2026.entities.BasketItem;
-import org.example.gym_shop_2026.entities.Product;
-import org.example.gym_shop_2026.entities.Transaction;
+import org.example.gym_shop_2026.entities.*;
 import org.example.gym_shop_2026.persistence.BasketDAO;
 import org.example.gym_shop_2026.persistence.ProductDAO;
 import org.example.gym_shop_2026.persistence.TransactionDAO;
@@ -22,24 +19,34 @@ public class PaymentService {
     private final BasketService basketService;
     private final ProductService productService;
     private final TransactionService transactionService;
+    private final UserService userService;
 
-    public PaymentService(BasketService basketService, ProductService productService, TransactionService transactionService) {
+    @Autowired
+    public PaymentService(BasketService basketService, ProductService productService,
+                          TransactionService transactionService, UserService userService) {
         this.basketService = basketService;
         this.productService = productService;
         this.transactionService = transactionService;
+        this.userService = userService;
     }
 
     public String initiatePayment(int userId) throws Exception{
+        User user = userService.getUserById(userId);
         Basket basket = basketService.getBasketForUser(userId);
         double totalAmount = calculateTotal(basket);
 
-        PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount((long) (totalAmount * 100)) // using cents
+        PaymentIntentCreateParams.Builder paramsBuilder = PaymentIntentCreateParams.builder()
+                .setAmount((long) (totalAmount * 100))
                 .setCurrency("eur")
-                .putMetadata("userId", String.valueOf(userId))
-                .build();
+                .putMetadata("userId", String.valueOf(userId));
 
-        PaymentIntent intent = PaymentIntent.create(params);
+        if (user.getStripeCustomerId() != null) {
+            paramsBuilder.setCustomer(user.getStripeCustomerId());
+            // save my card functionality
+            paramsBuilder.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
+        }
+
+        PaymentIntent intent = PaymentIntent.create(paramsBuilder.build());
 
         Transaction t = Transaction.builder()
                 .userId(userId)

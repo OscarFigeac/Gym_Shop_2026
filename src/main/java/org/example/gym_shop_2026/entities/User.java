@@ -72,4 +72,6 @@ public class User {
     public boolean is2faEnabled() {
         return is2faEnabled;
     }
+
+    private String stripeCustomerId;
 }

@@ -2,6 +2,8 @@ package org.example.gym_shop_2026.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gym_shop_2026.entities.Basket;
+import org.example.gym_shop_2026.entities.BasketItem;
 import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.entities.paymentMethod;
 import org.example.gym_shop_2026.persistence.paymentMethodDAO;
@@ -23,27 +25,42 @@ import java.util.List;
 public class CheckoutController {
 
     private final PaymentService paymentService;
+    private final BasketService basketService;
+    private final UserService userService;
 
-    public CheckoutController(PaymentService paymentService) {
+    public CheckoutController(PaymentService paymentService,
+                              BasketService basketService,
+                              UserService userService) {
         this.paymentService = paymentService;
+        this.basketService = basketService;
+        this.userService = userService;
     }
 
-    @GetMapping
-    public String showCheckoutPage() {
+    @GetMapping("/begin")
+    public String showCheckoutPage(Model model, Principal principal) throws SQLException {
+        User user = userService.findUser(principal.getName());
+        Basket basket = basketService.getBasketForUser(user.getUser_id());
+
+        model.addAttribute("basket", basket);
+
+        double total = basketService.getBasketTotal(basket.getBasketId());
+        model.addAttribute("grandTotal", total);
+
         return "checkout";
     }
 
     @PostMapping("/charge")
     @ResponseBody
-    public String processPayment(HttpSession session) throws Exception {
-        int userId = (int) session.getAttribute("userId");
+    public String processPayment(Principal principal) throws Exception {
+        String username = principal.getName();
 
-        return paymentService.initiatePayment(userId);
+        User user = userService.findUser(username);
+
+        return paymentService.initiatePayment(user.getUser_id());
     }
 
-    @PostMapping("/success")
-    public String paymentSuccess(@RequestParam String payment_intent) throws SQLException {
-        paymentService.fulfillOrder(payment_intent);
-        return "redirect:/dashboard?success=true";
+    @GetMapping("/success")
+    public String showSuccessPage() {
+        return "checkout-success";
     }
 }

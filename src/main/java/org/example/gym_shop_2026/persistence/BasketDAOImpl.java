@@ -1,191 +1,134 @@
 package org.example.gym_shop_2026.persistence;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.gym_shop_2026.connector.Connector;
 import org.example.gym_shop_2026.entities.Basket;
 import org.example.gym_shop_2026.entities.BasketItem;
-import org.example.gym_shop_2026.entities.User;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Repository
 @Slf4j
+@Repository
 public class BasketDAOImpl implements BasketDAO {
-    private final Connector connector;
 
-    public BasketDAOImpl(Connector connector) {
-        this.connector = connector;
+    private final DataSource dataSource;
+
+    public BasketDAOImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
-    //Functionality
-
     @Override
-    public Basket findByUserID(int user_id) throws SQLException {
-        if(user_id <= 0){
-            throw new IllegalArgumentException("ID - ID cannot be less than or equal to zero for search process !");
-        }
-
-        Connection conn = connector.getConnection();
-        if(conn == null){
-            throw new SQLException("findUserByID - Unable to establish a connection to the database !");
-        }
-
-        Basket found = null;
-        try(PreparedStatement ps = conn.prepareStatement("SELECT * FROM basket WHERE user_id = ?")){
-            ps.setInt(1, user_id);
-            try(ResultSet rs = ps.executeQuery()){
-                if(rs.next()) found = mapBasketRow(rs);
-            }
-        } catch (SQLException e) {
-            log.error("findByUsername(): SQL error. \nException: {}", e.getMessage());
-            throw e;
-        }
-        return found;
-    }
-
-    /**
-     * @author Oscar
-     * Takes in a basket Id to display the content of the basket.
-     * @param basketId The basket being looked for
-     * @return A List of Items stored in the Basket
-     * @throws SQLException If the Connection to the database fails at any point
-     */
-    @Override
-    public List<BasketItem> findItemsByBasketId(int basketId) throws SQLException {
-        List<BasketItem> items = new ArrayList<>();
-        String sql = "SELECT * FROM basket_item WHERE basketId = ?";
-        try (Connection conn = connector.getConnection();
+    public Basket findByUserID(int userId) {
+        String sql = "SELECT * FROM basket WHERE user_id = ?";
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, basketId);
+
+            ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    items.add(BasketItem.builder()
-                            .itemId(rs.getInt("itemId"))
-                            .productId(rs.getInt("productId"))
-                            .basketId(rs.getInt("basketId"))
-                            .itemQuantity(rs.getInt("itemQuantity"))
-                            .build());
+                if (rs.next()) {
+                    java.sql.Timestamp ts = rs.getTimestamp("created_at");
+                    java.time.LocalDateTime createdAt = (ts != null) ? ts.toLocalDateTime() : java.time.LocalDateTime.now();
+
+                    return Basket.builder()
+                            .basketId(rs.getInt("basket_id"))
+                            .user_id(rs.getInt("user_id"))
+                            .status(rs.getString("status"))
+                            .createdAt(Timestamp.valueOf(createdAt))
+                            .build();
                 }
             }
+        } catch (SQLException e) {
+            log.error("Error fetching basket for user: {}", userId, e);
+            throw new RuntimeException("Could not retrieve basket.", e); // Important: rethrow or handle the error properly
         }
-        return items;
+        return null;
     }
 
-    /**
-     * @author Oscar
-     * Adds an item into the basket, it's id and quantity
-     * @param basketId The basket identifier where the products are being added
-     * @param productId The Identifier of the product being added
-     * @param quantity The number of Items being added
-     * @throws SQLException If the connection to the database fails at any point
-     */
     @Override
-    public void addItemToBasket(int basketId, int productId, int quantity) throws SQLException {
-        String sql = "INSERT INTO basket_item (basket_id, product_id, item_quantity) " +
-                "VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE item_quantity = item_quantity + ?";
+    public boolean addProductToBasket(int basketId, int productId, int quantity) {
+        String sql = "INSERT INTO basket_item (basket_id, product_id, item_quantity) VALUES (?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE item_quantity = item_quantity + ?";
 
-        try (Connection conn = connector.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, basketId);
             ps.setInt(2, productId);
             ps.setInt(3, quantity);
             ps.setInt(4, quantity);
-            ps.executeUpdate();
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            log.error("addProductToBasket(): SQL error. Exception: {}", e.getMessage());
+            return false;
         }
     }
 
-    /**
-     * @author Oscar
-     * Updates the amount of an item currently in a basket
-     * @param itemId The item being updated
-     * @param newQuantity The new amount being added into the basket
-     * @throws SQLException If the connection to the database fails at any point
-     */
     @Override
-    public void updateItemQuantity(int itemId, int newQuantity) throws SQLException {
-        String sql = "UPDATE basket_item SET item_quantity = ? WHERE item_id = ?";
-        try (Connection conn = connector.getConnection();
+    public boolean removeProduct(int basketId, int productId) {
+        String sql = "DELETE FROM basket_item WHERE basket_id = ? AND product_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, newQuantity);
-            ps.setInt(2, itemId);
-            ps.executeUpdate();
+
+            ps.setInt(1, basketId);
+            ps.setInt(2, productId);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            log.error("removeProduct(): SQL error. Exception: {}", e.getMessage());
+            return false;
         }
     }
 
-    /**
-     * @author Oscar
-     * Deletes an item from a basket
-     * @param itemId The item being deleted
-     * @throws SQLException If the connection to the database fails at any point
-     */
     @Override
-    public void removeItem(int itemId) throws SQLException {
-        String sql = "DELETE FROM basket_item WHERE item_id = ?";
-        try (Connection conn = connector.getConnection();
+    public boolean clearBasket(int basketId) {
+        String sql = "DELETE FROM basket_item WHERE basket_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, itemId);
-            ps.executeUpdate();
+
+            ps.setInt(1, basketId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            log.error("clearBasket(): SQL error. Exception: {}", e.getMessage());
+            return false;
         }
     }
 
-    /**
-     * @author Oscar
-     * creates a basket for a user. The userId is passed as a parameter
-     * @param userId The owner of the basket being created
-     * @return The full Basket Object so that the service can handle it immediately
-     * @throws SQLException If the connection to the database fails at any point
-     */
     @Override
-    public Basket createBasket(int userId) throws SQLException {
-        String sql = "INSERT INTO basket (user_id, status, created_at) VALUES (?, 'Active', CURRENT_TIMESTAMP)";
+    public List<BasketItem> findItemsByBasketId(int basketId) {
+        List<BasketItem> items = new ArrayList<>();
 
-        try (Connection conn = connector.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String sql = "SELECT bi.*, p.name, p.price " +
+                "FROM basket_item bi " +
+                "JOIN products p ON bi.product_id = p.product_id " +
+                "WHERE bi.basket_id = ?";
 
-            ps.setInt(1, userId);
-            ps.executeUpdate();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    int newId = rs.getInt(1);
-                    return findByUserID(userId);
+            ps.setInt(1, basketId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int quantity = rs.getInt("item_quantity");
+                    double price = rs.getDouble("price");
+
+                    items.add(BasketItem.builder()
+                            .productId(rs.getInt("product_id"))
+                            .itemQuantity(quantity)
+                            .productName(rs.getString("name"))
+                            .price(price)
+                            .subtotal(quantity * price)
+                            .build());
                 }
             }
-        }
-        throw new SQLException("Creating basket failed, no ID obtained.");
-    }
-
-    /**
-     * @author Oscar
-     * Deletes all the items in the existing basket
-     * @param basketId The basket being cleared
-     * @throws SQLException if the connection to the database fails at any point
-     */
-    @Override
-    public void clearBasket(int basketId) throws SQLException {
-        String sql = "DELETE FROM basket_item WHERE basket_id = ?";
-        try (Connection conn = connector.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, basketId);
-            ps.executeUpdate();
-            log.info("Basket {} cleared after successful purchase.", basketId);
         } catch (SQLException e) {
-            log.error("Error clearing basket {}: {}", basketId, e.getMessage());
-            throw e;
+            log.error("Error fetching items for basket: {}", basketId, e);
         }
-    }
-
-    //Private Methods
-
-    private static Basket mapBasketRow(ResultSet rs) throws SQLException {
-        return Basket.builder()
-                .basketId(rs.getInt("basket_id"))
-                .user_id(rs.getInt("user_id"))
-                .status(rs.getString("status"))
-                .createdAt(rs.getTimestamp("created_at"))
-                .build();
+        return items;
     }
 }

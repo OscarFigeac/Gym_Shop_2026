@@ -14,4 +14,5 @@ public interface UserDAO {
     User findUserByID(int userId) throws SQLException;
     boolean updateUser(User toBeUpdated) throws SQLException;
     boolean deleteUser(User toBeDeleted) throws SQLException;
+    public boolean updateStripeId(int userId, String stripeId) throws SQLException;
 }
