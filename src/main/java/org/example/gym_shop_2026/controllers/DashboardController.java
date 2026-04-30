@@ -1,6 +1,9 @@
 package org.example.gym_shop_2026.controllers;
 
+import com.stripe.service.BalanceService;
+import org.example.gym_shop_2026.entities.Basket;
 import org.example.gym_shop_2026.entities.User;
+import org.example.gym_shop_2026.services.BasketService;
 import org.example.gym_shop_2026.services.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,15 +21,24 @@ import java.sql.SQLException;
 public class DashboardController {
 
     private final UserService userService;
+    private final BasketService basketService;
 
-    public DashboardController(UserService userService) {
+    public DashboardController(UserService userService, BasketService basketService) {
         this.userService = userService;
+        this.basketService = basketService;
     }
 
     @GetMapping
     public String showDashboard(Model model, @AuthenticationPrincipal UserDetails userDetails) throws SQLException {
         User user = userService.findUser(userDetails.getUsername());
-        model.addAttribute("user", user); // Pass the whole object for easier access
+
+        Basket basket = basketService.getBasketForUser(user.getUser_id());
+
+        int itemCount = (basket != null && basket.getItems() != null) ? basket.getItems().size() : 0;
+
+        model.addAttribute("user", user);
+        model.addAttribute("basketCount", itemCount);
+
         return "dashboard";
     }
 
