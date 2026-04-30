@@ -132,7 +132,6 @@
                 </div>
 
                 <form id="loginForm" th:action="@{/login}" method="post" class="needs-validation" novalidate>
-
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
@@ -146,12 +145,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="code" class="form-label">2FA Security Code</label>
-                        <input type="text" class="form-control" id="code" name="code" placeholder="6-digit code (if enabled)" maxlength="6">
-                    </div>
-
-                    <button type="submit" class="btn-primary-gym">Secure Login</button>
+                    <button type="submit" class="btn-primary-gym mt-2">Secure Login</button>
 
                     <div class="text-center signup-footer">
                         Don't have an account? <a th:href="@{/register}">Sign Up Now</a>
