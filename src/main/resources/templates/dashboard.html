@@ -16,37 +16,41 @@
     body {
       background-color: var(--brand-light);
       font-family: 'Segoe UI', system-ui, sans-serif;
+      color: var(--brand-dark);
     }
 
     .dashboard-header {
       background-color: var(--brand-dark);
       color: white;
-      padding: 40px 0;
-      margin-bottom: 40px;
+      padding: 50px 0;
       border-bottom: 4px solid var(--brand-orange);
+    }
+
+    .welcome-text {
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+      margin-bottom: 0;
     }
 
     .stat-card {
       background: white;
-      border: none;
       border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      transition: 0.3s;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      height: 100%;
     }
 
     .action-card {
       background: white;
-      border: 1px solid #eee;
+      border: 1px solid #e0e0e0;
       border-radius: 8px;
       padding: 30px;
       text-align: center;
-      transition: 0.3s;
-      height: 100%;
-      cursor: pointer;
+      display: block;
       text-decoration: none;
       color: var(--brand-dark);
-      display: block;
+      transition: all 0.3s ease;
     }
 
     .action-card:hover {
@@ -59,19 +63,7 @@
       font-size: 2.5rem;
       color: var(--brand-orange);
       margin-bottom: 15px;
-    }
-
-    .welcome-text {
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: -1px;
-    }
-
-    .badge-2fa {
-      font-size: 0.7rem;
-      padding: 5px 10px;
-      border-radius: 20px;
-      vertical-align: middle;
+      display: block;
     }
   </style>
 </head>
@@ -81,73 +73,59 @@
 
 <div class="dashboard-header">
   <div class="container">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <h1 class="welcome-text">Hello, <span th:text="${username}" style="color: var(--brand-orange)">Member</span>!</h1>
-        <p class="mb-0 opacity-75">Welcome back to your GymShop performance hub.</p>
-      </div>
-      <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <span th:if="${is2faEnabled}" class="badge bg-success badge-2fa">
-                    <i class="bi bi-shield-check"></i> 2FA SECURED
-                </span>
-        <span th:unless="${is2faEnabled}" class="badge bg-warning text-dark badge-2fa">
-                    <i class="bi bi-shield-exclamation"></i> 2FA DISABLED
-                </span>
-      </div>
-    </div>
+    <h1 class="welcome-text">Hello, <span th:text="${user.fullName}" style="color: var(--brand-orange)">Member</span>!</h1>
+    <p class="mt-2 mb-0 opacity-75">Welcome back to your performance hub.</p>
   </div>
 </div>
 
-<main class="container mb-5">
+<main class="container my-5">
   <div class="row g-4">
     <div class="col-md-4">
       <div class="stat-card">
-        <h6 class="text-muted text-uppercase small fw-bold">Recent Orders</h6>
-        <p class="h3 fw-bold">0</p>
-        <a th:href="@{/orders}" class="small text-decoration-none" style="color: var(--brand-orange)">View History &rarr;</a>
+        <h6 class="text-muted text-uppercase small fw-bold">Active Orders</h6>
+        <p class="h2 fw-bold mt-2">0</p>
+        <a th:href="@{/dashboard/orders}" class="text-decoration-none fw-bold" style="color: var(--brand-orange)">View History &rarr;</a>
       </div>
     </div>
     <div class="col-md-4">
       <div class="stat-card">
         <h6 class="text-muted text-uppercase small fw-bold">Items in Basket</h6>
-        <p class="h3 fw-bold">0</p>
-        <a th:href="@{/basket}" class="small text-decoration-none" style="color: var(--brand-orange)">Go to Checkout &rarr;</a>
+        <p class="h2 fw-bold mt-2" th:text="${basketCount}">0</p>
+        <a th:href="@{/basket}" class="text-decoration-none fw-bold" style="color: var(--brand-orange)">Go to Checkout &rarr;</a>
       </div>
     </div>
     <div class="col-md-4">
       <div class="stat-card">
-        <h6 class="text-muted text-uppercase small fw-bold">Account Level</h6>
-        <p class="h3 fw-bold">PRIME</p>
-        <span class="small text-muted">Member since 2026</span>
+        <h6 class="text-muted text-uppercase small fw-bold">Membership</h6>
+        <p class="h2 fw-bold mt-2" th:text="${user.userType}">MEMBER</p>
       </div>
     </div>
+  </div>
 
-    <div class="col-12 mt-5">
-      <h4 class="fw-bold mb-4 text-uppercase">Account Management</h4>
-    </div>
-
-    <div class="col-md-4">
-      <a th:href="@{/products}" class="action-card">
-        <i class="bi bi-cart4 action-icon"></i>
-        <h5 class="fw-bold">Browse Shop</h5>
-        <p class="text-muted small mb-0">Explore our latest supplements and gym equipment.</p>
-      </a>
-    </div>
-
-    <div class="col-md-4">
-      <a th:href="@{/profile/settings}" class="action-card">
-        <i class="bi bi-person-gear action-icon"></i>
-        <h5 class="fw-bold">Security Settings</h5>
-        <p class="text-muted small mb-0">Update your password and manage 2FA security.</p>
-      </a>
-    </div>
-
-    <div class="col-md-4">
-      <a th:href="@{/support}" class="action-card">
-        <i class="bi bi-headset action-icon"></i>
-        <h5 class="fw-bold">Get Support</h5>
-        <p class="text-muted small mb-0">Need help with an order? Our team is ready.</p>
-      </a>
+  <div class="mt-5">
+    <h4 class="fw-bold text-uppercase mb-4">Account Management</h4>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <a th:href="@{/products}" class="action-card">
+          <i class="bi bi-shop action-icon"></i>
+          <h5 class="fw-bold">Browse Shop</h5>
+          <p class="text-muted small mb-0">Shop the latest gym gear.</p>
+        </a>
+      </div>
+      <div class="col-md-4">
+        <a th:href="@{/dashboard/orders}" class="action-card">
+          <i class="bi bi-clock-history action-icon"></i>
+          <h5 class="fw-bold">Order History</h5>
+          <p class="text-muted small mb-0">See your past purchases.</p>
+        </a>
+      </div>
+      <div class="col-md-4">
+        <a th:href="@{/dashboard/settings}" class="action-card">
+          <i class="bi bi-person-gear action-icon"></i>
+          <h5 class="fw-bold">Security Settings</h5>
+          <p class="text-muted small mb-0">Manage password and account details.</p>
+        </a>
+      </div>
     </div>
   </div>
 </main>
