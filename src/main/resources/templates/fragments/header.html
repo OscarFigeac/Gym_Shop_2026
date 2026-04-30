@@ -110,10 +110,21 @@
                         <a th:href="@{/register}" class="auth-link" style="color: var(--brand-orange);">Sign Up</a>
                     </div>
 
-                    <div th:if="${#authorization.expression('isAuthenticated()')}">
-                        <a th:href="@{/dashboard}" class="auth-link">
+                    <div th:if="${#authorization.expression('isAuthenticated()')}" class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle auth-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Welcome, <span th:text="${#authentication.name}">User</span>
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" th:href="@{/dashboard}">Dashboard</a></li>
+                            <li><a class="dropdown-item" th:href="@{/dashboard/orders}">My Orders</a></li>
+                            <li><a class="dropdown-item" th:href="@{/dashboard/settings}">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/logout}" method="post">
+                                    <button type="submit" class="dropdown-item text-danger fw-bold">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
 
                     <a th:href="@{/basket}" class="cart-wrapper">
