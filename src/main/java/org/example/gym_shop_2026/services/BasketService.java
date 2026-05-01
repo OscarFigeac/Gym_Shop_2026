@@ -9,6 +9,9 @@ import org.example.gym_shop_2026.persistence.ProductDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -18,11 +21,13 @@ public class BasketService {
 
     private final BasketDAO basketDAO;
     private final ProductDAO productDAO;
+    private final DataSource dataSource;
 
     @Autowired
-    public BasketService(BasketDAO basketDAO, ProductDAO productDAO) {
+    public BasketService(BasketDAO basketDAO, ProductDAO productDAO, DataSource dataSource) {
         this.basketDAO = basketDAO;
         this.productDAO = productDAO;
+        this.dataSource = dataSource;
     }
 
     /**
@@ -149,6 +154,24 @@ public class BasketService {
         } catch (Exception e) {
             log.error("Error clearing basket for user: {}", userId, e);
             throw new RuntimeException("Error clearing basket.");
+        }
+    }
+
+    /**
+     * Takes in parameters to be updated for the basket belonging to a user.
+     * @param basketId the Identifier of the basket being updated
+     * @param productId the identifier of the product being updated
+     * @param quantity the new amount
+     * @throws SQLException if the connection to the database fails at any point
+     */
+    public void updateQuantity(int basketId, int productId, int quantity) throws SQLException {
+        String sql = "UPDATE basket_item SET item_quantity = ? WHERE basket_id = ? AND product_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, basketId);
+            ps.setInt(3, productId);
+            ps.executeUpdate();
         }
     }
 }
