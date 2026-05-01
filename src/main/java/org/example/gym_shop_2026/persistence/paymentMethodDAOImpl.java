@@ -360,4 +360,28 @@ public class paymentMethodDAOImpl implements paymentMethodDAO{
         }
         return affectedRows > 0;
     }
+
+    @Override
+    public List<paymentMethod> getMethodsForUser(int userId) {
+        List<paymentMethod> methods = new ArrayList<>();
+        String sql = "SELECT * FROM payment_methods WHERE user_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    methods.add(paymentMethod.builder()
+                            .methodId(rs.getInt("method_id"))
+                            .cardType(rs.getString("card_type"))
+                            .lastFourDigits(rs.getString("last_four_digits"))
+                            .build());
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error fetching payment methods for user: {}", userId, e);
+        }
+        return methods;
+    }
 }

@@ -3,6 +3,7 @@ package org.example.gym_shop_2026.entities;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -21,5 +22,6 @@ public class Basket {
     @NonNull
     private Timestamp createdAt;
 
-    private List<BasketItem> items;
+    @Builder.Default
+    private List<BasketItem> items = new ArrayList<>();
 }

@@ -39,8 +39,21 @@ public class TransactionDAOImpl implements TransactionDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, newTransaction.getUserId());
-            ps.setInt(2, newTransaction.getPlanId());
-            ps.setInt(3, newTransaction.getMethodId());
+
+            Integer planId = newTransaction.getPlanId();
+            if (planId != null && planId > 0) {
+                ps.setInt(2, planId);
+            } else {
+                ps.setNull(2, java.sql.Types.INTEGER);
+            }
+
+            Integer methodId = newTransaction.getMethodId();
+            if (methodId != null && methodId > 0) {
+                ps.setInt(3, methodId);
+            } else {
+                ps.setNull(3, java.sql.Types.INTEGER);
+            }
+
             ps.setDouble(4, newTransaction.getAmountPaid());
             ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
             ps.setString(6, newTransaction.getStatus());

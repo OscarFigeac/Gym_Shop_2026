@@ -55,22 +55,22 @@ public class TransactionService {
      * @param transaction Given {@link Transaction} object
      * @return True if transaction added successfully, else false
      */
-    public boolean addTransaction(Transaction transaction) {
-        if(transaction == null) {
-            log.error("Cannot perform add transaction operation service as given Transaction object was null!");
-            throw new IllegalArgumentException("Cannot add transaction as given Transaction was null!");
-        }
+    public boolean addTransaction(Transaction transaction) throws SQLException {
+//        if(transaction == null) {
+//            log.error("Cannot perform add transaction operation service as given Transaction object was null!");
+//            throw new IllegalArgumentException("Cannot add transaction as given Transaction was null!");
+//        }
+//
+//        boolean addResult = false;
+//
+//        try {
+//            addResult = transactionDAO.createTransaction(transaction);
+//        }
+//        catch (SQLException e) {
+//            log.error("Could not perform add transaction service operation due to error! {}", e.toString());
+//        }
 
-        boolean addResult = false;
-
-        try {
-            addResult = transactionDAO.createTransaction(transaction);
-        }
-        catch (SQLException e) {
-            log.error("Could not perform add transaction service operation due to error! {}", e.toString());
-        }
-
-        return addResult;
+        return transactionDAO.createTransaction(transaction);
 
     }
 

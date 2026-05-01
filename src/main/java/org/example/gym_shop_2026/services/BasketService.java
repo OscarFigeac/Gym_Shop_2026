@@ -40,6 +40,7 @@ public class BasketService {
     public Basket getBasketForUser(int userId) {
         try {
             Basket basket = basketDAO.findByUserID(userId);
+            log.info("Fetched basket for user {}: {}", userId, basket);
             if (basket != null) {
                 List<BasketItem> items = basketDAO.findItemsByBasketId(basket.getBasketId());
 

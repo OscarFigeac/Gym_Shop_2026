@@ -105,5 +105,9 @@ ALTER TABLE users ADD COLUMN stripe_customer_id VARCHAR(255);
 ALTER TABLE payment_methods RENAME COLUMN processor_token TO stripe_payment_method_id;
 ALTER TABLE payment_methods MODIFY COLUMN last_four_digits VARCHAR(4);
 
+ALTER TABLE transactions MODIFY plan_id INT NULL;
+
+ALTER TABLE transactions MODIFY method_id INT NULL;
+
 ALTER TABLE products ADD COLUMN description TEXT;
 ALTER TABLE products ADD COLUMN image_url VARCHAR(255);
