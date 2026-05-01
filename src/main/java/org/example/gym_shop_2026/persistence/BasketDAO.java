@@ -13,4 +13,5 @@ public interface BasketDAO {
     boolean removeProduct(int basketId, int productId);
     boolean clearBasket(int basketId);
     boolean createBasket(int userId);
+    public void updateQuantity(int basketId, int productId, int quantity) throws SQLException;
 }

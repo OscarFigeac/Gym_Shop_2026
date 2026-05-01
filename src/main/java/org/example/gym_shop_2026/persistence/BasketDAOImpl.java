@@ -22,7 +22,7 @@ public class BasketDAOImpl implements BasketDAO {
 
     @Override
     public Basket findByUserID(int userId) {
-        String sql = "SELECT * FROM basket WHERE user_id = ?";
+        String sql = "SELECT * FROM basket WHERE user_id = ? AND status = 'ACTIVE'"; // Added status filter
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -32,17 +32,21 @@ public class BasketDAOImpl implements BasketDAO {
                     java.sql.Timestamp ts = rs.getTimestamp("created_at");
                     java.time.LocalDateTime createdAt = (ts != null) ? ts.toLocalDateTime() : java.time.LocalDateTime.now();
 
-                    return Basket.builder()
+                    Basket basket = Basket.builder()
                             .basketId(rs.getInt("basket_id"))
                             .user_id(rs.getInt("user_id"))
                             .status(rs.getString("status"))
                             .createdAt(Timestamp.valueOf(createdAt))
                             .build();
+
+                    basket.setItems(findItemsByBasketId(basket.getBasketId()));
+
+                    return basket;
                 }
             }
         } catch (SQLException e) {
             log.error("Error fetching basket for user: {}", userId, e);
-            throw new RuntimeException("Could not retrieve basket.", e); // Important: rethrow or handle the error properly
+            throw new RuntimeException("Could not retrieve basket.", e);
         }
         return null;
     }
@@ -147,6 +151,17 @@ public class BasketDAOImpl implements BasketDAO {
         } catch (SQLException e) {
             log.error("createBasket(): SQL error for user ID {}. Exception: {}", userId, e.getMessage());
             return false;
+        }
+    }
+
+    public void updateQuantity(int basketId, int productId, int quantity) throws SQLException {
+        String sql = "UPDATE basket_item SET item_quantity = ? WHERE basket_id = ? AND product_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, basketId);
+            ps.setInt(3, productId);
+            ps.executeUpdate();
         }
     }
 }
