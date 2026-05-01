@@ -92,8 +92,18 @@
 
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/products}">Products</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Products
+                        </a>
+                        <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="productsDropdown">
+                            <li><a class="dropdown-item fw-bold" th:href="@{/products}">All Products</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/products/supplements}">Supplements</a></li>
+                            <li><a class="dropdown-item" th:href="@{/products/equipment}">Equipment</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-orange fw-bold" th:href="@{/products/bestsellers}" style="color: var(--brand-orange);">Bestsellers</a></li>
+                        </ul>
                     </li>
                 </ul>
 

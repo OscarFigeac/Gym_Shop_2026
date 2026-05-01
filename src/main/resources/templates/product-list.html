@@ -121,7 +121,7 @@
 
 <main class="container mb-5">
     <div class="d-flex justify-content-between align-items-center flex-wrap">
-        <h2 class="page-title">Our <span style="color: var(--brand-orange)">Supplements</span></h2>
+        <h2 class="page-title">Our <span style="color: var(--brand-orange)" th:text="${pageTitle != null ? pageTitle : 'Products'}">Products</span></h2>
 
         <form th:action="@{/products/search}" method="get" class="d-flex gap-2 mb-3">
             <input type="text" name="query" class="form-control" placeholder="Search products..." th:value="${query}" style="width: 250px;">
