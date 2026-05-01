@@ -4,6 +4,7 @@ import lombok.*;
 import jakarta.validation.constraints.*;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @ToString
@@ -35,4 +36,6 @@ public class Product {
 
     @NonNull
     private String imageUrl;
+
+    private int total_sold;
 }

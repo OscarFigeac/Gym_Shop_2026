@@ -121,15 +121,16 @@ public class ProductDAOImpl implements ProductDAO{
     @Override
     public List<Product> getBestSellers(int sellLimit) throws SQLException {
         List<Product> bestSellers = new ArrayList<>();
-        String sql = "SELECT p.*, SUM(p.quantity) AS total_sold " +
-                "FROM products p " +
-                "GROUP BY p.product_id ORDER BY total_sold DESC LIMIT ?";
+        String sql = "SELECT p.*, SUM(b.item_quantity) AS sold FROM products p JOIN basket_item b ON p.product_id = b.product_id GROUP BY p.product_id ORDER BY sold DESC LIMIT ?";
+
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, sellLimit);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    bestSellers.add(mapProductRow(rs));
+                    Product p = mapProductRow(rs);
+                    p.setTotal_sold(rs.getInt("sold"));
+                    bestSellers.add(p);
                 }
             }
         }

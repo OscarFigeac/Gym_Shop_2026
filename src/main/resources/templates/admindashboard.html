@@ -80,7 +80,7 @@
           <tbody>
           <tr th:each="s : ${bestSellers}">
             <td th:text="${s.name}">Product</td>
-            <td class="text-end fw-bold" th:text="${s.quantity}">0</td>
+            <td class="text-end fw-bold" th:text="${s.total_sold}">0</td>
           </tr>
           </tbody>
         </table>
