@@ -7,10 +7,13 @@ import org.example.gym_shop_2026.entities.UserType;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 @Slf4j
@@ -153,6 +156,25 @@ public class UserDAOImpl implements UserDAO {
             ps.setInt(2, userId);
             return ps.executeUpdate() == 1;
         }
+    }
+
+    @Override
+    public List<User> getAllUsers(){
+        String sql = "SELECT * FROM users";
+        ArrayList<User> allUsers = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                allUsers.add(mapUserRow(rs));
+            }
+        } catch (SQLException e) {
+            log.error("Error retrieving all users: {}", e.getMessage());
+        }
+
+        return allUsers;
     }
 
     private User mapUserRow(ResultSet rs) throws SQLException {

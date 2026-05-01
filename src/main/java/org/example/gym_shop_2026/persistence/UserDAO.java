@@ -5,6 +5,7 @@ import org.example.gym_shop_2026.entities.UserType;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.List;
 
 public interface UserDAO {
     boolean login(String username, String password) throws SQLException;
@@ -16,4 +17,5 @@ public interface UserDAO {
     boolean updateUser(User toBeUpdated) throws SQLException;
     boolean deleteUser(User toBeDeleted) throws SQLException;
     public boolean updateStripeId(int userId, String stripeId) throws SQLException;
+    public List<User> getAllUsers() throws SQLException;
 }

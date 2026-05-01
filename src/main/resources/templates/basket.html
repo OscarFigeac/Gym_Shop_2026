@@ -83,6 +83,17 @@
         .remove-link:hover {
             text-decoration: underline;
         }
+
+        .product-name-link:hover {
+            color: var(--brand-orange) !important;
+            text-decoration: underline;
+        }
+
+        .product-img-sm {
+            width: 80px;
+            height: 80px;
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
@@ -115,9 +126,18 @@
                         <tr th:each="item : ${basketItems}">
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="product-img-sm me-3"><i class="bi bi-box-seam text-muted"></i></div>
+                                    <div class="product-img-sm me-3 bg-white border">
+                                        <img th:src="${item.product.imageUrl}"
+                                             th:alt="${item.productName}"
+                                             style="max-width: 100%; max-height: 100%; object-fit: contain;"
+                                             onerror="this.src='https://via.placeholder.com/80?text=No+Image'">
+                                    </div>
+
                                     <div>
-                                        <p class="mb-0 fw-bold" th:text="${item.productName}">Protein Powder</p>
+                                        <a th:href="@{/products/{id}(id=${item.productId})}"
+                                           class="text-decoration-none text-dark">
+                                            <p class="mb-0 fw-bold product-name-link" th:text="${item.productName}">Product Name</p>
+                                        </a>
                                         <p class="mb-0 small text-muted" th:text="'€' + ${#numbers.formatDecimal(item.price, 1, 2)}">€0.00</p>
                                     </div>
                                 </div>
@@ -127,10 +147,7 @@
                                       class="d-flex justify-content-center align-items-center">
                                     <input type="hidden" name="productId" th:value="${item.productId}">
                                     <input type="number" name="quantity" class="qty-input form-control-sm"
-                                           th:value="${item.itemQuantity}" min="1" onchange="this.form.submit()">
-                                    <button type="submit" class="btn btn-sm ms-2 text-muted d-none">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                    </button>
+                                           th:value="${item.item_quantity}" min="1" onchange="this.form.submit()">
                                 </form>
                             </td>
                             <td class="text-end fw-bold" th:text="'€' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">€0.00</td>

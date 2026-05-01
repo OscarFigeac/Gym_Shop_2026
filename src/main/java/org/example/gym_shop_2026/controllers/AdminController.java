@@ -26,14 +26,17 @@ public class AdminController {
         this.uService = userService;
     }
 
-    @GetMapping("/admin/dashboard")
+    @GetMapping("/dashboard")
     public String viewDashboard(Model model){
         try{
             var restock = aService.getReorderProducts();
             var sellers = aService.getBestSellers();
 
+            var allUsers = uService.getAllUsers();
+
             model.addAttribute("restockProducts", (restock != null) ? restock : new ArrayList<>());
             model.addAttribute("bestSellers", (sellers != null) ? sellers : new ArrayList<>());
+            model.addAttribute("users", allUsers);
 
             return "admindashboard";
         }catch (SQLException e){

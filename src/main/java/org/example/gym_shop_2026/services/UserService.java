@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -49,6 +50,10 @@ public class UserService {
 
     public User getUserById(int userId) throws SQLException {
         return userDao.findUserByID(userId);
+    }
+
+    public List<User> getAllUsers() throws SQLException {
+        return userDao.getAllUsers();
     }
 
     //CRUD Methods

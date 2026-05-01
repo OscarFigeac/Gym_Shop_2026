@@ -71,7 +71,7 @@ public class PaymentService {
         Basket basket = basketService.getBasketForUser(userId);
 
         for (BasketItem item : basket.getItems()) {
-            productService.purchaseProduct(item.getProductId(), item.getItemQuantity());
+            productService.purchaseProduct(item.getProductId(), item.getItem_quantity());
             log.info("Stock reduced for Product ID: {}", item.getProductId());
         }
 
@@ -84,7 +84,7 @@ public class PaymentService {
 
     private double calculateTotal(Basket basket) {
         return basket.getItems().stream()
-                .mapToDouble(item -> productService.getDetails(item.getProductId()).getPrice() * item.getItemQuantity())
+                .mapToDouble(item -> productService.getDetails(item.getProductId()).getPrice() * item.getItem_quantity())
                 .sum();
     }
 }

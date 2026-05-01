@@ -16,7 +16,7 @@ public class BasketItem {
     @NonNull
     private int basketId;
     @NonNull
-    private int itemQuantity;
+    private int item_quantity;
     private String productName;
     private double price;
     private double subtotal;
