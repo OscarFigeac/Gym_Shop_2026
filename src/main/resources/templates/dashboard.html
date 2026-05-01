@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -73,8 +73,21 @@
 
 <div class="dashboard-header">
   <div class="container">
-    <h1 class="welcome-text">Hello, <span th:text="${user.fullName}" style="color: var(--brand-orange)">Member</span>!</h1>
-    <p class="mt-2 mb-0 opacity-75">Welcome back to your performance hub.</p>
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="welcome-text">
+          Hello, <span th:text="${user.fullName}" style="color: var(--brand-orange)">Member</span>!
+        </h1>
+        <p class="mt-2 mb-0 opacity-75">Welcome back to your performance hub!</p>
+      </div>
+      <div sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/admin/dashboard}"
+           class="btn btn-lg fw-bold text-white shadow-lg"
+           style="background-color: var(--brand-orange); border: none; padding: 15px 30px; border-radius: 5px;">
+          <i class="bi bi-shield-lock-fill me-2"></i> Admin Hub
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 

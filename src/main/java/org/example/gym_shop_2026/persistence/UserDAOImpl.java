@@ -91,16 +91,19 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public boolean createUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob, secret_key, is_2fa_enabled) VALUES (?,?,?,?,?,?,?,?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getUserType().name());
             ps.setString(4, user.getEmail());
             ps.setString(5, passwordEncoder.encode(user.getPassword()));
             ps.setDate(6, new java.sql.Date(user.getDob().getTime()));
+            ps.setString(7, "NOT SET");
+            ps.setBoolean(8, false);
 
             return ps.executeUpdate() == 1;
         }

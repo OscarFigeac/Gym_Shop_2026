@@ -162,18 +162,47 @@
 <div class="modal fade" id="createModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content border-0 shadow">
-      <form th:action="@{/admin/user/create}" method="post">
-        <div class="modal-header bg-dark text-white">
-          <h5 class="modal-title fw-bold">NEW GYMSHOP MEMBER</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      <form th:action="@{/admin/user/create}" method="post" class="p-2">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label fw-bold small text-uppercase">Full Name</label>
+            <input type="text" name="fullName" class="form-control border-dark-subtle" placeholder="e.g. Mike Tyson" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-bold small text-uppercase">Username</label>
+            <input type="text" name="username" class="form-control border-dark-subtle" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-bold small text-uppercase">Email</label>
+            <input type="email" name="email" class="form-control border-dark-subtle" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-bold small text-uppercase">Password</label>
+            <input type="password" name="password" class="form-control border-dark-subtle" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-bold small text-uppercase">Date of Birth</label>
+            <input type="date" name="dob" class="form-control border-dark-subtle" required>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label fw-bold small text-uppercase" style="color: #f47920;">Assign Permissions</label>
+            <select name="userType" class="form-select border-2" style="border-color: #f47920;" required>
+              <option value="ROLE_MEMBER" selected>Standard Member</option>
+              <option value="ROLE_ADMIN">Administrator</option>
+            </select>
+          </div>
         </div>
-        <div class="modal-body">
-          <div class="mb-3"><label class="form-label small fw-bold">Username</label><input type="text" name="username" class="form-control" required></div>
-          <div class="mb-3"><label class="form-label small fw-bold">Email</label><input type="email" name="email" class="form-control" required></div>
-          <div class="mb-3"><label class="form-label small fw-bold">Password</label><input type="password" name="password" class="form-control" required></div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-warning text-white fw-bold w-100">CREATE ACCOUNT</button>
+
+        <div class="mt-4 pt-3 border-top d-flex justify-content-end">
+          <button type="button" class="btn btn-outline-secondary me-2 fw-bold" data-bs-dismiss="modal">CANCEL</button>
+          <button type="submit" class="btn btn-dark fw-bold px-4" style="background-color: #f47920; border: none;">
+            CREATE USER
+          </button>
         </div>
       </form>
     </div>

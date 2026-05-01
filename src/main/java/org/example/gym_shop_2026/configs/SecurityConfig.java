@@ -64,6 +64,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disable for local dev; enable & config for production
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/", "/products/**", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
 
                         .requestMatchers("/basket/**").authenticated()
