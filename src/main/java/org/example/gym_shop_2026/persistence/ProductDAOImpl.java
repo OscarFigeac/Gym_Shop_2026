@@ -136,4 +136,19 @@ public class ProductDAOImpl implements ProductDAO{
         }
         return bestSellers;
     }
+
+    public List<Product> getByCategory(String category) throws SQLException {
+        List<Product> categorised = new ArrayList<>();
+        String sql = "SELECT * FROM products WHERE LOWER(product_category) LIKE LOWER(?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + category + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    categorised.add(mapProductRow(rs));
+                }
+            }
+        }
+        return categorised;
+    }
 }
