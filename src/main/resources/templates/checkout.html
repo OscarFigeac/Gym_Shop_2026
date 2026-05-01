@@ -80,10 +80,10 @@
                     <tbody>
                     <tr th:each="item : ${basket.items}">
                         <td>
-                            <span class="fw-bold" th:text="${item.itemQuantity} + 'x'">1x</span>
+                            <span class="fw-bold" th:text="${item.item_quantity} + 'x'">1x</span>
                             <span class="ms-2" th:text="${item.product.name}">Product Name</span>
                         </td>
-                        <td class="text-end fw-bold" th:text="'€' + ${#numbers.formatDecimal(item.itemQuantity * item.product.price, 1, 2)}">€0.00</td>
+                        <td class="text-end fw-bold" th:text="'€' + ${#numbers.formatDecimal(item.item_quantity * item.product.price, 1, 2)}">€0.00</td>
                     </tr>
                     </tbody>
                 </table>

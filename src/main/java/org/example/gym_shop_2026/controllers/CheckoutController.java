@@ -84,7 +84,7 @@ public class CheckoutController {
             OrderItem oi = OrderItem.builder()
                     .order_id(orderId)
                     .product_id(item.getProductId())
-                    .quantity(item.getItemQuantity())
+                    .quantity(item.getItem_quantity())
                     .priceAtPurchase(item.getProduct().getPrice())
                     .build();
             orderItemDAO.createOrderItem(oi);
