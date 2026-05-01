@@ -118,7 +118,7 @@
                                     <div class="product-img-sm me-3"><i class="bi bi-box-seam text-muted"></i></div>
                                     <div>
                                         <p class="mb-0 fw-bold" th:text="${item.productName}">Protein Powder</p>
-                                        <p class="mb-0 small text-muted" th:text="'€' + ${item.price}">€0.00</p>
+                                        <p class="mb-0 small text-muted" th:text="'€' + ${#numbers.formatDecimal(item.price, 1, 2)}">€0.00</p>
                                     </div>
                                 </div>
                             </td>
@@ -127,16 +127,15 @@
                                       class="d-flex justify-content-center align-items-center">
                                     <input type="hidden" name="productId" th:value="${item.productId}">
                                     <input type="number" name="quantity" class="qty-input form-control-sm"
-                                           th:value="${item.itemQuantity}" min="1">
-                                    <button type="submit" class="btn btn-sm ms-2 text-muted" title="Update Quantity">
+                                           th:value="${item.itemQuantity}" min="1" onchange="this.form.submit()">
+                                    <button type="submit" class="btn btn-sm ms-2 text-muted d-none">
                                         <i class="bi bi-arrow-clockwise"></i>
                                     </button>
                                 </form>
                             </td>
-                            <td class="text-end fw-bold" th:text="'€' + ${item.subtotal}">€0.00</td>
+                            <td class="text-end fw-bold" th:text="'€' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">€0.00</td>
                             <td class="text-end">
-                                <form th:action="@{/basket/remove}" method="post">
-                                    <input type="hidden" name="productId" th:value="${item.productId}">
+                                <form th:action="@{/basket/remove/{id}(id=${item.productId})}" method="post">
                                     <button type="submit" class="remove-link">REMOVE</button>
                                 </form>
                             </td>
@@ -154,7 +153,7 @@
 
                 <div class="d-flex justify-content-between mb-2">
                     <span class="opacity-75">Items Subtotal</span>
-                    <span th:text="'€' + ${totalPrice}">€0.00</span>
+                    <span th:text="'€' + ${#numbers.formatDecimal(totalPrice, 1, 2)}">€0.00</span>
                 </div>
 
                 <div class="d-flex justify-content-between mb-4">
@@ -164,7 +163,7 @@
 
                 <div class="d-flex justify-content-between h4 fw-bold mb-5">
                     <span>Total</span>
-                    <span style="color: var(--brand-orange)" th:text="'€' + ${totalPrice}">€0.00</span>
+                    <span style="color: var(--brand-orange)" th:text="'€' + ${#numbers.formatDecimal(totalPrice, 1, 2)}">€0.00</span>
                 </div>
 
                 <a th:href="@{/checkout/begin}" class="btn-checkout">
