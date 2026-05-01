@@ -94,7 +94,7 @@ public class BasketService {
             for (BasketItem item : items) {
                 Product p = productDAO.getProductById(item.getProductId());
                 if (p != null) {
-                    total += p.getPrice() * item.getItemQuantity();
+                    total += p.getPrice() * item.getItem_quantity();
                 }
             }
             return total;

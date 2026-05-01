@@ -147,7 +147,7 @@
                                       class="d-flex justify-content-center align-items-center">
                                     <input type="hidden" name="productId" th:value="${item.productId}">
                                     <input type="number" name="quantity" class="qty-input form-control-sm"
-                                           th:value="${item.itemQuantity}" min="1" onchange="this.form.submit()">
+                                           th:value="${item.item_quantity}" min="1" onchange="this.form.submit()">
                                 </form>
                             </td>
                             <td class="text-end fw-bold" th:text="'€' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">€0.00</td>

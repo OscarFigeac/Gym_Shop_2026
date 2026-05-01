@@ -119,7 +119,7 @@ public class BasketDAOImpl implements BasketDAO {
 
                     items.add(BasketItem.builder()
                             .productId(rs.getInt("product_id"))
-                            .itemQuantity(quantity)
+                            .item_quantity(quantity)
                             .productName(rs.getString("name"))
                             .price(price)
                             .subtotal(quantity * price)

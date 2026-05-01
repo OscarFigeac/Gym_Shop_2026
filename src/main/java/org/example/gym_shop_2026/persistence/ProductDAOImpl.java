@@ -121,8 +121,8 @@ public class ProductDAOImpl implements ProductDAO{
     @Override
     public List<Product> getBestSellers(int sellLimit) throws SQLException {
         List<Product> bestSellers = new ArrayList<>();
-        String sql = "SELECT p.*, SUM(b.itemQuantity) AS total_sold " +
-                "FROM products p JOIN basket_item b ON p.product_id = b.product_id " +
+        String sql = "SELECT p.*, SUM(p.quantity) AS total_sold " +
+                "FROM products p " +
                 "GROUP BY p.product_id ORDER BY total_sold DESC LIMIT ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
