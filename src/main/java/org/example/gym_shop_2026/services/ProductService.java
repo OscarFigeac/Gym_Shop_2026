@@ -82,4 +82,21 @@ public class ProductService {
             return null;
         }
     }
+
+    public List<Product> getBestSellers(int sellLimit){
+        try{
+            return productDAO.getBestSellers(sellLimit);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+    public List<Product> getByCategory(String category){
+        try{
+            return productDAO.getByCategory(category);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
 }
