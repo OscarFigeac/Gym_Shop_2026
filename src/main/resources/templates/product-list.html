@@ -133,9 +133,10 @@
         <div class="col" th:each="product : ${products}">
             <div class="card product-card p-3">
                 <div class="product-img-container mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-box-seam" viewBox="0 0 16 16">
-                        <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0L14.958 2.71c.537.215.854.733.854 1.314v9.924c0 .581-.317 1.1-.854 1.314l-6.5 2.6a1.5 1.5 0 0 1-1.114 0l-6.5-2.6c-.537-.215-.854-.733-.854-1.314V4.024c0-.581.317-1.1.854-1.314L7.443.184z"/>
-                    </svg>
+                    <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/products/default.png'}"
+                         class="img-fluid"
+                         th:alt="${product.name}"
+                         style="max-height: 100%; width: auto; object-fit: contain;">
                 </div>
 
                 <div class="flex-grow-1">

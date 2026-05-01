@@ -24,8 +24,10 @@ public class ProductDAOImpl implements ProductDAO{
                 .productId(rs.getInt("product_id"))
                 .productCategory(rs.getString("product_category"))
                 .name(rs.getString("name"))
+                .description(rs.getString("description"))
                 .price(rs.getDouble("price"))
                 .quantity(rs.getInt("quantity"))
+                .imageUrl(rs.getString("image_url"))
                 .build();
     }
 
@@ -48,15 +50,17 @@ public class ProductDAOImpl implements ProductDAO{
 
     public boolean addProduct(Product p) throws SQLException {
         if (p == null) throw new IllegalArgumentException("Product cannot be null");
-        String sql = "INSERT INTO products (product_id, product_category, name, price, quantity) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products (product_id, product_category, name, description, price, quantity, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, p.getProductId());
             ps.setString(2, p.getProductCategory());
             ps.setString(3, p.getName());
-            ps.setDouble(4, p.getPrice());
-            ps.setInt(5, p.getQuantity());
+            ps.setString(4, p.getDescription());
+            ps.setDouble(5, p.getPrice());
+            ps.setInt(6, p.getQuantity());
+            ps.setString(7, p.getImageUrl());
             return ps.executeUpdate() == 1;
         }
     }
