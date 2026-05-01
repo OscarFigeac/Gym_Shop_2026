@@ -75,4 +75,18 @@ public class BasketController {
 
         return "redirect:/basket";
     }
+
+    @PostMapping("/update")
+    public String updateQuantity(@RequestParam("productId") int productId,
+                                 @RequestParam("quantity") int quantity,
+                                 Principal principal) throws SQLException {
+        User user = getAuthenticatedUser(principal);
+        if (user != null) {
+            Basket basket = basketService.getBasketForUser(user.getUser_id());
+            if (basket != null) {
+                basketService.updateQuantity(basket.getBasketId(), productId, quantity);
+            }
+        }
+        return "redirect:/basket";
+    }
 }
