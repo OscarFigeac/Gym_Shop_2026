@@ -93,6 +93,26 @@ CREATE TABLE IF NOT EXISTS basket_item(
     CONSTRAINT fk_basketItem_basket FOREIGN KEY(basket_id) REFERENCES basket(basket_id),
     CONSTRAINT ck_basketItem_itemQuantity CHECK(item_quantity >= 0)
 );
+
+CREATE TABLE IF NOT EXISTS orders (
+                        order_id INT AUTO_INCREMENT PRIMARY KEY,
+                        user_id INT NOT NULL,
+                        total_amount DECIMAL(8, 2) NOT NULL,
+                        order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        status VARCHAR(50),
+                        FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+                             item_id INT AUTO_INCREMENT PRIMARY KEY,
+                             order_id INT NOT NULL,
+                             product_id INT NOT NULL,
+                             quantity INT NOT NULL,
+                             price_at_purchase DECIMAL(8, 2) NOT NULL,
+                             FOREIGN KEY(order_id) REFERENCES orders(order_id),
+                             FOREIGN KEY(product_id) REFERENCES products(product_id)
+);
+
 # CREATE TABLE IF NOT EXISTS productslocations(
 #     product_id INT NOT NULL,
 #     location_id INT NOT NULL,
@@ -104,3 +124,7 @@ ALTER TABLE users ADD COLUMN stripe_customer_id VARCHAR(255);
 
 ALTER TABLE payment_methods RENAME COLUMN processor_token TO stripe_payment_method_id;
 ALTER TABLE payment_methods MODIFY COLUMN last_four_digits VARCHAR(4);
+
+ALTER TABLE transactions MODIFY plan_id INT NULL;
+
+ALTER TABLE transactions MODIFY method_id INT NULL;
