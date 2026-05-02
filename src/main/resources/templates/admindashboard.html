@@ -28,6 +28,22 @@
     .welcome-text { font-weight: 800; text-transform: uppercase; letter-spacing: -1px; }
     .accent-line { width: 40px; height: 3px; background-color: var(--brand-orange); margin-bottom: 15px; }
     .table thead { background-color: #f1f1f1; font-size: 0.75rem; text-transform: uppercase; }
+    .accordion-body {
+      padding: 1.25rem !important;
+    }
+    .accordion-item {
+      margin-bottom: 1rem !important;
+      border: none !important;
+    }
+    .accordion-button {
+      border-radius: 8px !important;
+    }
+    .accordion-button:not(.collapsed) {
+      background-color: #fff;
+      color: var(--brand-orange);
+      box-shadow: none;
+      border-bottom: 1px solid #eee;
+    }
   </style>
 </head>
 <body>
@@ -44,6 +60,9 @@
       <div class="col-md-4 text-md-end mt-3 mt-md-0">
         <button class="btn btn-warning fw-bold" data-bs-toggle="modal" data-bs-target="#createModal">
           <i class="bi bi-person-plus-fill"></i> NEW MEMBER
+        </button>
+        <button class="btn btn-outline-light fw-bold ms-2" data-bs-toggle="modal" data-bs-target="#addProductModal">
+          <i class="bi bi-plus-square-fill"></i> ADD PRODUCT
         </button>
       </div>
     </div>
@@ -86,75 +105,173 @@
         </table>
       </div>
     </div>
+    <div class="accordion" id="adminAccordion">
 
-    <div class="col-12 mt-5">
-      <h4 class="fw-bold text-uppercase mb-4">Member Directory</h4>
-      <div class="admin-card overflow-hidden">
-        <table class="table align-middle mb-0">
-          <thead>
-          <tr>
-            <th class="ps-4">User Details</th>
-            <th>Role</th>
-            <th class="text-end pe-4">Actions</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr th:each="user : ${users}">
-            <td class="ps-4">
-              <div class="fw-bold text-dark" th:text="${user.username}">Username</div>
-              <div class="text-muted x-small" th:text="${user.email}">email@gym.com</div>
-            </td>
-            <td>
+      <div class="accordion-item admin-card mb-3 border-0">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed fw-bold text-uppercase" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProducts">
+            <i class="bi bi-box-seam me-2"></i> Inventory Management
+          </button>
+        </h2>
+        <div id="collapseProducts" class="accordion-collapse collapse" data-bs-parent="#adminAccordion">
+          <div class="accordion-body p-0">
+            <table class="table align-middle mb-0">
+              <thead class="table-light">
+              <tr>
+                <th class="ps-4">Product Info</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th class="text-end pe-4">Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="product : ${products}">
+                <td class="ps-4">
+                  <div class="d-flex align-items-center">
+                    <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/products/default.png'}" width="40" height="40" class="rounded me-3" style="object-fit: cover;">
+                    <div>
+                      <div class="fw-bold text-dark" th:text="${product.name}">Product Name</div>
+                      <div class="text-muted x-small" th:text="${#strings.abbreviate(product.description, 40)}">Desc...</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge bg-light text-dark border" th:text="${product.productCategory}">Category</span></td>
+                <td class="fw-bold" th:text="${'€' + #numbers.formatDecimal(product.price, 1, 2)}">€0.00</td>
+                <td>
+                  <span th:text="${product.quantity}" th:classappend="${product.quantity < 10} ? 'text-danger fw-bold' : ''">0</span>
+                </td>
+                <td class="text-end pe-4">
+                  <button class="btn btn-sm btn-outline-dark"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger ms-1"><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item admin-card mb-3 border-0">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed fw-bold text-uppercase" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUsers">
+            <i class="bi bi-people me-2"></i> Member Directory
+          </button>
+        </h2>
+        <div id="collapseUsers" class="accordion-collapse collapse" data-bs-parent="#adminAccordion">
+          <div class="accordion-body p-0">
+            <div class="col-12 mt-5">
+                <table class="table align-middle mb-0">
+                  <thead>
+                  <tr>
+                    <th class="ps-4">User Details</th>
+                    <th>Role</th>
+                    <th class="text-end pe-4">Actions</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr th:each="user : ${users}">
+                    <td class="ps-4">
+                      <div class="fw-bold text-dark" th:text="${user.username}">Username</div>
+                      <div class="text-muted x-small" th:text="${user.email}">email@gym.com</div>
+                    </td>
+                    <td>
                 <span th:classappend="${user.userType == 'ADMIN'} ? 'bg-dark' : 'bg-secondary'"
                       class="badge border px-2 py-1" th:text="${user.userType}">MEMBER</span>
-            </td>
-            <td class="text-end pe-4">
-              <div class="btn-group">
-                <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" th:data-bs-target="'#edit' + ${user.user_id}">
-                  <i class="bi bi-pencil-square"></i>
-                </button>
-                <form th:action="@{/admin/user/delete/{id}(id=${user.user_id})}" method="post"
-                      onsubmit="return confirm('Delete this member forever?')">
-                  <button type="submit" class="btn btn-sm btn-outline-danger ms-1">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </form>
-              </div>
+                    </td>
+                    <td class="text-end pe-4">
+                      <div class="btn-group">
+                        <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" th:data-bs-target="'#edit' + ${user.user_id}">
+                          <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <form th:action="@{/admin/user/delete/{id}(id=${user.user_id})}" method="post"
+                              onsubmit="return confirm('Delete this member forever?')">
+                          <button type="submit" class="btn btn-sm btn-outline-danger ms-1">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </form>
+                      </div>
 
-              <div class="modal fade text-start" th:id="'edit' + ${user.user_id}" tabindex="-1">
-                <div class="modal-dialog">
-                  <div class="modal-content border-0">
-                    <form th:action="@{/admin/user/update}" method="post">
-                      <div class="modal-header bg-dark text-white">
-                        <h6 class="modal-title fw-bold">EDIT: [[${user.username}]]</h6>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                      </div>
-                      <div class="modal-body">
-                        <input type="hidden" name="user_id" th:value="${user.user_id}">
-                        <div class="mb-3">
-                          <label class="form-label small fw-bold">Email</label>
-                          <input type="email" name="email" class="form-control" th:value="${user.email}" required>
+                      <div class="modal fade text-start" th:id="'edit' + ${user.user_id}" tabindex="-1">
+                        <div class="modal-dialog">
+                          <div class="modal-content border-0">
+                            <form th:action="@{/admin/user/update}" method="post">
+                              <div class="modal-header bg-dark text-white">
+                                <h6 class="modal-title fw-bold">EDIT: [[${user.username}]]</h6>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                              </div>
+                              <div class="modal-body">
+                                <input type="hidden" name="user_id" th:value="${user.user_id}">
+                                <div class="mb-3">
+                                  <label class="form-label small fw-bold">Email</label>
+                                  <input type="email" name="email" class="form-control" th:value="${user.email}" required>
+                                </div>
+                                <div class="mb-3">
+                                  <label class="form-label small fw-bold">Change Role</label>
+                                  <select name="userType" class="form-select">
+                                    <option value="ROLE_MEMBER" th:selected="${user.userType.name() == 'ROLE_MEMBER'}">Member</option>
+                                    <option value="ROLE_ADMIN" th:selected="${user.userType.name() == 'ROLE_ADMIN'}">Admin</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="submit" class="btn btn-warning text-white fw-bold w-100">SAVE CHANGES</button>
+                              </div>
+                            </form>
+                          </div>
                         </div>
-                        <div class="mb-3">
-                          <label class="form-label small fw-bold">Change Role</label>
-                          <select name="role" class="form-select">
-                            <option value="MEMBER" th:selected="${user.userType == 'ROLE_MEMBER'}">Member</option>
-                            <option value="ADMIN" th:selected="${user.userType == 'ROLE_ADMIN'}">Admin</option>
-                          </select>
-                        </div>
                       </div>
-                      <div class="modal-footer">
-                        <button type="submit" class="btn btn-warning text-white fw-bold w-100">SAVE CHANGES</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
               </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
+
+      <div class="accordion-item admin-card mb-3 border-0">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed fw-bold text-uppercase" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOrders">
+            <i class="bi bi-truck me-2"></i> Outgoing Orders
+          </button>
+        </h2>
+        <div id="collapseOrders" class="accordion-collapse collapse" data-bs-parent="#adminAccordion">
+          <div class="accordion-body">
+            <div class="d-flex mb-3">
+              <input type="text" class="form-control w-25 me-2" placeholder="Find Order by ID...">
+              <button class="btn btn-dark">Search</button>
+            </div>
+            <table class="table align-middle mb-0">
+              <thead class="table-light">
+              <tr>
+                <th class="ps-4">Order Ref</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th class="text-end pe-4">Manage</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="txn : ${transactions}">
+                <td class="ps-4">
+                  <span class="fw-bold">#<span th:text="${txn.transactionId}">ID</span></span>
+                </td>
+                <td th:text="${#temporals.format(txn.transactionDate, 'dd MMM HH:mm')}">Date</td>
+                <td class="fw-bold text-success" th:text="${'€' + txn.amountPaid}">€0.00</td>
+                <td>
+                  <span th:classappend="${txn.status == 'PAID' ? 'status-paid' : 'status-pending'}" class="status-badge" th:text="${txn.status}">STATUS</span>
+                </td>
+                <td class="text-end pe-4">
+                  <button class="btn btn-sm btn-dark">Ship Order</button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </main>
@@ -202,6 +319,62 @@
           <button type="button" class="btn btn-outline-secondary me-2 fw-bold" data-bs-dismiss="modal">CANCEL</button>
           <button type="submit" class="btn btn-dark fw-bold px-4" style="background-color: #f47920; border: none;">
             CREATE USER
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="addProductModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow">
+      <form th:action="@{/admin/product/create}" method="post">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title fw-bold text-uppercase">
+            <i class="bi bi-plus-circle me-2"></i>Add New Inventory Item
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body p-4">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label small fw-bold">Product Name</label>
+              <input type="text" name="name" class="form-control" placeholder="e.g. Whey Protein Isolate 2kg" required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Product Category</label>
+              <select name="productCategory" class="form-select">
+                <option value="SUPPLEMENTS">Supplements</option>
+                <option value="EQUIPMENT">Equipment</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Price (€)</label>
+              <input type="number" step="0.01" name="price" class="form-control" placeholder="0.00" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label small fw-bold">Inital Stock Intake</label>
+              <input type="number" name="quantity" class="form-control" value="0" required>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label small fw-bold">Image URL (jpg)</label>
+              <input type="text" name="imageUrl" class="form-control" placeholder="product-image.jpg">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label small fw-bold">Product Description</label>
+              <textarea name="description" class="form-control" rows="3" placeholder="Enter product details..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">CANCEL</button>
+          <button type="submit" class="btn btn-warning fw-bold px-4 text-white">
+            <i class="bi bi-save me-1"></i> ON TO THE SHELVES!
           </button>
         </div>
       </form>
