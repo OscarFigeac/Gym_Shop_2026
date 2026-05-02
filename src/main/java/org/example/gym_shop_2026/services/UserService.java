@@ -40,6 +40,10 @@ public class UserService {
         return false;
     }
 
+    public void updatePassword(int userId, String newPassword) throws SQLException {
+        userDao.updatePassword(userId, newPassword);
+    }
+
     public User findUser (String toBeFound) throws SQLException{
         return userDao.findByUsername(toBeFound);
     }

@@ -74,6 +74,18 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public void updatePassword(int userId, String newPassword) throws SQLException {
+        String sql = "UPDATE users SET password = ? WHERE user_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, passwordEncoder.encode(newPassword));
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
     public User findByUsername(String username) throws SQLException {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username cannot be empty");
