@@ -20,4 +20,5 @@ public class OrderItem {
     private int quantity;
     @NonNull
     private double priceAtPurchase;
+    private Product product;
 }

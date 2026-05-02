@@ -111,3 +111,4 @@ ALTER TABLE transactions MODIFY method_id INT NULL;
 
 ALTER TABLE products ADD COLUMN description TEXT;
 ALTER TABLE products ADD COLUMN image_url VARCHAR(255);
+ALTER TABLE order_items ADD COLUMN product_name VARCHAR(255);
