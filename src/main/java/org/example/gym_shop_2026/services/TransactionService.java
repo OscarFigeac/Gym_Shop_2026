@@ -102,4 +102,8 @@ public class TransactionService {
     public void updateTransaction(Transaction txn) throws SQLException {
         transactionDAO.updateTransaction(txn);
     }
+
+    public Transaction findTransactionByID(int id) throws SQLException{
+        return transactionDAO.findTransactionById(id);
+    }
 }
