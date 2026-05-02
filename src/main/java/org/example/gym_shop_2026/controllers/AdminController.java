@@ -7,6 +7,7 @@ import org.example.gym_shop_2026.entities.Transaction;
 import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.services.AdminService;
 import org.example.gym_shop_2026.services.ProductService;
+import org.example.gym_shop_2026.services.TransactionService;
 import org.example.gym_shop_2026.services.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,13 +25,14 @@ public class AdminController {
     public final AdminService aService;
     public final UserService uService;
     public final ProductService pService;
+    public final TransactionService tService;
 
-
-    public AdminController(AdminService adminService, UserService userService, ProductService productService){
+    public AdminController(AdminService adminService, UserService userService, ProductService productService, TransactionService transactionService){
 
         this.aService = adminService;
         this.uService = userService;
         this.pService = productService;
+        this.tService = transactionService;
     }
 
     @GetMapping("/dashboard")
@@ -93,6 +95,42 @@ public class AdminController {
         boolean success = pService.addProduct(product);
         if(!success) {
             log.error("Failed to insert product into database");
+        }
+
+        return "redirect:/admin/dashboard";
+    }
+    @PostMapping("/product/delete/{id}")
+    public String adminDeleteProduct(@PathVariable int id) throws SQLException {
+        Product toBeDeleted = pService.findProduct(id);
+        if(toBeDeleted != null){
+            pService.deleteProduct(toBeDeleted);
+        }
+        return "redirect:/admin/dashboard";
+    }
+    @PostMapping("/product/update")
+    public String adminUpdateProduct (@ModelAttribute Product toBeUpdated) throws SQLException {
+        Product stockedProduct = pService.findProduct(toBeUpdated.getProductId());
+
+        if(stockedProduct != null){
+            stockedProduct.setName(toBeUpdated.getName());
+            stockedProduct.setDescription(toBeUpdated.getDescription());
+            stockedProduct.setPrice(toBeUpdated.getPrice());
+            stockedProduct.setQuantity(toBeUpdated.getQuantity());
+            stockedProduct.setImageUrl(toBeUpdated.getImageUrl());
+            stockedProduct.setProductCategory(toBeUpdated.getProductCategory());
+
+            pService.updateProduct(stockedProduct);
+        }
+
+        return "redirect:/admin/dashboard";
+    }
+    @PostMapping("/orders/deliver/{id}")
+    public String changeOrderStatus(@PathVariable int id) throws SQLException{
+        Transaction t = tService.findTransactionByID(id);
+
+        if(t != null){
+            t.setStatus("DELIVERED");
+            tService.updateTransaction(t);
         }
 
         return "redirect:/admin/dashboard";
