@@ -3,6 +3,7 @@ package org.example.gym_shop_2026.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.gym_shop_2026.entities.Product;
+import org.example.gym_shop_2026.entities.Transaction;
 import org.example.gym_shop_2026.entities.User;
 import org.example.gym_shop_2026.services.AdminService;
 import org.example.gym_shop_2026.services.ProductService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -36,8 +38,15 @@ public class AdminController {
         try{
             var restock = aService.getReorderProducts();
             var sellers = aService.getBestSellers();
-
             var allUsers = uService.getAllUsers();
+
+            List<Product> allProducts = pService.getAllProducts();
+            List<Transaction> allOrders = aService.getAllTransactions();
+
+            log.info("Dashboard loaded. Products: {}, Users: {}, Orders: {}", allProducts.size(), allUsers.size(), allOrders.size());
+
+            model.addAttribute("products", (allProducts != null) ? allProducts : new ArrayList<>());
+            model.addAttribute("transactions", (allOrders != null) ? allOrders : new ArrayList<>());
 
             model.addAttribute("restockProducts", (restock != null) ? restock : new ArrayList<>());
             model.addAttribute("bestSellers", (sellers != null) ? sellers : new ArrayList<>());
@@ -86,7 +95,6 @@ public class AdminController {
             log.error("Failed to insert product into database");
         }
 
-        pService.addProduct(product);
         return "redirect:/admin/dashboard";
     }
 }
