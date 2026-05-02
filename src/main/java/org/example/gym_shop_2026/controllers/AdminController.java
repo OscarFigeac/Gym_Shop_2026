@@ -39,6 +39,7 @@ public class AdminController {
     public String viewDashboard(Model model){
         try{
             var restock = aService.getReorderProducts();
+            System.out.println("DEBUG: Number of low stock products found: " + (restock != null ? restock.size() : "null"));
             var sellers = aService.getBestSellers();
             var allUsers = uService.getAllUsers();
 

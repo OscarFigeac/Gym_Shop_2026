@@ -23,7 +23,7 @@ public class AdminService {
     }
 
     public List<Product> getReorderProducts() throws SQLException{
-        return pDAO.getProductsLowStock(2);
+        return pDAO.getProductsLowStock(10);
     }
 
     public List<Product> getBestSellers() throws SQLException{
