@@ -50,17 +50,16 @@ public class ProductDAOImpl implements ProductDAO{
 
     public boolean addProduct(Product p) throws SQLException {
         if (p == null) throw new IllegalArgumentException("Product cannot be null");
-        String sql = "INSERT INTO products (product_id, product_category, name, description, price, quantity, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products (product_category, name, description, price, quantity, image_url) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, p.getProductId());
-            ps.setString(2, p.getProductCategory());
-            ps.setString(3, p.getName());
-            ps.setString(4, p.getDescription());
-            ps.setDouble(5, p.getPrice());
-            ps.setInt(6, p.getQuantity());
-            ps.setString(7, p.getImageUrl());
+            ps.setString(1, p.getProductCategory());
+            ps.setString(2, p.getName());
+            ps.setString(3, p.getDescription());
+            ps.setDouble(4, p.getPrice());
+            ps.setInt(5, p.getQuantity());
+            ps.setString(6, p.getImageUrl());
             return ps.executeUpdate() == 1;
         }
     }

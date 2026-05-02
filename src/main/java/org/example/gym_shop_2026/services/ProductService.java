@@ -99,4 +99,12 @@ public class ProductService {
             return null;
         }
     }
+    public boolean addProduct(Product product){
+        try{
+            return productDAO.addProduct(product);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
 }
