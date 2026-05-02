@@ -151,6 +151,20 @@ public class TransactionDAOImpl implements TransactionDAO {
         return null;
     }
 
+    public List<Transaction> getAllTransactions() throws SQLException {
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT * FROM transactions ORDER BY transaction_date DESC";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                transactions.add(mapTransactionRow(rs));
+            }
+        }
+        return transactions;
+    }
+
     /**
      * Helper that maps transaction record data from database to a {@link Transaction} object.
      * @param rs Given {@link ResultSet} object, to be passed from other methods,
