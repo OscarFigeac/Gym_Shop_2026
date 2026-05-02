@@ -88,10 +88,9 @@ public class TransactionDAOImpl implements TransactionDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, transactionId);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapTransactionRow(rs);
+                return rs.next() ? mapTransactionRow(rs) : null;
             }
         }
-        return null;
     }
 
     @Override
