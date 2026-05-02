@@ -136,8 +136,19 @@
             if (!response.ok) throw new Error("Backend failed to create Payment Intent");
 
             const clientSecret = await response.text();
-            elements = stripe.elements({appearance: {theme: 'stripe'}, clientSecret});
+
+            const options = {
+                clientSecret,
+                appearance: { theme: 'stripe' },
+                wallets: {
+                    applePay: 'auto',
+                    googlePay: 'auto'
+                }
+            };
+
+            elements = stripe.elements(options);
             const paymentElement = elements.create("payment");
+
             paymentElement.mount("#payment-element");
 
             paymentElement.on('ready', () => { submitBtn.disabled = false; });
@@ -153,6 +164,9 @@
 
         const {error, paymentIntent} = await stripe.confirmPayment({
             elements,
+            confirmParams: {
+                return_url: window.location.origin + "/checkout/success",
+            },
             redirect: 'if_required'
         });
 
