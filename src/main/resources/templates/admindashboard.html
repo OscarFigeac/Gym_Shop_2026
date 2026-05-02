@@ -129,7 +129,7 @@
               <tr th:each="product : ${products}">
                 <td class="ps-4">
                   <div class="d-flex align-items-center">
-                    <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/products/default.png'}" width="40" height="40" class="rounded me-3" style="object-fit: cover;">
+                    <img th:src="${product.imageUrl != null && !product.imageUrl.isEmpty() ? product.imageUrl : '/images/products/default.png'}" width="40" height="40" class="rounded me-3" style="object-fit: cover;">
                     <div>
                       <div class="fw-bold text-dark" th:text="${product.name}">Product Name</div>
                       <div class="text-muted x-small" th:text="${#strings.abbreviate(product.description, 40)}">Desc...</div>
@@ -142,8 +142,70 @@
                   <span th:text="${product.quantity}" th:classappend="${product.quantity < 10} ? 'text-danger fw-bold' : ''">0</span>
                 </td>
                 <td class="text-end pe-4">
-                  <button class="btn btn-sm btn-outline-dark"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-outline-danger ms-1"><i class="bi bi-trash"></i></button>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" th:data-bs-target="'#editProductModal' + ${product.productId}">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <form th:action="@{/admin/product/delete/{id}(id=${product.productId})}" method="post"
+                          onsubmit="return confirm('Remove this product from inventory?')" style="display:inline;">
+                      <button type="submit" class="btn btn-sm btn-outline-danger ms-1">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                  <div class="modal fade text-start" th:id="'editProductModal' + ${product.productId}" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content border-0 shadow">
+                        <form th:action="@{/admin/product/update}" method="post">
+                          <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title fw-bold">EDIT PRODUCT: [[${product.name}]]</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                          </div>
+
+                          <div class="modal-body p-4">
+                            <input type="hidden" name="productId" th:value="${product.productId}">
+
+                            <div class="row g-3">
+                              <div class="col-12">
+                                <label class="form-label small fw-bold">Product Name</label>
+                                <input type="text" name="name" class="form-control" th:value="${product.name}" required>
+                              </div>
+                              <div class="col-md-6">
+                                <label class="form-label small fw-bold">Product Category</label>
+                                <select name="productCategory" class="form-select border-primary">
+                                  <option value="SUPPLEMENTS" th:selected="${product.productCategory == 'SUPPLEMENTS'}">Supplements</option>
+                                  <option value="EQUIPMENT" th:selected="${product.productCategory == 'EQUIPMENT'}">Equipment</option>
+                                </select>
+                              </div>
+                              <div class="col-md-6">
+                                <label class="form-label small fw-bold">Price (€)</label>
+                                <input type="number" step="0.01" name="price" class="form-control" th:value="${product.price}" required>
+                              </div>
+                              <div class="col-md-4">
+                                <label class="form-label small fw-bold">Current Stock</label>
+                                <input type="number" name="quantity" class="form-control" th:value="${product.quantity}" required>
+                              </div>
+                              <div class="col-md-8">
+                                <label class="form-label small fw-bold">Image URL</label>
+                                <input type="text" name="imageUrl" class="form-control" th:value="${product.imageUrl}">
+                              </div>
+                              <div class="col-12">
+                                <label class="form-label small fw-bold">Description</label>
+                                <textarea name="description" class="form-control" rows="3" th:text="${product.description}"></textarea>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">CANCEL</button>
+                            <button type="submit" class="btn btn-warning fw-bold px-4 text-white">
+                              <i class="bi bi-check-circle me-1"></i> SAVE CHANGES
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
                 </td>
               </tr>
               </tbody>
@@ -237,33 +299,23 @@
           </button>
         </h2>
         <div id="collapseOrders" class="accordion-collapse collapse" data-bs-parent="#adminAccordion">
-          <div class="accordion-body">
-            <div class="d-flex mb-3">
-              <input type="text" class="form-control w-25 me-2" placeholder="Find Order by ID...">
-              <button class="btn btn-dark">Search</button>
-            </div>
+          <div class="accordion-body p-0">
             <table class="table align-middle mb-0">
               <thead class="table-light">
               <tr>
-                <th class="ps-4">Order Ref</th>
-                <th>Date</th>
-                <th>Amount</th>
+                <th class="ps-4">Ref</th>
                 <th>Status</th>
                 <th class="text-end pe-4">Manage</th>
               </tr>
               </thead>
               <tbody>
-              <tr th:each="txn : ${transactions}">
-                <td class="ps-4">
-                  <span class="fw-bold">#<span th:text="${txn.transactionId}">ID</span></span>
-                </td>
-                <td th:text="${#temporals.format(txn.transactionDate, 'dd MMM HH:mm')}">Date</td>
-                <td class="fw-bold text-success" th:text="${'€' + txn.amountPaid}">€0.00</td>
-                <td>
-                  <span th:classappend="${txn.status == 'PAID' ? 'status-paid' : 'status-pending'}" class="status-badge" th:text="${txn.status}">STATUS</span>
-                </td>
+              <tr th:each="txn : ${transactions}" th:if="${txn.status != 'DELIVERED'}">
+                <td class="ps-4 fw-bold">#[[${txn.transactionId}]]</td>
+                <td><span class="badge bg-info text-dark">[[${txn.status}]]</span></td>
                 <td class="text-end pe-4">
-                  <button class="btn btn-sm btn-dark">Ship Order</button>
+                  <form th:action="@{/admin/orders/deliver/{id}(id=${txn.transactionId})}" method="post">
+                    <button type="submit" class="btn btn-sm btn-dark">Mark Delivered</button>
+                  </form>
                 </td>
               </tr>
               </tbody>
@@ -272,6 +324,33 @@
         </div>
       </div>
 
+      <div class="accordion-item admin-card mb-3 border-0">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed fw-bold text-uppercase" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHistory">
+            <i class="bi bi-archive me-2"></i> Order History (Delivered)
+          </button>
+        </h2>
+        <div id="collapseHistory" class="accordion-collapse collapse" data-bs-parent="#adminAccordion">
+          <div class="accordion-body p-0">
+            <table class="table align-middle mb-0 opacity-75">
+              <thead class="table-light">
+              <tr>
+                <th class="ps-4">Ref</th>
+                <th>Date</th>
+                <th class="text-end pe-4">Total</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="txn : ${transactions}" th:if="${txn.status == 'DELIVERED'}">
+                <td class="ps-4">#[[${txn.transactionId}]]</td>
+                <td th:text="${#temporals.format(txn.transactionDate, 'dd MMM')}">Date</td>
+                <td class="text-end pe-4 fw-bold text-success">€[[${txn.amountPaid}]]</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </main>
