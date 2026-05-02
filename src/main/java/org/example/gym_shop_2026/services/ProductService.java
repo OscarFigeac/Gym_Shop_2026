@@ -107,4 +107,28 @@ public class ProductService {
             return false;
         }
     }
+    public boolean deleteProduct(Product product){
+        try{
+            return productDAO.deleteProduct(product);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+    public boolean updateProduct(Product product){
+        try{
+            return productDAO.updateProduct(product);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+    public Product findProduct(int id){
+        try{
+            return productDAO.getProductById(id);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
 }
