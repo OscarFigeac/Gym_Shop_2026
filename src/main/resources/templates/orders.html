@@ -52,6 +52,19 @@
             padding: 3px 6px;
             border-radius: 4px;
         }
+
+        .btn-view {
+            border: 2px solid var(--brand-dark);
+            color: var(--brand-dark);
+            font-weight: 700;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .btn-view:hover {
+            background-color: var(--brand-dark);
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -81,6 +94,7 @@
                     <th>Date</th>
                     <th>Amount</th>
                     <th>Status</th>
+                    <th class="text-end">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -99,12 +113,17 @@
                     </td>
                     <td>
                             <span th:classappend="${
-                                txn.status == 'PAID' or txn.status == 'COMPLETED' ? 'status-paid' :
+                                txn.status == 'PAID' or txn.status == 'SUCCESS' or txn.status == 'COMPLETED' ? 'status-paid' :
                                 (txn.status == 'PENDING' ? 'status-pending' :
                                 (txn.status == 'FAILED' ? 'status-failed' : 'status-default'))
                             }" class="status-badge" th:text="${txn.status != null ? txn.status : 'UNKNOWN'}">
                                 STATUS
                             </span>
+                    </td>
+                    <td class="text-end">
+                        <a th:href="@{'/dashboard/orders/details/' + ${txn.transactionId}}" class="btn btn-sm btn-view px-3 text-uppercase">
+                            Details
+                        </a>
                     </td>
                 </tr>
                 </tbody>
