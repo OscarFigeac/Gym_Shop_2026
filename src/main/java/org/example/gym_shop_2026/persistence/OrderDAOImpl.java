@@ -37,4 +37,29 @@ public class OrderDAOImpl implements OrderDAO {
         }
         return -1;
     }
+
+    /**
+     * @author Oscar
+     * Retrieves all the active orders for a current user.
+     * @param userId The identifier of the user whose orders we want to find
+     * @return returns the count; 0 otherwise
+     * @throws SQLException if the connection to the database fails at any point
+     */
+    @Override
+    public int getActiveOrderCount(int userId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM orders WHERE user_id = ? AND status = 'ACTIVE'";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
 }

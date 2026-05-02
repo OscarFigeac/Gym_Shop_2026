@@ -6,5 +6,6 @@ import java.sql.SQLException;
 
 public interface OrderDAO {
 
-    public int createOrder(Order order) throws SQLException;
+    int createOrder(Order order) throws SQLException;
+    int getActiveOrderCount(int userId) throws SQLException;
 }
