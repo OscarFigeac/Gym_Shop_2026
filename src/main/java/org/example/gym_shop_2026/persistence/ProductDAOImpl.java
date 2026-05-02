@@ -2,6 +2,7 @@ package org.example.gym_shop_2026.persistence;
 
 import lombok.extern.slf4j.Slf4j;
 //import org.example.gym_shop_2026.connector.Connector;
+import org.example.gym_shop_2026.entities.User;
 import org.springframework.stereotype.Repository;
 import org.example.gym_shop_2026.entities.Product;
 
@@ -150,4 +151,32 @@ public class ProductDAOImpl implements ProductDAO{
         }
         return categorised;
     }
+
+    @Override
+    public boolean deleteProduct(Product product) throws SQLException {
+        String sql = "DELETE FROM products WHERE product_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, product.getProductId());
+            return ps.executeUpdate() == 1;
+        }
+    }
+
+    @Override
+    public boolean updateProduct(Product product) throws SQLException {
+        String sql = "UPDATE products SET product_category = ?, name = ?, price = ?, quantity = ?, description = ?, image_url = ? WHERE product_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, product.getProductCategory());
+            ps.setString(2, product.getName());
+            ps.setDouble(3, product.getPrice());
+            ps.setInt(4, product.getQuantity());
+            ps.setString(5, product.getDescription());
+            ps.setString(6, product.getImageUrl());
+            ps.setInt(7, product.getProductId());
+
+            return ps.executeUpdate() == 1;
+        }
+    }
+
 }
