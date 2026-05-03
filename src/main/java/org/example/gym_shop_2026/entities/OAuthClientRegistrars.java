@@ -33,7 +33,7 @@ public abstract class OAuthClientRegistrars {
      * @param scopes Permission scopes
      * @param grantTypes Types of granted privileges issued
      */
-    protected OAuthClientRegistrars(String registrationId, String clientId, String clientSecret, String oAuthMethod, String redirectUri, String scopes, String grantTypes) {
+    protected OAuthClientRegistrars(String registrationId, String clientId, String clientSecret, String oAuthMethod, String redirectUri, String scopes, String grantTypes) throws IllegalArgumentException {
         this.registrationId = registrationId;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
