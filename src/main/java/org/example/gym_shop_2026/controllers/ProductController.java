@@ -1,6 +1,7 @@
 package org.example.gym_shop_2026.controllers;
 
 import org.example.gym_shop_2026.entities.Product;
+import org.example.gym_shop_2026.services.AdminService;
 import org.example.gym_shop_2026.services.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,5 +55,35 @@ public class ProductController {
             model.addAttribute("error", "Sorry, we're out of stock or there was an issue.");
         }
         return "purchase-status";
+    }
+
+    @GetMapping("/bestsellers")
+    public String getBestsellers(Model model){
+        List<Product> bestSellers = productService.getBestSellers(10);
+
+        model.addAttribute("products", bestSellers);
+        model.addAttribute("pageTitle", "Best Sellers");
+
+        return "product-list";
+    }
+
+    @GetMapping("/equipment")
+    public String getEquipment(Model model){
+        List<Product> equipment = productService.getByCategory("EQUIPMENT");
+
+        model.addAttribute("products", equipment);
+        model.addAttribute("pageTitle", "Equipment");
+
+        return "product-list";
+    }
+
+    @GetMapping("/supplements")
+    public String getSupplements(Model model){
+        List<Product> supplements = productService.getByCategory("SUPPLEMENTS");
+
+        model.addAttribute("products", supplements);
+        model.addAttribute("pageTitle", "Supplements");
+
+        return "product-list";
     }
 }

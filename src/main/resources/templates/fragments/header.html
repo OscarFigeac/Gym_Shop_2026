@@ -92,8 +92,18 @@
 
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/products}">Products</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Products
+                        </a>
+                        <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="productsDropdown">
+                            <li><a class="dropdown-item fw-bold" th:href="@{/products}">All Products</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/products/supplements}">Supplements</a></li>
+                            <li><a class="dropdown-item" th:href="@{/products/equipment}">Equipment</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-orange fw-bold" th:href="@{/products/bestsellers}" style="color: var(--brand-orange);">Bestsellers</a></li>
+                        </ul>
                     </li>
                 </ul>
 
@@ -110,10 +120,27 @@
                         <a th:href="@{/register}" class="auth-link" style="color: var(--brand-orange);">Sign Up</a>
                     </div>
 
-                    <div th:if="${#authorization.expression('isAuthenticated()')}">
-                        <a th:href="@{/dashboard}" class="auth-link">
+                    <div th:if="${#authorization.expression('isAuthenticated()')}" class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle auth-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Welcome, <span th:text="${#authentication.name}">User</span>
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" th:href="@{/dashboard}">Dashboard</a></li>
+                            <li><a class="dropdown-item" th:href="@{/dashboard/orders}">My Orders</a></li>
+                            <li><a class="dropdown-item" th:href="@{/dashboard/settings}">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                                <hr class="dropdown-divider">
+                                <a class="dropdown-item fw-bold" th:href="@{/admin/dashboard}" style="color: var(--brand-orange);">
+                                    <i class="bi bi-shield-lock-fill me-1"></i> Admin Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <form th:action="@{/logout}" method="post">
+                                    <button type="submit" class="dropdown-item text-danger fw-bold">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
 
                     <a th:href="@{/basket}" class="cart-wrapper">

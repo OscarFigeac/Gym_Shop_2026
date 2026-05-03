@@ -35,14 +35,27 @@ public class PaymentService {
         Basket basket = basketService.getBasketForUser(userId);
         double totalAmount = calculateTotal(basket);
 
+        java.util.List<String> allowedMethods = java.util.Arrays.asList(
+                "card",
+                "klarna",
+                "revolut_pay",
+                "amazon_pay",
+                "paypal"
+        );
+
         PaymentIntentCreateParams.Builder paramsBuilder = PaymentIntentCreateParams.builder()
                 .setAmount((long) (totalAmount * 100))
                 .setCurrency("eur")
+                .setAutomaticPaymentMethods(
+                        PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
+                                .setEnabled(false)
+                                .build()
+                )
+                .addAllPaymentMethodType(allowedMethods)
                 .putMetadata("userId", String.valueOf(userId));
 
         if (user.getStripeCustomerId() != null) {
             paramsBuilder.setCustomer(user.getStripeCustomerId());
-            // save my card functionality
             paramsBuilder.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
         }
 
@@ -71,7 +84,7 @@ public class PaymentService {
         Basket basket = basketService.getBasketForUser(userId);
 
         for (BasketItem item : basket.getItems()) {
-            productService.purchaseProduct(item.getProductId(), item.getItemQuantity());
+            productService.purchaseProduct(item.getProductId(), item.getItem_quantity());
             log.info("Stock reduced for Product ID: {}", item.getProductId());
         }
 
@@ -84,7 +97,7 @@ public class PaymentService {
 
     private double calculateTotal(Basket basket) {
         return basket.getItems().stream()
-                .mapToDouble(item -> productService.getDetails(item.getProductId()).getPrice() * item.getItemQuantity())
+                .mapToDouble(item -> productService.getDetails(item.getProductId()).getPrice() * item.getItem_quantity())
                 .sum();
     }
 }

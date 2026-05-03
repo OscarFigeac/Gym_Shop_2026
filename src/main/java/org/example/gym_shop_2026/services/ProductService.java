@@ -82,4 +82,53 @@ public class ProductService {
             return null;
         }
     }
+
+    public List<Product> getBestSellers(int sellLimit){
+        try{
+            return productDAO.getBestSellers(sellLimit);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+    public List<Product> getByCategory(String category){
+        try{
+            return productDAO.getByCategory(category);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
+    public boolean addProduct(Product product){
+        try{
+            return productDAO.addProduct(product);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+    public boolean deleteProduct(Product product){
+        try{
+            return productDAO.deleteProduct(product);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+    public boolean updateProduct(Product product){
+        try{
+            return productDAO.updateProduct(product);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+    public Product findProduct(int id){
+        try{
+            return productDAO.getProductById(id);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+    }
 }

@@ -17,4 +17,5 @@ public interface paymentMethodDAO {
     boolean updateMethodValidity(int methodId, boolean isValid) throws SQLException;
     paymentMethod deleteMethodById(int id) throws SQLException;
     paymentMethod deleteMethodByIdTesting(int id) throws SQLException;
+    List<paymentMethod> getMethodsForUser(int userId);
 }

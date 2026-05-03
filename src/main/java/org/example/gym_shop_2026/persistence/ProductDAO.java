@@ -13,4 +13,7 @@ public interface ProductDAO {
     List<Product> searchProductsByName(String keyword) throws SQLException;
     List<Product> getProductsLowStock(int reOrder) throws SQLException;
     List<Product> getBestSellers(int sellCatch) throws SQLException;
+    List<Product> getByCategory(String category) throws SQLException;
+    boolean deleteProduct(Product product) throws SQLException;
+    boolean updateProduct(Product product) throws SQLException;
 }

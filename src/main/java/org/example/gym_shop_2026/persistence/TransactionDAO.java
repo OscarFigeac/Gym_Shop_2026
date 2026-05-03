@@ -71,4 +71,6 @@ public interface TransactionDAO {
      * @throws SQLException if the connection to the database fails at any point.
      */
     boolean updateTransaction(Transaction txn) throws SQLException;
+
+    public List<Transaction> getAllTransactions() throws SQLException;
 }

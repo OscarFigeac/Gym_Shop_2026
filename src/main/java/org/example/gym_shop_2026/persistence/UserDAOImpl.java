@@ -7,10 +7,13 @@ import org.example.gym_shop_2026.entities.UserType;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 @Slf4j
@@ -71,6 +74,18 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public void updatePassword(int userId, String newPassword) throws SQLException {
+        String sql = "UPDATE users SET password = ? WHERE user_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, passwordEncoder.encode(newPassword));
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
     public User findByUsername(String username) throws SQLException {
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Username cannot be empty");
@@ -88,16 +103,19 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public boolean createUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO users (username, full_name, user_type, email, password, dob, secret_key, is_2fa_enabled) VALUES (?,?,?,?,?,?,?,?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getUserType().name());
             ps.setString(4, user.getEmail());
             ps.setString(5, passwordEncoder.encode(user.getPassword()));
             ps.setDate(6, new java.sql.Date(user.getDob().getTime()));
+            ps.setString(7, "NOT SET");
+            ps.setBoolean(8, false);
 
             return ps.executeUpdate() == 1;
         }
@@ -153,6 +171,25 @@ public class UserDAOImpl implements UserDAO {
             ps.setInt(2, userId);
             return ps.executeUpdate() == 1;
         }
+    }
+
+    @Override
+    public List<User> getAllUsers(){
+        String sql = "SELECT * FROM users";
+        ArrayList<User> allUsers = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                allUsers.add(mapUserRow(rs));
+            }
+        } catch (SQLException e) {
+            log.error("Error retrieving all users: {}", e.getMessage());
+        }
+
+        return allUsers;
     }
 
     private User mapUserRow(ResultSet rs) throws SQLException {

@@ -4,33 +4,38 @@ import lombok.*;
 import jakarta.validation.constraints.*;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Product {
 
     @EqualsAndHashCode.Include
-    private final int productId;
+    private Integer productId;
 
     @NotBlank(message = "Category is required")
     @NonNull
-    private final String productCategory;
+    private String productCategory;
 
     @NotBlank(message = "Product name is required")
     @NonNull
-    private final String name;
+    private String name;
 
-//    @NotBlank(message = "Description is required")
-//    @NonNull
-//    private final String description;
+    @NotBlank(message = "Description is required")
+    @NonNull
+    private String description;
 
     @Min(value = 0, message = "In stock quantity cannot be negative")
     @NonNull
-    private final int quantity;
+    private int quantity;
 
     @Min(value = 0, message = "Price cannot be negative")
     @NonNull
-    private final double price;
+    private double price;
 
+    private String imageUrl;
+
+    private int total_sold;
 }

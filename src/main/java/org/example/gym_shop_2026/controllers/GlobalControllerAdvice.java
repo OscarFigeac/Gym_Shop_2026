@@ -36,7 +36,7 @@ public class GlobalControllerAdvice {
 
             if (basket != null && basket.getItems() != null) {
                 return basket.getItems().stream()
-                        .mapToInt(BasketItem::getItemQuantity)
+                        .mapToInt(BasketItem::getItem_quantity)
                         .sum();
             }
         } catch (Exception e) {

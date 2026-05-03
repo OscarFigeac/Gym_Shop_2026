@@ -58,35 +58,13 @@ public class SecurityConfig {
 
         return passwordEncoder;
     }
-//    public UserDetailsService userDetailsService() {
-//        return username -> {
-//            try{
-//                org.example.gym_shop_2026.entities.User user = userDAO.findByUsername(username);
-//                if (user == null){
-//                    throw new UsernameNotFoundException("User not found: " + username);
-//                }
-//
-//                // returns the spring security user object mapped from our database user
-//                return org.springframework.security.core.userdetails.User.builder()
-//                        .username(user.getUsername())
-//                        .password(user.getPassword())
-//                        .disabled(false)
-//                        .accountExpired(false)
-//                        .credentialsExpired(false)
-//                        .accountLocked(false)
-//                        .authorities("USER")
-//                        .build();
-//            } catch (SQLException e){
-//                throw new UsernameNotFoundException("Database error during authentication", e);
-//            }
-//        };
-//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Disable for local dev; enable & config for production
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/", "/products/**", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
 
                         .requestMatchers("/basket/**").authenticated()

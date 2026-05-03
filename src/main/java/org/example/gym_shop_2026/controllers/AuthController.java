@@ -72,7 +72,7 @@ public class AuthController {
 
             Date sqlDate = Date.valueOf(dob);
 
-            UserType typeEnum = UserType.valueOf(userType);
+            UserType typeEnum = UserType.valueOf(String.valueOf(userType));
 
             boolean success = userService.registerUser(
                     username,

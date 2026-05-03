@@ -2,11 +2,19 @@ CREATE DATABASE IF NOT EXISTS `gymshopdb`;
 CREATE DATABASE IF NOT EXISTS gymshopdbtest;
 
 -- Run in each database
+# CREATE TABLE IF NOT EXISTS addresses (
+#     address_id INT AUTO_INCREMENT PRIMARY KEY,
+#     user_id INT NOT NULL,
+#     address VARCHAR(255),
+#     eircode CHAR(8) NOT NULL,
+#     CONSTRAINT fk_addresses_users FOREIGN KEY(user_id) REFERENCES users(user_id)
+# );
+
 CREATE TABLE IF NOT EXISTS users(
 	user_id INT AUTO_INCREMENT PRIMARY KEY,
 	username VARCHAR(255) NOT NULL,
 	full_name VARCHAR(255) NOT NULL,
-	user_type ENUM('ROLE_ADMIN', 'ROLE_MEMBER') NOT NULL,
+	user_type VARCHAR(255) NOT NULL,
 	email VARCHAR(255) NOT NULL UNIQUE,
 	password VARCHAR(72) NOT NULL,
 	dob DATE NOT NULL,
@@ -28,8 +36,24 @@ CREATE TABLE IF NOT EXISTS products(
     product_category VARCHAR(255),
     name VARCHAR(255) NOT NULL,
     price DECIMAL(8, 2) NOT NULL,
-    quantity INT NOT NULL
+    quantity INT NOT NULL,
+    description TEXT,
+    image_url VARCHAR(255)
 );
+
+# CREATE TABLE IF NOT EXISTS locations(
+# 	location_id INT AUTO_INCREMENT PRIMARY KEY,
+# 	location_address_code VARCHAR(255) NOT NULL
+# );
+
+
+# CREATE TABLE IF NOT EXISTS subscriptions_users(
+#     plan_id INT NOT NULL,
+#     user_id INT NOT NULL,
+#     expiry_date DATE NOT NULL,
+#     CONSTRAINT fk_subscriptionsusers_subscriptions FOREIGN KEY(plan_id) REFERENCES subscriptions(plan_id),
+#     CONSTRAINT fk_subscriptionsusers_users FOREIGN KEY(user_id) REFERENCES users(user_id)
+# );
 
 CREATE TABLE IF NOT EXISTS payment_methods(
     method_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -46,8 +70,8 @@ CREATE TABLE IF NOT EXISTS payment_methods(
 CREATE TABLE IF NOT EXISTS transactions(
     transaction_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    plan_id INT NOT NULL,
-    method_id INT NOT NULL,
+    plan_id INT NULL,
+    method_id INT NULL,
     amount_paid DECIMAL(8, 2) NOT NULL,
     transaction_date TIMESTAMP NOT NULL,
     status VARCHAR(255),
@@ -71,4 +95,25 @@ CREATE TABLE IF NOT EXISTS basket_item(
     CONSTRAINT fk_basketItem_products FOREIGN KEY(product_id) REFERENCES products(product_id),
     CONSTRAINT fk_basketItem_basket FOREIGN KEY(basket_id) REFERENCES basket(basket_id),
     CONSTRAINT ck_basketItem_itemQuantity CHECK(item_quantity >= 0)
+);
+
+CREATE TABLE orders(
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    total_amount decimal(8,2) NOT NULL,
+    order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    status VARCHAR(50),
+    stripe_payment_intent_id VARCHAR(255),
+    CONSTRAINT fk_orders_users FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+CREATE TABLE order_items(
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    price_at_purchase DECIMAL(8,2),
+    product_name VARCHAR(255),
+    CONSTRAINT fk_orderitems_orders FOREIGN KEY(order_id) REFERENCES orders(order_id),
+    CONSTRAINT fk_orderitems_products FOREIGN KEY(product_id) REFERENCES products(product_id),
+    CONSTRAINT ck_orderitems_quantity CHECK(quantity >= 0)
 );
