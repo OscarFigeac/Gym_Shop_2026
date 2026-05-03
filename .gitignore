@@ -11,3 +11,4 @@
 /.idea/**
 # don't need target directories
 /target/**
+/src/main/resources/*-secrets.properties
