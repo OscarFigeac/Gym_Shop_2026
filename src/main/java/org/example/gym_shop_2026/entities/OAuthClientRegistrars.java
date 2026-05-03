@@ -14,6 +14,7 @@ import org.example.gym_shop_2026.enums.OAuthMethod;
 @Getter
 @Setter(AccessLevel.PROTECTED)
 public abstract class OAuthClientRegistrars {
+    protected String url;
     protected String registrationId;
     protected String clientId;
     protected String clientSecret;
@@ -25,6 +26,7 @@ public abstract class OAuthClientRegistrars {
     /**
      * An all-arguments constructor that sets field attributes to parameterised
      * values.
+     * @param url Authorisation server url
      * @param registrationId Url of authorisation server
      * @param clientId Client id for authorisation server
      * @param clientSecret Client secret from provider client setup
@@ -33,7 +35,7 @@ public abstract class OAuthClientRegistrars {
      * @param scopes Permission scopes
      * @param grantTypes Types of granted privileges issued
      */
-    protected OAuthClientRegistrars(String registrationId, String clientId, String clientSecret, String oAuthMethod, String redirectUri, String scopes, String grantTypes) throws IllegalArgumentException {
+    protected OAuthClientRegistrars(String url ,String registrationId, String clientId, String clientSecret, String oAuthMethod, String redirectUri, String scopes, String grantTypes) throws IllegalArgumentException {
         this.registrationId = registrationId;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
