@@ -1,6 +1,7 @@
 package org.example.gym_shop_2026.entities;
 
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.gym_shop_2026.enums.OAuthMethod;
@@ -11,7 +12,7 @@ import org.example.gym_shop_2026.enums.OAuthMethod;
  * @author Cal Woods
  */
 @Getter
-@Setter
+@Setter(AccessLevel.PROTECTED)
 public abstract class OAuthClientRegistrars {
     protected String registrationId;
     protected String clientId;
