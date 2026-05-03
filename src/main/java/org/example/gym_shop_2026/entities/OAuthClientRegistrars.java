@@ -33,11 +33,11 @@ public abstract class OAuthClientRegistrars {
      * @param scopes Permission scopes
      * @param grantTypes Types of granted privileges issued
      */
-    protected OAuthClientRegistrars(String registrationId, String clientId, String clientSecret, OAuthMethod oAuthMethod, String redirectUri, String scopes, String grantTypes) {
+    protected OAuthClientRegistrars(String registrationId, String clientId, String clientSecret, String oAuthMethod, String redirectUri, String scopes, String grantTypes) {
         this.registrationId = registrationId;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.oAuthMethod = oAuthMethod;
+        this.oAuthMethod = OAuthMethod.valueOf(oAuthMethod);
         this.redirectUri = redirectUri;
         this.scopes = scopes;
         this.grantTypes = grantTypes;
