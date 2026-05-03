@@ -22,8 +22,8 @@ public abstract class OAuthClientRegistrars {
     protected String grantTypes;
 
     /**
-     * A no arguments constructor that reads
-     * details from a file.
+     * An all-arguments constructor that sets field attributes to parameterised
+     * values.
      */
     protected OAuthClientRegistrars(String registrationId, String clientId, String clientSecret, OAuthMethod oAuthMethod, String redirectUri, String scopes, String grantTypes) {
         this.registrationId = registrationId;
