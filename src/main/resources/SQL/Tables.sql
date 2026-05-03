@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS users(
     address VARCHAR(255),
     eircode CHAR(8),
     secret_key VARCHAR(255) NOT NULL,
-    is_2fa_enabled BOOLEAN NOT NULL
+    is_2fa_enabled BOOLEAN NOT NULL,
+    stripe_customer_id VARCHAR(255)
 );
 CREATE TABLE IF NOT EXISTS subscriptions(
     plan_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -35,7 +36,9 @@ CREATE TABLE IF NOT EXISTS products(
     product_category VARCHAR(255),
     name VARCHAR(255) NOT NULL,
     price DECIMAL(8, 2) NOT NULL,
-    quantity INT NOT NULL
+    quantity INT NOT NULL,
+    description TEXT,
+    image_url VARCHAR(255)
 );
 
 # CREATE TABLE IF NOT EXISTS locations(
@@ -55,8 +58,8 @@ CREATE TABLE IF NOT EXISTS products(
 CREATE TABLE IF NOT EXISTS payment_methods(
     method_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    processor_token VARCHAR(255) NOT NULL,
-    last_four_digits INT NOT NULL,
+    stripe_payment_method_id VARCHAR(255) NOT NULL,
+    last_four_digits VARCHAR(4) NOT NULL,
     expiry_date VARCHAR(255) NOT NULL,
     card_type VARCHAR(12) NOT NULL,
     is_valid TINYINT NOT NULL,
@@ -67,8 +70,8 @@ CREATE TABLE IF NOT EXISTS payment_methods(
 CREATE TABLE IF NOT EXISTS transactions(
     transaction_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    plan_id INT NOT NULL,
-    method_id INT NOT NULL,
+    plan_id INT NULL,
+    method_id INT NULL,
     amount_paid DECIMAL(8, 2) NOT NULL,
     transaction_date TIMESTAMP NOT NULL,
     status VARCHAR(255),
@@ -93,22 +96,24 @@ CREATE TABLE IF NOT EXISTS basket_item(
     CONSTRAINT fk_basketItem_basket FOREIGN KEY(basket_id) REFERENCES basket(basket_id),
     CONSTRAINT ck_basketItem_itemQuantity CHECK(item_quantity >= 0)
 );
-# CREATE TABLE IF NOT EXISTS productslocations(
-#     product_id INT NOT NULL,
-#     location_id INT NOT NULL,
-#     CONSTRAINT fk_productslocationsproducts FOREIGN KEY(product_id) REFERENCES products(product_id),
-#     CONSTRAINT fk_productslocationslocations FOREIGN KEY(location_id) REFERENCES locations(location_id)
-# );
 
-ALTER TABLE users ADD COLUMN stripe_customer_id VARCHAR(255);
-
-ALTER TABLE payment_methods RENAME COLUMN processor_token TO stripe_payment_method_id;
-ALTER TABLE payment_methods MODIFY COLUMN last_four_digits VARCHAR(4);
-
-ALTER TABLE transactions MODIFY plan_id INT NULL;
-
-ALTER TABLE transactions MODIFY method_id INT NULL;
-
-ALTER TABLE products ADD COLUMN description TEXT;
-ALTER TABLE products ADD COLUMN image_url VARCHAR(255);
-ALTER TABLE order_items ADD COLUMN product_name VARCHAR(255);
+CREATE TABLE orders(
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    total_amount decimal(8,2) NOT NULL,
+    order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    status VARCHAR(50),
+    stripe_payment_intent_id VARCHAR(255),
+    CONSTRAINT fk_orders_users FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+CREATE TABLE order_items(
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    price_at_purchase DECIMAL(8,2),
+    product_name VARCHAR(255),
+    CONSTRAINT fk_orderitems_orders FOREIGN KEY(order_id) REFERENCES orders(order_id),
+    CONSTRAINT fk_orderitems_products FOREIGN KEY(product_id) REFERENCES products(product_id),
+    CONSTRAINT ck_orderitems_quantity CHECK(quantity >= 0)
+);
