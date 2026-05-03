@@ -25,7 +25,13 @@ public abstract class OAuthClientRegistrars {
      * A no arguments constructor that reads
      * details from a file.
      */
-    protected OAuthClientRegistrars() {
-
+    protected OAuthClientRegistrars(String registrationId, String clientId, String clientSecret, OAuthMethod oAuthMethod, String redirectUri, String scopes, String grantTypes) {
+        this.registrationId = registrationId;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.oAuthMethod = oAuthMethod;
+        this.redirectUri = redirectUri;
+        this.scopes = scopes;
+        this.grantTypes = grantTypes;
     }
 }
